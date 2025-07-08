@@ -1,7 +1,11 @@
 #include <SFML/Graphics.hpp>
+#include "Core/Program.h"
 
 int main()
 {
+    Program p;
+    p.Run();
+
     auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
     window.setFramerateLimit(144);
 
