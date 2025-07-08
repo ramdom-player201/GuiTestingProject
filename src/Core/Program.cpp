@@ -27,6 +27,7 @@ void Program::Run()
 
 	while (true){
 	// program should get call console to get commands
+		bool commandLinePause = windowManager->updateWindows();
 	}
 }
 
