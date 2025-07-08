@@ -1,7 +1,8 @@
 #include "Program.h"
 #include <iostream>
 
-#include "ColouredConsole.h"
+#include "ConsoleColours.h"
+#include "Services.h"
 
 void Program::Run()
 {
@@ -12,6 +13,17 @@ void Program::Run()
 
 	std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN) << "Starting "
 		<< ConsoleColours::getColourCode(AnsiColours::CYAN)<< "program\n";
+
+	Services::initialise();
+	auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
+	auto commandConsole = dynamic_cast<CommandConsole*>(Services::getService(ServiceType::CommandConsole));
+
+	windowManager->debugMode = true;
+
+	windowManager->countWindows();
+	windowManager->createWindow("Window 1");
+	windowManager->createWindow("Window 2");
+	windowManager->countWindows();
 
 	while (true){
 	// program should get call console to get commands

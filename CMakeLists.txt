@@ -12,6 +12,6 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp "src/Core/Program.cpp" "src/Core/Program.h" "src/Core/ColouredConsole.h" )
+add_executable(main src/main.cpp "src/Core/Program.cpp" "src/Core/Program.h" "src/Core/ConsoleColours.h"  "src/Core/Services/WindowManager.h" "src/Core/Services/WindowManager.cpp" "src/Core/Services.h" "src/Core/Services/CommandConsole.cpp" "src/Core/Services/CommandConsole.h" "src/Core/Services/IService.h" "src/Core/Window.h" "src/Core/Window.cpp")
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)

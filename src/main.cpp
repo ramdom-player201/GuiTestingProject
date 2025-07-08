@@ -6,7 +6,7 @@ int main()
     Program p;
     p.Run();
 
-    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
+    /*auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
     window.setFramerateLimit(144);
 
     while (window.isOpen())
@@ -21,5 +21,5 @@ int main()
 
         window.clear();
         window.display();
-    }
+    }*/
 }
