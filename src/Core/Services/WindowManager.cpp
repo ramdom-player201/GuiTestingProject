@@ -1,13 +1,13 @@
 #include "WindowManager.h"
 #include "../ConsoleColours.h"
 
-void WindowManager::initialise() {
-	// may be removed, not currently used
-}
-
-void WindowManager::shutdown() {
-	// may be removed, may be replaced with destructor or something? depends on whether IService can support that.
-}
+//void WindowManager::initialise() {
+//	// may be removed, not currently used
+//}
+//
+//void WindowManager::shutdown() {
+//	// may be removed, may be replaced with destructor or something? depends on whether IService can support that.
+//}
 
 bool WindowManager::createWindow(const std::string& title) {
 	// creates a new Window and adds it to vector
@@ -73,20 +73,33 @@ std::unique_ptr<Window> WindowManager::getWindowById(int id)
 	return std::unique_ptr<Window>();
 }
 
+void WindowManager::closeWindow(Window* win)
+{
+}
+
 bool WindowManager::updateWindows()
 {
 	bool debugPause = false;
 	// update all windows
 	for (auto& window : windows) {
-		bool winPause = window->Update();
-		if (winPause) {
+		WindowReturnData winData = window->Update();
+		if (winData.UserCommandBreak) {
 			debugPause = true;
+		}
+		if (winData.WindowClosed) {
+			// delete window from vector and update id
+			std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
+				ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "updateWindows() :: " <<
+				ConsoleColours::getColourCode(AnsiColours::RED) << "WINDOW CLOSE DETECTED: ERROR WIP" <<
+				ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
+
 		}
 	}
 	if (debugPause) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
 			ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "updateWindows() :: " <<
-			ConsoleColours::getColourCode(AnsiColours::GREEN) << "USER CMD INTERUPT\n";
+			ConsoleColours::getColourCode(AnsiColours::GREEN) << "USER CMD INTERUPT" <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
 	}
 	return debugPause;
 }

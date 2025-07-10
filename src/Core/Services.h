@@ -1,4 +1,5 @@
 #pragma once
+
 #include <map>
 #include <mutex>
 #include "Services/IService.h"
@@ -6,10 +7,12 @@
 //services
 #include "Services/CommandConsole.h"
 #include "Services/WindowManager.h"
+#include "Services/ObjectManager.h"
 
 enum class ServiceType {
 	CommandConsole,
-	WindowManager
+	WindowManager,
+	ObjectManager
 };
 
 class Services {
@@ -23,10 +26,13 @@ private:
 	static IService* createService(ServiceType service) {
 		switch (service) {
 		case ServiceType::CommandConsole: {
-			//return CommandConsole();
+			return new CommandConsole();
 		}
 		case ServiceType::WindowManager: {
 			return new WindowManager();
+		}
+		case ServiceType::ObjectManager: {
+			return new ObjectManager();
 		}
 		default:
 			throw std::invalid_argument("Unknown service type");

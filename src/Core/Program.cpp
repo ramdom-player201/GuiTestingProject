@@ -16,7 +16,9 @@ void Program::Run()
 
 	Services::initialise();
 	auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
+	//auto windowManager2 = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
 	auto commandConsole = dynamic_cast<CommandConsole*>(Services::getService(ServiceType::CommandConsole));
+	auto objectManager = dynamic_cast<ObjectManager*>(Services::getService(ServiceType::ObjectManager));
 
 	windowManager->debugMode = true;
 
@@ -25,9 +27,13 @@ void Program::Run()
 	windowManager->createWindow("Window 2");
 	windowManager->countWindows();
 
-	while (true){
+	windowManager->debugMode = false;
+	while (windowManager->countWindows() > 0){
 	// program should get call console to get commands
 		bool commandLinePause = windowManager->updateWindows();
+		if (commandLinePause) {
+			commandConsole->parseCommand();
+		}
 	}
 }
 

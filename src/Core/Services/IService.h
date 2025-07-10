@@ -11,6 +11,6 @@ public:
 	virtual ~IService() = default; // virtual destructor
 
 	// common service methods
-	virtual void initialise() = 0;
-	virtual void shutdown() = 0;
+	// // virtual void initialise() = 0;
+	// // virtual void shutdown() = 0;
 };
