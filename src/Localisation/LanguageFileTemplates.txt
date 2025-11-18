@@ -1,0 +1,19 @@
+Description of file format used by custom .lang files.
+
+< comment > < ending bracket is not required, since comments are not multi-line
+
+debug = "TRUE"
+langDisplayName = "English (UK)"
+
+< Data >
+
+@ "Key" | "Text"      | < further localisation parameters can be added as third parameter >
+@ "Key2" | "Text Two" |
+
+< metadata is always read in specific order
+< @ -- marks start of data entry
+< " -- marks start or end of text (comments cannot be inside text)
+< | -- optional separator
+
+< Syntax errors are reported to debug, but do not actually halt execution, the program will simply handle errors and move to next entry
+< If Key is intact but text is not, error will be written into text

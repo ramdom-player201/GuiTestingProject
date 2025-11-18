@@ -16,8 +16,16 @@ WindowReturnData Window::Update()
 				
 			}
 			else if (event->is<sf::Event::Resized>()) { // window resized, force redraw
-
 			}
+			else if (event->is<sf::Event::FocusGained>()) {
+				windowInFocus = true;
+				returnData.FocusChanged = true;
+			}
+			else if (event->is<sf::Event::FocusLost>()) {
+				windowInFocus = false;
+				returnData.FocusChanged = true;
+			}
+			
 		}
 		// request inputs if primary
 		//<>
@@ -31,4 +39,6 @@ Window::Window(size_t id, std::string const& title)
 {
 	windowId = id;
 	windowTitle = title;
+
+	window.setTitle(windowTitle);
 }

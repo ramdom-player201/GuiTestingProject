@@ -9,8 +9,9 @@
 
 class WindowManager {
 private:
-	static inline std::vector<std::unique_ptr<Window>> windows;
-	static inline size_t currentId{ 1 };
+	//static inline std::vector<std::unique_ptr<Window>> windows;
+	static inline std::unordered_map<size_t, std::shared_ptr<Window>> windows;	// list of windows with unique numeric id that does not shift
+	static inline size_t currentId{ 0 };										// initial id
 public:
 	//void initialise() override;
 	//void shutdown() override;
@@ -19,11 +20,11 @@ public:
 	static inline bool debugMode{ false };
 
 	// service-specific functionality
-	static bool createWindow(const std::string& title);		// creates a new window and adds it to list
+	static size_t createWindow(const std::string& title);		// creates a new window and adds it to list
 	static size_t countWindows();							// returns number of windows in list
-	static std::vector<Window*> getWindows();				// returns a copy of the window list
-	static std::unique_ptr<Window> getWindowById(int id);	// returns a copy of a pointer to the window, based on its position in the vector
-	static void closeWindow(Window* win);					// closes the referenced window
+	//static std::vector<Window*> getWindows();				// returns a copy of the window list
+	static std::shared_ptr<Window> getWindowById(size_t id);	// returns a copy of a pointer to the window, based on its position in the vector
+	static void closeWindow(size_t id);						// closes the referenced window
 
 	static bool updateWindows();							// loop through windows, calling update on each one. Return true if command line break;
 };
