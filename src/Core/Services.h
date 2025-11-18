@@ -11,7 +11,7 @@
 
 enum class ServiceType {
 	CommandConsole,
-	WindowManager,
+	//WindowManager,
 	ObjectManager
 };
 
@@ -28,9 +28,9 @@ private:
 		case ServiceType::CommandConsole: {
 			return new CommandConsole();
 		}
-		case ServiceType::WindowManager: {
-			return new WindowManager();
-		}
+		//case ServiceType::WindowManager: {
+		//	return new WindowManager();
+		//}
 		case ServiceType::ObjectManager: {
 			return new ObjectManager();
 		}
@@ -56,6 +56,6 @@ public:
 	static void initialise() {
 		// register services with their implementations
 		instances[ServiceType::CommandConsole] = nullptr;
-		instances[ServiceType::WindowManager] = nullptr;
+		//instances[ServiceType::WindowManager] = nullptr;
 	}
 };

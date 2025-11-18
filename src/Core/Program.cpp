@@ -15,22 +15,24 @@ void Program::Run()
 		<< ConsoleColours::getColourCode(AnsiColours::CYAN)<< "program\n";
 
 	Services::initialise();
-	auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
+	//auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
 	//auto windowManager2 = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
 	auto commandConsole = dynamic_cast<CommandConsole*>(Services::getService(ServiceType::CommandConsole));
 	auto objectManager = dynamic_cast<ObjectManager*>(Services::getService(ServiceType::ObjectManager));
 
-	windowManager->debugMode = true;
+	WindowManager::debugMode = true;
 
-	windowManager->countWindows();
-	windowManager->createWindow("Window 1");
-	windowManager->createWindow("Window 2");
-	windowManager->countWindows();
+	WindowManager::countWindows();
+	WindowManager::createWindow("Window 1");
+	WindowManager::createWindow("Window 2");
+	WindowManager::countWindows();
 
-	windowManager->debugMode = false;
-	while (windowManager->countWindows() > 0){
+	WindowManager::createWindow("Window 33");
+
+	WindowManager::debugMode = false;
+	while (WindowManager::countWindows() > 0){
 	// program should get call console to get commands
-		bool commandLinePause = windowManager->updateWindows();
+		bool commandLinePause = WindowManager::updateWindows();
 		if (commandLinePause) {
 			commandConsole->parseCommand();
 		}
