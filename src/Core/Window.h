@@ -22,7 +22,7 @@ class Window {
 private:
 	size_t windowId = 0;
 	std::string windowTitle = "Untitled Window";
-	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode({ 200u, 200u }), "Untitled Window");;
+	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode({ 400u, 200u }), "Untitled Window");;
 	//const IService* windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
 
 	Tiles windowTiles;	// see WindowTilesLayout.png and Pages.txt

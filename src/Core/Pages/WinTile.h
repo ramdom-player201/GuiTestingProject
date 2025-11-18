@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UiPanel.h"
+#include <memory>
 
 enum class TileType {
 	side,				// left|right -> upper,lower,corner

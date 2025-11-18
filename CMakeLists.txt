@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(CMakeSFMLProject LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(FetchContent)
@@ -32,6 +34,8 @@ add_executable(
     "src/Core/Objects/IBaseObject.h"
     "src/Core/Pages/WinTile.cpp"
     "src/Core/Pages/WinTile.h"
- "src/Core/Pages/UiPanel.h" "src/Core/Pages/UiPanel.cpp")
+    "src/Core/Pages/UiPanel.h"
+    "src/Core/Pages/UiPanel.cpp"
+ )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
