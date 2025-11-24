@@ -20,24 +20,25 @@ Can remove custom singleton logic and just use static
 
 # Implement InputManager and input abstraction layer.																					[ ]
 
+# Implement pages																														[ ]
 
-# Implement pages
+# Modify CommandConsole to bring console to foreground																					[ ]
 
-
-
-# Implement debug logging
+# Implement debug logging																												[ ]
 Write debug logs to file, print number of debugs at program termination
 Come up with a structure to define how and when debug logs are cleaned, and ensure memory limits
 Mark logs with categories for sorting: by class, by function, etc
 Mark logs with types, eg: CRITICAL, HIGH, MED, TRACE, SPAM
 
-CRITICAL	<- immediate fault that may lead to crash
-[Untitled]	<- like assertion, should never be encountered, indicative of a problem in program that may have have undefined results
+CRITICAL	<- immediate fault that may lead to crash or data corruption
+ERROR		<- like assertion, should never be encountered, indicative of a problem in program that may have have undefined results
 ABNORM		<- shouldn't crash, but something is outside of standard operational parameters
+WIP			<- missing/incomplete feature, should include todo message in log
 
-HIGH	<- something important
-MED		<- something lower priority
-LOW		<- something low priority
+HIGH		<- something important
+MED			<- something lower priority
+LOW			<- something low priority
 
-TRACE	<- tracks the chain of operations of the program between activities
-SPAM	<- rapidly called and not stored
+TRACE		<- tracks the chain of operations of the program between activities
+SPAM		<- rapidly called and not stored
+FILTER		<- when a SPAM log meets certain parameters, a FILTER copy should be kept so it doesn't get expired by other SPAM logs

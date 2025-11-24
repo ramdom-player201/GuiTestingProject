@@ -16,6 +16,7 @@ void CommandConsole::parseCommand(std::string cmd)
 // take input and call parse on it
 void CommandConsole::parseCommand()
 {
+	focusConsole();
 	std::cout << ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\nAwaiting User Input: type help for more info.\n" << "U->";
 	std::string input;
 	std::cin >> input;
@@ -26,4 +27,16 @@ void CommandConsole::parseCommand()
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cout << "[User]: " << input << "\n";
 	parseCommand(input);
+}
+
+#include <Windows.h>
+
+void CommandConsole::focusConsole()
+{
+	std::cout << ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "WIP: CommandConsole -> Console may not work correctly on linux, additional testing recommended\n";
+	HWND consoleHandle = GetConsoleWindow();
+	if (consoleHandle) {
+		ShowWindow(consoleHandle, SW_RESTORE);
+		SetForegroundWindow(consoleHandle);
+	}
 }
