@@ -39,10 +39,10 @@ jobs:
           libvorbis-dev \
           libgl1-mesa-dev \
           libegl1-mesa-dev \
-          libfreetype-dev
-      #    #libwayland-dev \      # wayland client library, needed for GLFW
-      #    #wayland-protocols \   # needed for wayland
-      #    #libxkbcommon-dev      # keymap and keyboard layout handling for X11 and wayland
+          libfreetype-dev \
+          libwayland-dev \
+          wayland-protocols \
+          libxkbcommon-dev
 
       # libxrandr-dev       <- allows for runtime configuration of display attributes (eg resolution, rotation, etc)
       # libxcursor-dev      <- custom cursor management (eg changing cursor icon)
