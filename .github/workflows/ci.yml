@@ -27,22 +27,22 @@ jobs:
     steps:
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
-      # run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev
-      run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-          libxrandr-dev \       # allows for runtime configuration of display attributes (eg resolution, rotation, etc)
-          libxcursor-dev \      # custom cursor management (eg changing cursor icon)
-          libxi-dev \           # X11 input extension, enables support for for input devices
-          libudev-dev \         # device management
-          libflac-dev \         # FLAC audio support
-          libvorbis-dev \       # .ogg vorbis audio support
-          libgl1-mesa-dev \     # something something OpenGL
-          libegl1-mesa-dev \    # more OpenGL
-          libfreetype-dev #\     # text/font rendering
-          #libwayland-dev \      # wayland client library, needed for GLFW
-          #wayland-protocols \   # needed for wayland
-          #libxkbcommon-dev      # keymap and keyboard layout handling for X11 and wayland
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev
+      #run: |
+      #    sudo apt-get update
+      #    sudo apt-get install -y \
+      #    libxrandr-dev \       # allows for runtime configuration of display attributes (eg resolution, rotation, etc)
+      #    libxcursor-dev \      # custom cursor management (eg changing cursor icon)
+      #    libxi-dev \           # X11 input extension, enables support for for input devices
+      #    libudev-dev \         # device management
+      #    libflac-dev \         # FLAC audio support
+      #    libvorbis-dev \       # .ogg vorbis audio support
+      #    libgl1-mesa-dev \     # something something OpenGL
+      #    libegl1-mesa-dev \    # more OpenGL
+      #    libfreetype-dev #\     # text/font rendering
+      #    #libwayland-dev \      # wayland client library, needed for GLFW
+      #    #wayland-protocols \   # needed for wayland
+      #    #libxkbcommon-dev      # keymap and keyboard layout handling for X11 and wayland
 
     - name: Checkout
       uses: actions/checkout@v4
