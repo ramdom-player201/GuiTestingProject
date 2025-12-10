@@ -44,6 +44,6 @@ void CommandConsole::focusConsole()
 		SetForegroundWindow(consoleHandle);
 	}
 #else
-	std::cout << ConsoleColours::getColourCode(AnsiColours::Red) << "WIP: CommandConsole -> This feature is currently disabled for Mac and Linux\n";
+	std::cout << ConsoleColours::getColourCode(AnsiColours::RED) << "WIP: CommandConsole -> This feature is currently disabled for Mac and Linux\n";
 #endif
 }
