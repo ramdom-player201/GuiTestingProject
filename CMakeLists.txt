@@ -44,7 +44,8 @@ add_executable(
     "src/Core/Objects/IBaseObject.cpp"
     "src/Core/Pages/WinTile.cpp"
     "src/Core/Pages/UiPanel.cpp"
- )
+    "src/Core/Services/LogService.cpp"
+)
 
 target_compile_features(
     main PRIVATE

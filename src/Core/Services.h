@@ -8,6 +8,7 @@
 #include "Services/CommandConsole.h"
 #include "Services/WindowManager.h"
 #include "Services/ObjectManager.h"
+#include "Services/LogService.h"
 
 enum class ServiceType {
 	CommandConsole,

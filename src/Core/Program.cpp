@@ -6,7 +6,6 @@
 
 void Program::Run()
 {
-
 	//ColouredConsole::print(ConsoleColour::GREEN, "Starting ");
 	//ColouredConsole::print(ConsoleColour::CYAN, "Program",true);
 
