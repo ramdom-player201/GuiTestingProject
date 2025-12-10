@@ -56,9 +56,9 @@ std::shared_ptr<Window> WindowManager::getWindowById(size_t id)
 
 void WindowManager::closeWindow(size_t id)
 {
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Windows Manager" <<
-		ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "closeWIndows() ::" <<
-		ConsoleColours::getColourCode(AnsiColours::RED) << "COULD NOT CLOSE WINDOW: ERROR WIP" <<
+	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Windows Manager > " <<
+		ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "CloseWIndows() :: " <<
+		ConsoleColours::getColourCode(AnsiColours::YELLOW) << "Closing Window" <<
 		ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";;
 	windows.erase(id);
 }
@@ -76,8 +76,8 @@ bool WindowManager::updateWindows()
 		if (winData.WindowClosed) {
 			// delete window from vector and update id
 			std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
-				ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "updateWindows() :: " <<
-				ConsoleColours::getColourCode(AnsiColours::RED) << "WINDOW CLOSE DETECTED: ERROR WIP" <<
+				ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "UpdateWindows() :: " <<
+				ConsoleColours::getColourCode(AnsiColours::CYAN) << "WINDOW CLOSE REQUESTED" <<
 				ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
 			toClose.push_back(windowPair.first); // cannot close window directly in loop
 		}

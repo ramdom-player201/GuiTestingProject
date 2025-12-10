@@ -19,13 +19,8 @@ void CommandConsole::parseCommand()
 	focusConsole();
 	std::cout << ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\nAwaiting User Input: type help for more info.\n" << "U->";
 	std::string input;
-	std::cin >> input;
-	if (std::cin.fail()) {
-		std::cout << ConsoleColours::getColourCode(AnsiColours::RED) << "[CmdConsole|ERROR]: Unknown input error\n";
-	}
-	std::cin.clear();
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	std::cout << "[User]: " << input << "\n";
+	std::getline(std::cin, input); // get full line from cin and write it into input
+	std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN) << "\nParsing: U->" << input << std::endl;
 	parseCommand(input);
 }
 

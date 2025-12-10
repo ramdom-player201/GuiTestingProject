@@ -67,13 +67,13 @@ Window::Window(size_t id, std::string const& title)
 	glfwWindow = glfwCreateWindow(400, 200, title.c_str(), nullptr, nullptr);
 	if (glfwWindow) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window > "
-			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW window created\n";
 	}
 	else {
 		// window failed to instantiate
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window > "
-			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW window failed to create\n";
 	}
 }
@@ -81,7 +81,7 @@ Window::Window(size_t id, std::string const& title)
 Window::~Window()
 {
 	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window > "
-		<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Destructor() :: "
+		<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Destructor] :: "
 		<< ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Destroying window :: "
 		<< ConsoleColours::getColourCode(AnsiColours::RED) << "Id = "
 		<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << windowId << std::endl;

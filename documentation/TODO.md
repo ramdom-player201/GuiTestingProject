@@ -1,6 +1,6 @@
-# Fix window closing, allow WindowManager to remove closed windows from vector without messing up id system.							[ ]
+# Fix window closing, allow WindowManager to remove closed windows from vector without messing up id system.							[X]
 # Consider circumstances surrounding direct window access and potential issues with current system.										[ ]
-# Consider transitioning to a map such that windows can maintain same id without vector shifting.										[ ]
+# Consider transitioning to a map such that windows can maintain same id without vector shifting.										[X]
 
 # Add proper command processing to CommandConsole																						[ ]
 

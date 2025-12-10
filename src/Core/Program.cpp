@@ -6,7 +6,6 @@
 
 void Program::Run()
 {
-	std::cout << "Starting program\n";
 
 	//ColouredConsole::print(ConsoleColour::GREEN, "Starting ");
 	//ColouredConsole::print(ConsoleColour::CYAN, "Program",true);
@@ -44,13 +43,13 @@ Program::Program()
 	// Initialise GLFW
 	if (!glfwInit()) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW failed to initialise\n";
 		std::cerr << "Failed to initialize GLFW" << std::endl;
 	}
 	else {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW initialised successfully\n";
 	}
 
@@ -59,7 +58,7 @@ Program::Program()
 Program::~Program()
 {
 	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-		<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Terminate() :: "
+		<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Destructor] :: "
 		<< ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Program closing\n";
 	//glfwTerminate(); // Note: in the event of multiple program creations,
 					   //       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
