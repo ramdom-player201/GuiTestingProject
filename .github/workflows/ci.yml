@@ -42,7 +42,8 @@ jobs:
           libfreetype-dev \
           libwayland-dev \
           wayland-protocols \
-          libxkbcommon-dev
+          libxkbcommon-dev \
+          libxinerama-dev
 
       # libxrandr-dev       <- allows for runtime configuration of display attributes (eg resolution, rotation, etc)
       # libxcursor-dev      <- custom cursor management (eg changing cursor icon)
@@ -56,6 +57,7 @@ jobs:
       # #libwayland-dev     <- wayland client library, needed for GLFW
       # #wayland-protocols  <- needed for wayland
       # #libxkbcommon-dev   <- keymap and keyboard layout handling for X11 and wayland
+      # libxinerama-dev     <- multi-monitor support
 
     - name: Checkout
       uses: actions/checkout@v4
