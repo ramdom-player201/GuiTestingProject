@@ -7,6 +7,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # output directory, 
 
 include(FetchContent)
 
+# Download SFML
+FetchContent_Declare(
+    SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.0.1   # defines project version, SFML 3.0.1 in this case
+    GIT_SHALLOW ON  # only download the latest version, and not full version history
+    EXCLUDE_FROM_ALL
+    SYSTEM
+)
+FetchContent_MakeAvailable(SFML)
+
 # Download GLFW
 FetchContent_Declare(
     glfw
@@ -18,17 +29,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)    # turn off examples
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)       # turn off tests         <- validates that GLFW is working, not needed since we're not developing GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)        # turn off documentation <- this is available offline
 FetchContent_MakeAvailable(glfw)
-
-# Download SFML
-FetchContent_Declare(
-    SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 3.0.1   # defines project version, SFML 3.0.1 in this case
-    GIT_SHALLOW ON  # only download the latest version, and not full version history
-    EXCLUDE_FROM_ALL
-    SYSTEM
-)
-FetchContent_MakeAvailable(SFML)
 
 add_executable(
     main src/main.cpp
@@ -53,6 +53,6 @@ target_compile_features(
 
 target_link_libraries(
     main PRIVATE
-    glfw
     SFML::Graphics
+    glfw
 )
