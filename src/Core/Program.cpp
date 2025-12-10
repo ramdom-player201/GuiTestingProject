@@ -41,8 +41,26 @@ void Program::Run()
 
 Program::Program()
 {
+	// Initialise GLFW
+	if (!glfwInit()) {
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
+			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW failed to initialise\n";
+		std::cerr << "Failed to initialize GLFW" << std::endl;
+	}
+	else {
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
+			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW initialised successfully\n";
+	}
+
 }
 
 Program::~Program()
 {
+	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
+		<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Terminate() :: "
+		<< ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Program closing\n";
+	//glfwTerminate(); // Note: in the event of multiple program creations,
+					   //       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
 }

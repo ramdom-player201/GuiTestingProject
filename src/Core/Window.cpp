@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "ConsoleColours.h"
+
 WindowReturnData Window::Update()
 {
 	WindowReturnData returnData;
@@ -37,8 +39,27 @@ WindowReturnData Window::Update()
 
 Window::Window(size_t id, std::string const& title)
 {
+	// old initialisation
 	windowId = id;
 	windowTitle = title;
-
 	window.setTitle(windowTitle);
+
+	// GLFW window initialisation
+	glfwWindow = glfwCreateWindow(400, 200, title.c_str(), nullptr, nullptr);
+	if (!glfwWindow) {
+		// window failed to instantiate
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window > "
+			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW window failed to create\n";
+	}
+	else {
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window > "
+			<< ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "Initialise() :: "
+			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW window created\n";
+	}
+}
+
+Window::~Window()
+{
+
 }
