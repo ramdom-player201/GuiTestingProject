@@ -1,5 +1,7 @@
 #include "WindowManager.h"
+
 #include "../ConsoleColours.h"
+#include <vector>
 
 //void WindowManager::initialise() {
 //	// may be removed, not currently used
@@ -22,8 +24,8 @@ size_t WindowManager::createWindow(const std::string& title) {
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
 		std::cout << "WIP: ideally, windowId should never go backwards, add an assert/warning to ensure you are always writing to empty\n";
 	}
-	std::shared_ptr<Window> window = std::make_shared<Window>(currentId, title);
-	windows.insert({ currentId, window });
+	std::shared_ptr<Window> window = std::make_shared<Window>(currentId, title); // create new window
+	windows[currentId] = window;
 
 	return currentId++;
 }
@@ -39,28 +41,6 @@ size_t WindowManager::countWindows()
 	}
 	return windows.size();
 }
-
-//std::vector<Window*> WindowManager::getWindows()
-//{
-//	if (debugMode) {
-//		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
-//			ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "GetWindows() :: " <<
-//			ConsoleColours::getColourCode(AnsiColours::RED) << "Cout = " <<
-//			ConsoleColours::getColourCode(AnsiColours::YELLOW) << windows.size() <<
-//			"\n";
-//	}
-//
-//	// create a copy of the windows vector
-//	std::vector<Window*> result;
-//	result.reserve(windows.size());
-//
-//	// copy window pointers
-//	for (const auto& win : windows) {
-//		result.push_back(win.get());
-//	}
-//
-//	return result;
-//}
 
 std::shared_ptr<Window> WindowManager::getWindowById(size_t id)
 {
@@ -80,14 +60,16 @@ void WindowManager::closeWindow(size_t id)
 		ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "closeWIndows() ::" <<
 		ConsoleColours::getColourCode(AnsiColours::RED) << "COULD NOT CLOSE WINDOW: ERROR WIP" <<
 		ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";;
+	windows.erase(id);
 }
 
 bool WindowManager::updateWindows()
 {
 	bool debugPause = false;
 	// update all windows
-	for (auto& window : windows) {
-		WindowReturnData winData = window.second->Update();
+	std::vector<size_t> toClose;
+	for (auto& windowPair : windows) {
+		WindowReturnData winData = windowPair.second->Update();
 		if (winData.UserCommandBreak) {
 			debugPause = true;
 		}
@@ -97,8 +79,11 @@ bool WindowManager::updateWindows()
 				ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "updateWindows() :: " <<
 				ConsoleColours::getColourCode(AnsiColours::RED) << "WINDOW CLOSE DETECTED: ERROR WIP" <<
 				ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
-
+			toClose.push_back(windowPair.first); // cannot close window directly in loop
 		}
+	}
+	for (size_t id : toClose) { // wait until after updating to close
+		closeWindow(id);
 	}
 	if (debugPause) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<

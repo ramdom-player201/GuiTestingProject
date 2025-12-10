@@ -22,7 +22,6 @@ public:
 	// service-specific functionality
 	static size_t createWindow(const std::string& title);		// creates a new window and adds it to list
 	static size_t countWindows();							// returns number of windows in list
-	//static std::vector<Window*> getWindows();				// returns a copy of the window list
 	static std::shared_ptr<Window> getWindowById(size_t id);	// returns a copy of a pointer to the window, based on its position in the vector
 	static void closeWindow(size_t id);						// closes the referenced window
 
