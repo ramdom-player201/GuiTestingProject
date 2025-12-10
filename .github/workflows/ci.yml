@@ -38,8 +38,8 @@ jobs:
           libflac-dev \         # FLAC audio support
           libvorbis-dev \       # .ogg vorbis audio support
           libgl1-mesa-dev \     # something something OpenGL
-          libegl1-mesa-dev #\    # more OpenGL
-          #libfreetype-dev \     # text/font rendering
+          libegl1-mesa-dev \    # more OpenGL
+          libfreetype-dev #\     # text/font rendering
           #libwayland-dev \      # wayland client library, needed for GLFW
           #wayland-protocols \   # needed for wayland
           #libxkbcommon-dev      # keymap and keyboard layout handling for X11 and wayland
