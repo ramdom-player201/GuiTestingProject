@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GLFW/glfw3.h>
+
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Pages/WinTile.h"
