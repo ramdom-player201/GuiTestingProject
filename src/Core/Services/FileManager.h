@@ -18,9 +18,6 @@ public: // temporary access
 
 public:
 
-	// create ProgramFiles directory if missing, define programDirectory
-	static void Initialise();
-
 	// File Operations
 	static bool QueryFile(const std::string& relativePath);			// check if file exists
 	static size_t QueryFileSize(const std::string& relativePath);	// check size of file, return 0 if it doesn't exist
@@ -29,6 +26,8 @@ public:
 
 	// consider using a "File" class to automatically manage file opening/closing via constructor/destructor
 
+	// ClassName
+	static constexpr std::string_view className{"FileManager"};
 };
 
 // used to create/edit/delete files and folders

@@ -12,6 +12,9 @@ int main()
     FileManager::ValidatePath("Place/A/B/../D");
     FileManager::ValidatePath("Place/../../../../A");
     FileManager::ValidatePath("HyperSphere/TextFile.txt");
+    FileManager::ValidatePath("Place/../../../../Test.txt");
+    FileManager::ValidatePath("HyperCube/Cube.cube.txt");
+    FileManager::ValidatePath("HyperSphere/Cube.txt/A");
 
     // main code
     LogService::Initialise();

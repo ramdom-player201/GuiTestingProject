@@ -30,16 +30,16 @@ void LogService::Flush()
 //std::string message;
 //};
 
-void LogService::Log(const LogType logType, const std::string& source, const std::string& function, const std::string& message)
+void LogService::Log(const LogType logType, const std::string_view source, const std::string_view function, const std::string_view message)
 {
-	std::cout << "Temp -> LogService :: Log :: {source=[ " + source + " ]function=[ " + function + " ]message=[ " + message + " ]}\n";
+	std::cout << "Temp -> LogService :: {source=[ " << source << " ]function=[ " << function << " ]message=[ " << message << " ]}\n";
 
 	LogEntry newEntry{
 		logType,
 		std::chrono::system_clock::now(),
-		source,
-		function,
-		message
+		std::string(source),
+		std::string(function),
+		std::string(message)
 	};
 
 	switch (logType) {
@@ -64,7 +64,7 @@ void LogService::Log(const LogType logType, const std::string& source, const std
 		Logs_SECURITY.pushLog(newEntry);
 		break;
 	}
-					 //-----------------//
+						  //-----------------//
 	case LogType::HIGH: {
 		Logs_HIGH.pushLog(newEntry);
 		break;
@@ -98,7 +98,7 @@ void LogService::Log(const LogType logType, const std::string& source, const std
 				std::chrono::system_clock::now(),
 				"LogService",
 				"Log",
-				"Error: Log failed because invalid LogType :: Source = " + source + " :: Function = " + function
+				"Error: Log failed because invalid LogType :: Source = " + std::string(source) + " :: Function = " + std::string(function)
 			}
 		);
 	}

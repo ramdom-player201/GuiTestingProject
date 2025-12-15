@@ -9,10 +9,12 @@ std::filesystem::path FileManager::programDirectory{ std::filesystem::current_pa
 
 std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(const std::string& relativePath)
 {
+	constexpr std::string_view functionName{ "ValidatePath" };
+
 	LogService::Log(
 		LogType::TRACE,
-		"FileManager",
-		"ValidatePath",
+		className,
+		functionName,
 		"Attempt access: [" + relativePath + "]"
 	);
 
@@ -21,16 +23,22 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 
 	// normalise path
 	std::filesystem::path normalised = std::filesystem::weakly_canonical(targetPath);
+	// file may not exist yet, but missing directories are generated after security check, hence `weakly_canonical` over standard `canonical`
 
 	// check path is in valid location
 	LogService::Log(
 		LogType::TRACE,
-		"FileManager",
-		"ValidatePath",
+		className,
+		functionName,
 		"Normalised path: [" + normalised.string() + "]"
 	);
 	if (normalised.string().rfind(programDirectory.string(), 0) != 0) {
-		LogService::Log(LogType::SECURITY, "FileManager", "ValidatePath", "SECURITY: ACCESS DENIED");
+		LogService::Log(
+			LogType::SECURITY,
+			className,
+			functionName,
+			"SECURITY: ACCESS DENIED"
+		);
 		return std::unexpected("Security Error, failed to access file because {Out of Bounds}");
 	} // code exits here if trying to access out of bounds
 
@@ -40,16 +48,16 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 		if (std::filesystem::exists(normalised.parent_path())) {
 			LogService::Log(
 				LogType::TRACE,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"File parent directory is valid"
 			);
 		}
 		else {
 			LogService::Log(
 				LogType::MED,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"File parent directory is missing, creating folders"
 			);
 			std::filesystem::create_directories(normalised.parent_path());
@@ -57,24 +65,24 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 		if (std::filesystem::exists(normalised)) {
 			LogService::Log(
 				LogType::TRACE,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"File found"
 			);
 		}
 		else {
 			LogService::Log(
 				LogType::MED,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"File does not exist, creating new"
 			);
 			std::ofstream ofs(normalised);
 			if (!ofs) {
 				LogService::Log(
 					LogType::CRITICAL,
-					"FileManager",
-					"ValidatePath",
+					className,
+					functionName,
 					"Failed to create file"
 				);
 				return std::unexpected("Failed to create file: " + normalised.string());
@@ -86,24 +94,20 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 		if (std::filesystem::exists(normalised)) {
 			LogService::Log(
 				LogType::TRACE,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"Directory is valid"
 			);
 		}
 		else {
 			LogService::Log(
 				LogType::MED,
-				"FileManager",
-				"ValidatePath",
+				className,
+				functionName,
 				"Directory is missing, creating folders"
 			);
 			std::filesystem::create_directories(normalised);
 		}
 	}
 	return normalised;
-}
-
-void FileManager::Initialise() {
-	//programDirectory = std::filesystem::current_path() / "ProgramFiles";
 }

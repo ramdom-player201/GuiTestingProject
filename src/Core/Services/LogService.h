@@ -75,7 +75,7 @@ public:
 	static void Initialise();	// setup LogService, create LogService folder if needed
 	static void Flush();		// flush cached logs to file (rate limited)
 
-	static void Log(const LogType logType, const std::string& source, const std::string& function, const std::string& message);
+	static void Log(const LogType logType, const std::string_view source, const std::string_view function, const std::string_view message);
 
 	//static size_t GetCurrentDataUsage();
 
