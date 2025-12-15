@@ -1,6 +1,17 @@
 #include "LogService.h"
 #include <iostream>
 
+LogQueue<20> LogService::Logs_CRITICAL;
+LogQueue<250> LogService::Logs_ERROR;
+LogQueue<100> LogService::Logs_ABNORM;
+LogQueue<100> LogService::Logs_WIP;
+LogQueue<100> LogService::Logs_HIGH;
+LogQueue<100> LogService::Logs_MED;
+LogQueue<100> LogService::Logs_LOW;
+LogQueue<1000> LogService::Logs_TRACE;
+LogQueue<100> LogService::Logs_SPAM;
+LogQueue<100> LogService::Logs_CATCH;
+
 void LogService::Initialise()
 {
 	std::cout << "LogService::Initialise()" << std::endl;
