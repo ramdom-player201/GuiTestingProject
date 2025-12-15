@@ -27,49 +27,55 @@ struct LogEntry {
 	std::string message;
 };
 
-template <size_t queueSize>
-class LogQueue {
-private:
-	std::array<LogEntry, queueSize> queue; // collection of logs
-	size_t head{ 0 }; // position of head in circular queue
-	size_t fillCount{ 0 }; // counts up until one full cycle
-	size_t dropped{ 0 }; // number of logs overwritten
-public:
-	void pushLog(const LogEntry& entry){
-		queue[head] = entry; // add entry to queue at current head position
-		head = (head + 1) % queueSize;
-		if (fillCount < queueSize) {
-			fillCount++;
-		}
-		else {
-			dropped++;
-		}
-	}
-
-};
-
 class LogService {
 private:
 
+	// LogQueue nested class begin
+	template <size_t queueSize>
+	class LogQueue {
+	private:
+		std::array<LogEntry, queueSize> queue; // collection of logs
+		size_t head{ 0 }; // position of head in circular queue
+		size_t fillCount{ 0 }; // counts up until one full cycle
+		size_t dropped{ 0 }; // number of logs overwritten
+	public:
+		void pushLog(const LogEntry& entry) {
+			queue[head] = entry; // add entry to queue at current head position
+			head = (head + 1) % queueSize;
+			if (fillCount < queueSize) {
+				fillCount++;
+			}
+			else {
+				dropped++;
+			}
+		}
+		size_t getQueueSize() { return sizeof(queue); } // return size of queue array, in bytes
+		size_t getDropCount() { return dropped; } // return number of expired logs
+	};
+	// LogQueue nested class end
+
 	// list of category circular queues
-	LogQueue<20> Logs_CRITICAL;
-	LogQueue<250> Logs_ERROR;
-	LogQueue<100> Logs_ABNORM;
-	LogQueue<100> Logs_WIP;
+	static LogQueue<20> Logs_CRITICAL;
+	static LogQueue<250> Logs_ERROR;
+	static LogQueue<100> Logs_ABNORM;
+	static LogQueue<100> Logs_WIP;
 
-	LogQueue<100> Logs_HIGH;
-	LogQueue<100> Logs_MED;
-	LogQueue<100> Logs_LOW;
+	static LogQueue<100> Logs_HIGH;
+	static LogQueue<100> Logs_MED;
+	static LogQueue<100> Logs_LOW;
 
-	LogQueue<1000> Logs_TRACE;
-	LogQueue<100> Logs_SPAM;
-	LogQueue<100> Logs_CATCH;
+	static LogQueue<1000> Logs_TRACE;
+	static LogQueue<100> Logs_SPAM;
+	static LogQueue<100> Logs_CATCH;
 
 public:
 	static void Initialise();	// setup LogService, create LogService folder if needed
 	static void Flush();		// flush cached logs to file (rate limited)
 
-	static void Log(LogType logType, std::string source, std::string function, std::string message);
+	static void Log(const LogType logType, const std::string& source, const std::string& function, const std::string& message);
+
+	//static size_t GetCurrentDataUsage();
+
 	// logType	<- how important the log is
 	// source	<- which class created the log
 	// function	<- which function created the log
