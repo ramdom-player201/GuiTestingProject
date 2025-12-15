@@ -2,9 +2,18 @@
 
 #include "Core/Program.h"
 #include "Core/Services/LogService.h"
+#include "Core/Services/FileManager.h"
 
 int main()
 {
+    // quick tests
+    FileManager::ValidatePath("Place");
+    FileManager::ValidatePath("Place/A/B");
+    FileManager::ValidatePath("Place/A/B/../D");
+    FileManager::ValidatePath("Place/../../../../A");
+    FileManager::ValidatePath("HyperSphere/TextFile.txt");
+
+    // main code
     LogService::Initialise();
     Program p;  // create program
     p.Run();    // run program

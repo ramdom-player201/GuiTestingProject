@@ -9,6 +9,7 @@ enum class LogType : uint8_t {
 	ERROR,		// like assertion, should never be encountered, indicative of a problem in program that may have have undefined results :: [Red]
 	ABNORM,		// shouldn't crash, but something is outside of standard operational parameters											:: [Purple]
 	WIP,		// missing/incomplete feature, should include todo message in log														:: [Magenta]
+	SECURITY,	// program attempts to do something not allowed, such as access a file outside of its directory							:: [Blue]
 
 	HIGH,		// something important			:: [Orange]
 	MED,		// something lower priority		:: [Yellow]
@@ -60,6 +61,7 @@ private:
 	static LogQueue<250> Logs_ERROR;
 	static LogQueue<100> Logs_ABNORM;
 	static LogQueue<100> Logs_WIP;
+	static LogQueue<20> Logs_SECURITY;
 
 	static LogQueue<100> Logs_HIGH;
 	static LogQueue<100> Logs_MED;
