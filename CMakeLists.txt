@@ -45,6 +45,7 @@ add_executable(
     "src/Core/Pages/WinTile.cpp"
     "src/Core/Pages/UiPanel.cpp"
     "src/Core/Services/LogService.cpp"
+    "src/Core/Services/FileManager.cpp"
 )
 
 target_compile_features(

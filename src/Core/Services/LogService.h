@@ -27,33 +27,32 @@ struct LogEntry {
 	std::string message;
 };
 
-// LogQueue nested class begin
-template <size_t queueSize>
-class LogQueue {
-private:
-	std::array<LogEntry, queueSize> queue; // collection of logs
-	size_t head{ 0 }; // position of head in circular queue
-	size_t fillCount{ 0 }; // counts up until one full cycle
-	size_t dropped{ 0 }; // number of logs overwritten
-public:
-	void pushLog(const LogEntry& entry) {
-		queue[head] = entry; // add entry to queue at current head position
-		head = (head + 1) % queueSize;
-		if (fillCount < queueSize) {
-			fillCount++;
-		}
-		else {
-			dropped++;
-		}
-	}
-	size_t getQueueSize() { return sizeof(queue); } // return size of queue array, in bytes
-	size_t getDropCount() { return dropped; } // return number of expired logs
-};
-// LogQueue nested class end
-
 class LogService {
 private:
 
+	// LogQueue nested class begin
+	template <size_t queueSize>
+	class LogQueue {
+	private:
+		std::array<LogEntry, queueSize> queue; // collection of logs
+		size_t head{ 0 }; // position of head in circular queue
+		size_t fillCount{ 0 }; // counts up until one full cycle
+		size_t dropped{ 0 }; // number of logs overwritten
+	public:
+		void pushLog(const LogEntry& entry) {
+			queue[head] = entry; // add entry to queue at current head position
+			head = (head + 1) % queueSize;
+			if (fillCount < queueSize) {
+				fillCount++;
+			}
+			else {
+				dropped++;
+			}
+		}
+		size_t getQueueSize() { return sizeof(queue); } // return size of queue array, in bytes
+		size_t getDropCount() { return dropped; } // return number of expired logs
+	};
+	// LogQueue nested class end
 
 
 	// list of category circular queues
