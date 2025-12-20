@@ -1,8 +1,9 @@
 #pragma once
 
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
-#include <SFML/Graphics.hpp>
+//#include <SFML/Graphics.hpp>
 #include <string>
 #include "Pages/WinTile.h"
 
@@ -27,6 +28,7 @@ private:
 
 	// GLFW window
 	GLFWwindow* glfwWindow = nullptr;
+	static bool inline gladInitialised{ false };
 
 	Tiles windowTiles;	// see WindowTilesLayout.png and Pages.txt
 

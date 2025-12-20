@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "../Window.h"
 
@@ -21,9 +22,9 @@ public:
 
 	// service-specific functionality
 	static size_t createWindow(const std::string& title);		// creates a new window and adds it to list
-	static size_t countWindows();							// returns number of windows in list
+	static size_t countWindows();								// returns number of windows in list
 	static std::shared_ptr<Window> getWindowById(size_t id);	// returns a copy of a pointer to the window, based on its position in the vector
-	static void closeWindow(size_t id);						// closes the referenced window
+	static void closeWindow(size_t id);							// closes the referenced window
 
-	static bool updateWindows();							// loop through windows, calling update on each one. Return true if command line break;
+	static bool updateWindows();								// loop through windows, calling update on each one. Return true if command line break;
 };

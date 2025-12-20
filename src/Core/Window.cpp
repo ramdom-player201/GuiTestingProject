@@ -58,10 +58,32 @@ WindowReturnData Window::Update()
 
 Window::Window(size_t id, std::string const& title)
 {
+	// Remember: many Window instances can be created at a time
+	// glfwInit() is called in Program.cpp to avoid multiple calls
+
 	// old initialisation
 	windowId = id;
 	windowTitle = title;
 	//window.setTitle(windowTitle);
+
+	// Set GLFW window properties
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // sets version {3}
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // sets sub-version {3.3}
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // uses modern API profile?
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);	   // window resizing is allowed
+
+	// Set glfwContext
+	glfwMakeContextCurrent(glfwWindow); // This must be called prior to any window update too
+
+	// Load GLAD once after first window creation
+	if (!gladInitialised) {
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+
+		}
+		else {
+			gladInitialised = true;
+		}
+	}
 
 	// GLFW window initialisation
 	glfwWindow = glfwCreateWindow(400, 200, title.c_str(), nullptr, nullptr);
