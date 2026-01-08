@@ -61,10 +61,14 @@ jobs:
 
     - name: Install Vulkan SDK (Windows)
       if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-          curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
-          ./VulkanSDK-1.4.335.0-Installer.exe /S
+      uses: humbletim/install-vulkan-sdk@v1.2
+      with:
+        version: 1.4.225.0
+        cache: true
+      #shell: pwsh
+      #run: |
+      #    curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
+      #    ./VulkanSDK-1.4.335.0-Installer.exe /S
 
     - name: Install Vulkan SDK (Linux)
       if: runner.os == 'Linux'
