@@ -97,8 +97,8 @@ jobs:
     - name: Configure and Build (Windows)
       if: runner.os == 'Windows'
       run: |
-        # This step should now have access to VULKAN_SDK
-        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+        # Pass the environment variable value directly to CMake using -DVULKAN_SDK
+        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} -DVULKAN_SDK=$VULKAN_SDK
         cmake --build build --config Release
 
     - name: Configure (Other)
