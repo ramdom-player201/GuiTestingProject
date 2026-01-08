@@ -59,6 +59,27 @@ jobs:
       # #libxkbcommon-dev   <- keymap and keyboard layout handling for X11 and wayland
       # libxinerama-dev     <- multi-monitor support
 
+    - name: Install Vulkan SDK (Windows)
+      if: runner.os == 'Windows'
+      run: |
+          curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
+          ./VulkanSDK-1.4.335.0-Installer.exe /S
+
+    - name: Install Vulkan SDK (Linux)
+      if: runner.os == 'Linux'
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+          libvulkan-dev \
+          vulkan-validationlayers-dev \
+          spirv-tools \
+          vulkan-tools
+
+    - name: Install Vulkan SDK (macOS)
+      if: runner.os == 'macOS'
+      run: |
+          brew install molten-vk
+
     - name: Checkout
       uses: actions/checkout@v4
 
