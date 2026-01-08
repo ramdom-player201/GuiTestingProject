@@ -70,6 +70,12 @@ jobs:
       #    curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
       #    ./VulkanSDK-1.4.335.0-Installer.exe /S
 
+    - name: Export VULKAN_SDK (Windows)
+      if: runner.os == 'Windows'
+      run: |
+          echo "VULKAN_SDK=$VULKAN_SDK" >> $GITHUB_ENV
+      shell: bash
+
     - name: Install Vulkan SDK (Linux)
       if: runner.os == 'Linux'
       run: |
@@ -88,14 +94,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure and Build (Window)
-      if: runner.os == 'Windows'
+    - name: Configure
       run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
 
-    - name: Configure (Other)
-      if: runner.os != 'Windows'
-      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-
-    - name: Build (Other)
-      if: runner.os != 'Windows'
+    - name: Build
       run: cmake --build build --config Release
