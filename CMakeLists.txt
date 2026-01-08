@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 project(CMakeSFMLProject LANGUAGES C CXX)
 
+# NOTE: all libraries need to be imported using a repository link or have the files stored in the repository to make compilation seamless for other users.
+
 if(APPLE)
-    enable_language(OBJC) # MacOS compile failed, test if this fixes it
+    enable_language(OBJC) # This is required to compile on MacOS for some reason...
 endif()
 
 set(CMAKE_CXX_STANDARD 23) # C++ minimum language version
@@ -21,6 +23,17 @@ FetchContent_Declare(
     SYSTEM
 )
 FetchContent_MakeAvailable(SFML)
+
+# Import VULKAN -- SDK needs to be installed manually :: https://vulkan.lunarg.com/sdk/home
+find_package(Vulkan QUIET)
+if (NOT Vulkan_FOUND)
+    message(FATAL_ERROR
+        "Vulkan SDK not found.\n"
+        "Please install it manually from https://vulkan.lunarg.com/sdk/home and try again.\n"
+        "Note that you may have to close and re-open your IDE after install."
+    )
+endif()
+#find_package(Vulkan REQUIRED COMPONENTS glslc glslangValidator) # Not used right now, do more research
 
 # Download GLFW
 FetchContent_Declare(
@@ -66,6 +79,7 @@ target_include_directories(
 target_link_libraries(
     main PRIVATE
     SFML::Graphics
+    Vulkan::Vulkan
     glfw
     glad
 )
@@ -74,4 +88,3 @@ target_compile_features(
     main PRIVATE
     cxx_std_23
 )
-
