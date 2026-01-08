@@ -72,19 +72,6 @@ Window::Window(size_t id, std::string const& title)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // uses modern API profile?
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);	   // window resizing is allowed
 
-	// Set glfwContext
-	glfwMakeContextCurrent(glfwWindow); // This must be called prior to any window update too
-
-	// Load GLAD once after first window creation
-	if (!gladInitialised) {
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-
-		}
-		else {
-			gladInitialised = true;
-		}
-	}
-
 	// GLFW window initialisation
 	glfwWindow = glfwCreateWindow(400, 200, title.c_str(), nullptr, nullptr);
 	if (glfwWindow) {
@@ -98,6 +85,107 @@ Window::Window(size_t id, std::string const& title)
 			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW window failed to create\n";
 	}
+
+	// Set glfwContext
+	glfwMakeContextCurrent(glfwWindow); // This must be called prior to any window update
+
+	// Load GLAD once after first window creation
+	if (!gladInitialised) {
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+
+		}
+		else {
+			gladInitialised = true;
+		}
+	}
+
+	// Configure viewport
+	int width, height;
+	glfwGetFramebufferSize(glfwWindow, &width, &height);
+	glViewport(0, 0, width, height);
+
+	/////////////////////////
+	// TEST RENDERING TEMP //
+	/////////////////////////
+
+	const char* vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec2 aPos;
+
+void main()
+{
+    gl_Position = vec4(aPos, 0.0, 1.0);
+}
+)";
+
+	const char* fragmentShaderSource = R"(
+#version 330 core
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(1.0, 0.0, 0.0, 1.0); // red
+}
+)";
+
+	// Vertex shader
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+	glCompileShader(vertexShader);
+
+	// Fragment shader
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+	glCompileShader(fragmentShader);
+
+	// Shader program
+	unsigned int shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+
+	// Cleanup shaders (linked into program now)
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	float vertices[] = {
+		// First triangle
+		-0.5f, -0.5f,
+		 0.5f, -0.5f,
+		 0.5f,  0.5f,
+
+		 // Second triangle
+		  -0.5f, -0.5f,
+		   0.5f,  0.5f,
+		  -0.5f,  0.5f
+	};
+
+	unsigned int VAO, VBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Vertex attribute: location = 0, 2 floats per vertex
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(shaderProgram);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glfwSwapBuffers(glfwWindow);
+
+
 }
 
 Window::~Window()
