@@ -94,8 +94,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure
+    - name: Configure and Build (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        # This step should now have access to VULKAN_SDK
+        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+        cmake --build build --config Release
+
+    - name: Configure (Other)
+      if: runner.os != 'Windows'
       run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
 
-    - name: Build
+    - name: Build (Other)
+      if: runner.os != 'Windows'
       run: cmake --build build --config Release
