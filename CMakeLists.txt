@@ -25,14 +25,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SFML)
 
 # Import VULKAN -- SDK needs to be installed manually :: https://vulkan.lunarg.com/sdk/home
-find_package(Vulkan QUIET)
-if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR
-        "Vulkan SDK not found.\n"
-        "Please install it manually from https://vulkan.lunarg.com/sdk/home and try again.\n"
-        "Note that you may have to close and re-open your IDE after install."
-    )
-endif()
+#find_package(Vulkan QUIET)
+#if (NOT Vulkan_FOUND)
+#    message(FATAL_ERROR
+#        "Vulkan SDK not found.\n"
+#        "Please install it manually from https://vulkan.lunarg.com/sdk/home and try again.\n"
+#        "Note that you may have to close and re-open your IDE after install."
+#    )
+#endif()
+find_package(Vulkan REQUIRED) # fallback to default error message.
 #find_package(Vulkan REQUIRED COMPONENTS glslc glslangValidator) # Not used right now, do more research
 
 # Download GLFW
