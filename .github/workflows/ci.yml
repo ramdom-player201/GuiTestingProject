@@ -24,6 +24,7 @@ jobs:
         - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
         - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
 
+    # LINUX DEPENDENCIES
     steps:
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
@@ -59,16 +60,15 @@ jobs:
       # #libxkbcommon-dev   <- keymap and keyboard layout handling for X11 and wayland
       # libxinerama-dev     <- multi-monitor support
 
+    # INSTALL VULKAN PER OS 
+    # -- Windows
+
     - name: Install Vulkan SDK (Windows)
       if: runner.os == 'Windows'
       uses: humbletim/install-vulkan-sdk@v1.2
       with:
         version: 1.4.335.0
         cache: true
-      #shell: pwsh
-      #run: |
-      #    curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
-      #    ./VulkanSDK-1.4.335.0-Installer.exe /S
 
     - name: Export VULKAN_SDK (Windows)
       if: runner.os == 'Windows'
@@ -76,20 +76,26 @@ jobs:
           echo "VULKAN_SDK=$VULKAN_SDK" >> $GITHUB_ENV
       shell: bash
 
+    # -- Linux
+
     - name: Install Vulkan SDK (Linux)
       if: runner.os == 'Linux'
       run: |
           sudo apt-get update
           sudo apt-get install -y \
           libvulkan-dev \
-          vulkan-validationlayers-dev \
+          vulkan-utility-libraries-dev \
           spirv-tools \
           vulkan-tools
+
+    # -- Mac
 
     - name: Install Vulkan SDK (macOS)
       if: runner.os == 'macOS'
       run: |
           brew install molten-vk
+
+    # CHECKOUT and BUILD
 
     - name: Checkout
       uses: actions/checkout@v4
