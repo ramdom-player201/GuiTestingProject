@@ -63,12 +63,20 @@ jobs:
     # INSTALL VULKAN PER OS 
     # -- Windows
 
-    - name: Install Vulkan SDK (Windows)
-      if: runner.os == 'Windows'
-      uses: humbletim/install-vulkan-sdk@v1.2
+    - name: Prepare Vulkan SDK
+      uses: humbletim/setup-vulkan-sdk@v1.2.1
       with:
-        version: 1.4.335.0
-        cache: true
+           vulkan-query-version: 1.4.304.1
+           vulkan-components: Vulkan-Headers, Vulkan-Loader
+           vulkan-use-cache: true
+           
+
+    #- name: Install Vulkan SDK (Windows)
+    #  if: runner.os == 'Windows'
+    #  uses: humbletim/install-vulkan-sdk@v1.2
+    #  with:
+    #    version: 1.4.335.0
+    #    cache: true
 
     - name: Export VULKAN_SDK (Windows)
       if: runner.os == 'Windows'
