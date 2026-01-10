@@ -24,7 +24,6 @@ jobs:
         - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
         - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
 
-    # LINUX DEPENDENCIES
     steps:
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
@@ -60,58 +59,7 @@ jobs:
       # #libxkbcommon-dev   <- keymap and keyboard layout handling for X11 and wayland
       # libxinerama-dev     <- multi-monitor support
 
-    # INSTALL VULKAN PER OS 
     # -- Windows
-
-   # - name: Install Vulkan SDK (Windows)
-   #   uses: humbletim/setup-vulkan-sdk@v1.2.1
-   #   with:
-   #     vulkan-query-version: 1.4.304.1
-   #     vulkan-components: Vulkan-Headers, Vulkan-Loader
-   #     vulkan-use-cache: false
-   #
-   # - name: Configure and Build (Windows)
-   #   if: runner.os == 'Windows'
-   #   shell: bash
-   #   run: |
-   #     cmake -B build \
-   #       ${{ matrix.platform.flags }} \
-   #       ${{ matrix.config.flags }} \
-   #       -DVKVG_RECORDING=false \
-   #       -DVKVG_SVG=false \
-   #       -DGIT_SUBMODULE=true \
-   #       -DBUILD_SHARED_LIBS=OFF \
-   #       -S .
-   #
-   #     cmake --build build --config Release --debug-find
-      
-    #- name: configure
-    #  if: runner.os == 'Windows'
-    #  run: |
-    #    cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} \
-    #    -A x64 -DVKVG_RECORDING=false \
-    #    -DVKVG_SVG=false \
-    #    -DGIT_SUBMODULE=true \
-    #    -DBUILD_SHARED_LIBS=OFF
-        
-        
-        
-        #-DVULKAN_SDK="$SDK_PATH" \
-        #-DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
-        #-DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
-        #cmake --build build --config Release --debug-find
-    #- name: build win64
-    #  if: runner.os == 'Windows'
-    #  run: cmake --build build_win64 --parallel
-
-
-    #- name: Prepare Vulkan SDK (Windows)
-    #  uses: humbletim/setup-vulkan-sdk@v1.2.1
-    #  with:
-    #       vulkan-query-version: 1.4.304.1
-    #       vulkan-components: Vulkan-Headers, Vulkan-Loader
-    #       vulkan-use-cache: true
-           
 
     - name: Install Vulkan SDK (Windows)
       if: runner.os == 'Windows'
@@ -119,12 +67,10 @@ jobs:
       with:
         version: 1.4.335.0
         cache: true
-
-    - name: Export VULKAN_SDK (Windows)
-      if: runner.os == 'Windows'
-      run: |
-          echo "VULKAN_SDK=$VULKAN_SDK" >> $GITHUB_ENV
-      shell: bash
+      #shell: pwsh
+      #run: |
+      #    curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
+      #    ./VulkanSDK-1.4.335.0-Installer.exe /S
 
     # -- Linux
 
@@ -138,37 +84,20 @@ jobs:
           spirv-tools \
           vulkan-tools
 
-    # -- Mac
+    # -- MacOS
 
     - name: Install Vulkan SDK (macOS)
       if: runner.os == 'macOS'
       run: |
           brew install molten-vk
 
-    # CHECKOUT and BUILD
+    # -- Checkout
 
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure and Build (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        # Pass the environment variable value directly to CMake using -DVULKAN_SDK
-        SDK_PATH="$VULKAN_SDK"
-    
-        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-        -DVULKAN_SDK="$SDK_PATH" \
-        -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
-        -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
-        cmake --build build --config Release --debug-find
-      shell: bash
-
-    - name: Configure (Other)
-      if: runner.os != 'Windows'
+    - name: Configure
       run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-      #--debug-find
 
-    - name: Build (Other)
-      if: runner.os != 'Windows'
+    - name: Build
       run: cmake --build build --config Release
-      #--debug-find
