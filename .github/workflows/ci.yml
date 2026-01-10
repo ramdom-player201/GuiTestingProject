@@ -95,6 +95,13 @@ jobs:
       run: |
           brew install molten-vk
 
+    - name: Export Vulkan SDK Environment Variables (macOS) <- testing fix?
+      if: runner.os == "macOS"
+      run: |
+          echo "VULKAN_SDK=$(brew --prefix molten-vk)" >> $GITHUB_ENV
+          echo "VK_ICD_FILENAMES=$(brew --prefix molten-vk)/share/vulkan/icd.d/MoltenVK_icd.json" >> $GITHUB_ENV
+      shell: bash
+
     # CHECKOUT and BUILD
 
     - name: Checkout
