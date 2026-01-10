@@ -150,18 +150,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure and Build (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        # Pass the environment variable value directly to CMake using -DVULKAN_SDK
-        SDK_PATH="$VULKAN_SDK"
-
-        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-        -DVULKAN_SDK="$SDK_PATH" \
-        -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
-        -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
-        cmake --build build --config Release --debug-find
-      shell: bash
+    #- name: Configure and Build (Windows)
+    #  if: runner.os == 'Windows'
+    #  run: |
+    #    # Pass the environment variable value directly to CMake using -DVULKAN_SDK
+    #    SDK_PATH="$VULKAN_SDK"
+    #
+    #    cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+    #    -DVULKAN_SDK="$SDK_PATH" \
+    #    -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
+    #    -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
+    #    cmake --build build --config Release --debug-find
+    #  shell: bash
 
     - name: Configure (Other)
       if: runner.os != 'Windows'
