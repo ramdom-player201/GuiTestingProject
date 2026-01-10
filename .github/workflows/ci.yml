@@ -110,13 +110,15 @@ jobs:
         -DVULKAN_SDK="$SDK_PATH" \
         -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
         -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
-        cmake --build build --config Release
+        cmake --build build --config Release --debug-find
       shell: bash
 
     - name: Configure (Other)
       if: runner.os != 'Windows'
-      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} --debug-find
+      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+      #--debug-find
 
     - name: Build (Other)
       if: runner.os != 'Windows'
-      run: cmake --build build --config Release --debug-find
+      run: cmake --build build --config Release
+      #--debug-find
