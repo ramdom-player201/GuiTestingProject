@@ -83,7 +83,7 @@ jobs:
           -DBUILD_SHARED_LIBS=OFF \
           -S .
 
-        cmake --build build --config Release --parallel
+        cmake --build build --config Release --debug-find
       
     #- name: configure
     #  if: runner.os == 'Windows'
