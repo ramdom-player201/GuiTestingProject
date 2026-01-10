@@ -63,27 +63,27 @@ jobs:
     # INSTALL VULKAN PER OS 
     # -- Windows
 
-    - name: Install Vulkan SDK (Windows)
-      uses: humbletim/setup-vulkan-sdk@v1.2.1
-      with:
-        vulkan-query-version: 1.4.304.1
-        vulkan-components: Vulkan-Headers, Vulkan-Loader
-        vulkan-use-cache: false
-
-    - name: Configure and Build (Windows)
-      if: runner.os == 'Windows'
-      shell: bash
-      run: |
-        cmake -B build \
-          ${{ matrix.platform.flags }} \
-          ${{ matrix.config.flags }} \
-          -DVKVG_RECORDING=false \
-          -DVKVG_SVG=false \
-          -DGIT_SUBMODULE=true \
-          -DBUILD_SHARED_LIBS=OFF \
-          -S .
-
-        cmake --build build --config Release --debug-find
+   # - name: Install Vulkan SDK (Windows)
+   #   uses: humbletim/setup-vulkan-sdk@v1.2.1
+   #   with:
+   #     vulkan-query-version: 1.4.304.1
+   #     vulkan-components: Vulkan-Headers, Vulkan-Loader
+   #     vulkan-use-cache: false
+   #
+   # - name: Configure and Build (Windows)
+   #   if: runner.os == 'Windows'
+   #   shell: bash
+   #   run: |
+   #     cmake -B build \
+   #       ${{ matrix.platform.flags }} \
+   #       ${{ matrix.config.flags }} \
+   #       -DVKVG_RECORDING=false \
+   #       -DVKVG_SVG=false \
+   #       -DGIT_SUBMODULE=true \
+   #       -DBUILD_SHARED_LIBS=OFF \
+   #       -S .
+   #
+   #     cmake --build build --config Release --debug-find
       
     #- name: configure
     #  if: runner.os == 'Windows'
@@ -113,12 +113,12 @@ jobs:
     #       vulkan-use-cache: true
            
 
-    #- name: Install Vulkan SDK (Windows)
-    #  if: runner.os == 'Windows'
-    #  uses: humbletim/install-vulkan-sdk@v1.2
-    #  with:
-    #    version: 1.4.335.0
-    #    cache: true
+    - name: Install Vulkan SDK (Windows)
+      if: runner.os == 'Windows'
+      uses: humbletim/install-vulkan-sdk@v1.2
+      with:
+        version: 1.4.335.0
+        cache: true
 
     - name: Export VULKAN_SDK (Windows)
       if: runner.os == 'Windows'
@@ -150,18 +150,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    #- name: Configure and Build (Windows)
-    #  if: runner.os == 'Windows'
-    #  run: |
-    #    # Pass the environment variable value directly to CMake using -DVULKAN_SDK
-    #    SDK_PATH="$VULKAN_SDK"
-    #
-    #    cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-    #    -DVULKAN_SDK="$SDK_PATH" \
-    #    -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
-    #    -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
-    #    cmake --build build --config Release --debug-find
-    #  shell: bash
+    - name: Configure and Build (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        # Pass the environment variable value directly to CMake using -DVULKAN_SDK
+        SDK_PATH="$VULKAN_SDK"
+    
+        cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+        -DVULKAN_SDK="$SDK_PATH" \
+        -DVulkan_INCLUDE_DIR="$SDK_PATH/Include" \
+        -DVulkan_LIBRARY="$SDK_PATH/Lib/vulkan-1.lib"
+        cmake --build build --config Release --debug-find
+      shell: bash
 
     - name: Configure (Other)
       if: runner.os != 'Windows'
