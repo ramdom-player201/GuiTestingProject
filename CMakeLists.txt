@@ -34,6 +34,10 @@ FetchContent_MakeAvailable(SFML)
 #    )
 #endif()
 find_package(Vulkan REQUIRED) # fallback to default error message.
+# Added additonal debug notes based on: https://stackoverflow.com/questions/77840729/why-is-cmake-find-packagevulkan-not-outputting-any-environment-variable
+message("Vulkan found? " ${VULKAN_FOUND})
+message("Alright, where is it? " ${Vulkan_LIBRARIES})
+message("And I can include it? " ${Vulkan_INCLUDE_DIRS})
 #find_package(Vulkan REQUIRED COMPONENTS glslc glslangValidator) # Not used right now, do more research
 
 # Download GLFW
@@ -61,6 +65,7 @@ add_executable(
     "src/Core/Services/LogService.cpp"
     "src/Core/Services/FileManager.cpp"
     "src/Core/Services/VulkanHandler.cpp"
+    "src/Core/WindowClasses/BaseWindow.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
     "src/Core/Services.h" # <- no .cpp file

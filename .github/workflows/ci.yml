@@ -67,10 +67,6 @@ jobs:
       with:
         version: 1.4.335.0
         cache: true
-      #shell: pwsh
-      #run: |
-      #    curl -LO https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/VulkanSDK-1.4.335.0-Installer.exe
-      #    ./VulkanSDK-1.4.335.0-Installer.exe /S
 
     # -- Linux
 
