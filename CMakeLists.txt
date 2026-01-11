@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.31)
 project(CMakeSFMLProject LANGUAGES C CXX)
 
 # NOTE: all libraries need to be imported using a repository link or have the files stored in the repository to make compilation seamless for other users.
@@ -60,6 +60,7 @@ add_executable(
     "src/Core/Pages/UiPanel.cpp"
     "src/Core/Services/LogService.cpp"
     "src/Core/Services/FileManager.cpp"
+    "src/Core/Services/VulkanHandler.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
     "src/Core/Services.h" # <- no .cpp file
