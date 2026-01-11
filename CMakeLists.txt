@@ -35,11 +35,13 @@ FetchContent_MakeAvailable(SFML)
 #endif()
 
 # Added additonal debug notes based on: https://stackoverflow.com/questions/77840729/why-is-cmake-find-packagevulkan-not-outputting-any-environment-variable
-message("Vulkan found? " ${VULKAN_FOUND})
-message("Alright, where is it? " ${Vulkan_LIBRARIES})
-message("And I can include it? " ${Vulkan_INCLUDE_DIRS})
+message("Attempting to find vulkan")
 
-find_package(Vulkan REQUIRED) # fallback to default error message.
+find_package(Vulkan QUIET) # fallback to default error message.
+
+message("Vulkan found? [" ${VULKAN_FOUND} "]")
+message("Alright, where is it? [" ${Vulkan_LIBRARIES} "]")
+message("And I can include it? [" ${Vulkan_INCLUDE_DIRS} "]")
 #find_package(Vulkan REQUIRED COMPONENTS glslc glslangValidator) # Not used right now, do more research
 
 # Download GLFW
