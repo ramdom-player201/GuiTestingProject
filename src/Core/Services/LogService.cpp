@@ -1,5 +1,7 @@
 #include "LogService.h"
+
 #include <iostream>
+#include "../ConsoleColours.h"
 
 LogService::LogQueue<20> LogService::Logs_CRITICAL;
 LogService::LogQueue<250> LogService::Logs_ERROR;
@@ -32,14 +34,43 @@ void LogService::Flush()
 
 void LogService::Log(const LogType logType, const std::string_view source, const std::string_view function, const std::string_view message)
 {
-	std::cout << "Temp -> LogService :: {source=[ " << source << " ]function=[ " << function << " ]message=[ " << message << " ]}\n";
+	{
+		std::cout <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Temp -> LogService :: {t=[" <<
+			ConsoleColours::getColourCode(AnsiColours::GREEN);
+
+		switch (logType) {
+		case LogType::CRITICAL: { std::cout << "CRITICAL"; break; }
+		case LogType::ERROR: { std::cout << "ERROR"; break; }
+		case LogType::ABNORM: { std::cout << "ABNORM"; break; }
+		case LogType::WIP: { std::cout << "WIP"; break; }
+		case LogType::SECURITY: { std::cout << "SECURITY"; break; }
+		case LogType::HIGH: { std::cout << "HIGH"; break; }
+		case LogType::MED: { std::cout << "MEDIUM"; break; }
+		case LogType::LOW: { std::cout << "LOW"; break; }
+		case LogType::TRACE: { std::cout << "TRACE"; break; }
+		case LogType::SPAM: { std::cout << "SPAM"; break; }
+		case LogType::CATCH: { std::cout << "CATCH"; break; }
+		default: { std::cout << ConsoleColours::getColourCode(AnsiColours::RED) << "UNKNOWN"; }
+		}
+
+		std::cout <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]s=[" <<
+			ConsoleColours::getColourCode(AnsiColours::BLUE) << source <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]f=[" <<
+			ConsoleColours::getColourCode(AnsiColours::MAGENTA) << function <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]m=[" <<
+			ConsoleColours::getColourCode(AnsiColours::RED) << message <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]}\n";
+	}
 
 	LogEntry newEntry{
 		logType,
 		std::chrono::system_clock::now(),
 		std::string(source),
 		std::string(function),
-		std::string(message)
+		std::string(message),
+		1,
 	};
 
 	switch (logType) {

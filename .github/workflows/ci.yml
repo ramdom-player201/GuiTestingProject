@@ -93,7 +93,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Configure
-      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} --debug-find
+      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
 
     - name: Build
-      run: cmake --build build --config Release --debug-find
+      run: cmake --build build --config Release

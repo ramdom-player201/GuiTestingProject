@@ -26,6 +26,7 @@ struct LogEntry {
 	std::string source;
 	std::string function;
 	std::string message;
+	uint16_t copies;
 };
 
 class LogService {

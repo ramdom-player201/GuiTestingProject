@@ -7,12 +7,22 @@
 #include <unordered_map>
 
 #include "../Window.h"
+#include "../WindowClasses/BaseWindow.h"
+
+// Valid Window Types
+enum class WindowTypes : uint8_t {
+	TooltipWindow,
+	ContextWindow,
+	TiledWindow,
+	DedicatedWindow,
+	TestWindow,
+};
 
 class WindowManager {
 private:
 	//static inline std::vector<std::unique_ptr<Window>> windows;
-	static inline std::unordered_map<size_t, std::shared_ptr<Window>> windows;	// list of windows with unique numeric id that does not shift
-	static inline size_t currentId{ 0 };										// initial id
+	static inline std::unordered_map<size_t, std::shared_ptr<BaseWindow>> windows;	// list of windows with unique numeric id that does not shift
+	static inline size_t currentId{ 0 };											// initial id
 public:
 	//void initialise() override;
 	//void shutdown() override;
@@ -21,10 +31,13 @@ public:
 	static inline bool debugMode{ false };
 
 	// service-specific functionality
-	static size_t createWindow(const std::string& title);		// creates a new window and adds it to list
-	static size_t countWindows();								// returns number of windows in list
-	static std::shared_ptr<Window> getWindowById(size_t id);	// returns a copy of a pointer to the window, based on its position in the vector
-	static void closeWindow(size_t id);							// closes the referenced window
+	static size_t createWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
+	static size_t countWindows();											// returns number of windows in list
+	static std::shared_ptr<BaseWindow> getWindowById(size_t id);			// returns a copy of a pointer to the window, based on its position in the vector
+	static void closeWindow(size_t id);										// closes the referenced window
 
-	static bool updateWindows();								// loop through windows, calling update on each one. Return true if command line break;
+	static bool updateWindows();											// loop through windows, calling update on each one. Return true if command line break;
+
+	// ClassName
+	static constexpr std::string_view className{ "WindowManager" };
 };

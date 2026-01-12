@@ -61,7 +61,7 @@ add_executable(
     "src/Core/Program.cpp"
     "src/Core/Services/WindowManager.cpp"
     "src/Core/Services/CommandConsole.cpp"
-    "src/Core/Window.cpp"
+   #"src/Core/Window.cpp"
     "src/Core/Services/ObjectManager.cpp"
     "src/Core/Objects/IBaseObject.cpp"
     "src/Core/Pages/WinTile.cpp"
@@ -70,6 +70,11 @@ add_executable(
     "src/Core/Services/FileManager.cpp"
     "src/Core/Services/VulkanHandler.cpp"
     "src/Core/WindowClasses/BaseWindow.cpp"
+    "src/Core/WindowClasses/TiledWindow.cpp"
+    "src/Core/WindowClasses/TooltipWindow.cpp"
+    "src/Core/WindowClasses/ContextWindow.cpp"
+    "src/Core/WindowClasses/TestWindow.cpp"
+    "src/Core/WindowClasses/DedicatedWindow.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
     "src/Core/Services.h" # <- no .cpp file

@@ -21,11 +21,11 @@ void Program::Run()
 	WindowManager::debugMode = true;
 
 	WindowManager::countWindows();
-	WindowManager::createWindow("Window 1");
-	WindowManager::createWindow("Window 2");
+	WindowManager::createWindow("Window 1",WindowTypes::TestWindow);
+	WindowManager::createWindow("Window 2", WindowTypes::TestWindow);
 	WindowManager::countWindows();
 
-	WindowManager::createWindow("Window 33");
+	WindowManager::createWindow("Window 33", WindowTypes::TestWindow);
 
 	WindowManager::debugMode = false;
 	while (WindowManager::countWindows() > 0){
@@ -40,17 +40,17 @@ void Program::Run()
 Program::Program()
 {
 	// Initialise GLFW
-	if (!glfwInit()) {
+	//if (!glfwInit()) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
 			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
 			<< ConsoleColours::getColourCode(AnsiColours::RED) << "GLFW failed to initialise\n";
 		std::cerr << "Failed to initialize GLFW" << std::endl;
-	}
-	else {
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
-			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW initialised successfully\n";
-	}
+	//}
+	//else {
+	//	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
+	//		<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
+	//		<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW initialised successfully\n";
+	//}
 
 }
 
