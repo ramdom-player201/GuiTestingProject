@@ -63,7 +63,7 @@ jobs:
 
     - name: Install Vulkan SDK (Windows)
       if: runner.os == 'Windows'
-      uses: humbletim/install-vulkan-sdk@v1.2 # https://github.com/marketplace/actions/setup-vulkan-sdk
+      uses: humbletim/setup-vulkan-sdk@v1.2.1 # https://github.com/marketplace/actions/setup-vulkan-sdk
       with:
         vulkan-query-version: 1.4.304.1
         vulkan-components: Vulkan-Headers, Vulkan-Loader
