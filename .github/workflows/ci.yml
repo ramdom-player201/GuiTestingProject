@@ -116,14 +116,9 @@ jobs:
         $vulkanLib = "$env:VULKAN_SDK\\Lib\\vulkan-1.lib"
         cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} -DVulkan_INCLUDE_DIR="$vulkanInclude" -DVulkan_LIBRARY="$vulkanLib"
     
-    - name: Configure (Linux macOS)
+    - name: Configure (Other)
       if: runner.os != 'Windows'
-      run: |
-        # Use VULKAN_SDK if set; otherwise rely on system packages or CMAKE_PREFIX_PATH
-        cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} \
-          -DVulkan_INCLUDE_DIR="${VULKAN_SDK}/include" \
-          -DVulkan_LIBRARY="${VULKAN_SDK}/lib/libvulkan.so" || true
-      shell: bash
+      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
 
     # -- Build
 
