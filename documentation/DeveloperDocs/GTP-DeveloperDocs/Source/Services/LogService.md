@@ -22,6 +22,11 @@ LogEntry units have the following fields:
 Logs are written to individual streams depending on their LogType
 Each stream is of limited size, so logs will end up being forgotten once they go out of scope
 
+LogService uses or will use:
+[[WindowManager]] For creating a DedicatedWindow to view and manage logs
+[[FileManager]] For reading/writing log files
+[[ConsoleColours]] For writing coloured text to console, temporary until GUI is done
+
 TODO:
 
 Make logs write to file
