@@ -61,24 +61,39 @@ jobs:
 
     # -- Windows
 
+   # - name: Install Vulkan SDK (Windows)
+   #   if: runner.os == 'Windows'
+   #   uses: humbletim/setup-vulkan-sdk@v1.2.1 # https://github.com/marketplace/actions/setup-vulkan-sdk
+   #   with:
+   #     vulkan-query-version: 1.4.304.1
+   #     vulkan-components: Vulkan-Headers, Vulkan-Loader
+   #     vulkan-use-cache: true
+   #
+   # - name: Debug Vulkan env (Windows)
+   #   if: runner.os == 'Windows'
+   #   shell: pwsh
+   #   run: |
+   #       Write-Host "VULKAN_SDK = $env:VULKAN_SDK"
+   #       if (-not $env:VULKAN_SDK) { Write-Host "VULKAN_SDK not set"; exit 1 }
+   #       Write-Host "Include exists: $(Test-Path \"$env:VULKAN_SDK\\Include\")"
+   #       Write-Host "Lib exists: $(Test-Path \"$env:VULKAN_SDK\\Lib\")"
+   #       Get-ChildItem "$env:VULKAN_SDK\\Include" -ErrorAction SilentlyContinue
+   #       Get-ChildItem "$env:VULKAN_SDK\\Lib" -ErrorAction SilentlyContinue
     - name: Install Vulkan SDK (Windows)
       if: runner.os == 'Windows'
-      uses: humbletim/setup-vulkan-sdk@v1.2.1 # https://github.com/marketplace/actions/setup-vulkan-sdk
+      uses: humbletim/install-vulkan-sdk@v1.2 # https://github.com/humbletim/install-vulkan-sdk
       with:
-        vulkan-query-version: 1.4.304.1
-        vulkan-components: Vulkan-Headers, Vulkan-Loader
-        vulkan-use-cache: true
+        version: 1.4.335.0
+        cache: true
 
     - name: Debug Vulkan env (Windows)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-          Write-Host "VULKAN_SDK = $env:VULKAN_SDK"
-          if (-not $env:VULKAN_SDK) { Write-Host "VULKAN_SDK not set"; exit 1 }
-          Write-Host "Include exists: $(Test-Path \"$env:VULKAN_SDK\\Include\")"
-          Write-Host "Lib exists: $(Test-Path \"$env:VULKAN_SDK\\Lib\")"
-          Get-ChildItem "$env:VULKAN_SDK\\Include" -ErrorAction SilentlyContinue
-          Get-ChildItem "$env:VULKAN_SDK\\Lib" -ErrorAction SilentlyContinue
+        Write-Host "VULKAN_SDK = $env:VULKAN_SDK"
+        Test-Path "$env:VULKAN_SDK\Include"
+        Test-Path "$env:VULKAN_SDK\Lib"
+        Get-ChildItem "$env:VULKAN_SDK\Include" -ErrorAction SilentlyContinue
 
 
 
