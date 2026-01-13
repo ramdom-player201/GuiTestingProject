@@ -15,6 +15,8 @@ enum class LogType : uint8_t {
 	MED,		// something lower priority		:: [Yellow]
 	LOW,		// something low priority		:: [White]
 
+	SUCCESS,
+
 	TRACE,		// tracks the chain of operations of the program between activities														:: [Cyan]
 	SPAM,		// rapidly called and not stored																						:: [Grey]
 	CATCH,		// when a SPAM log meets certain parameters, a CATCH copy should be kept so it doesn't get expired by other SPAM logs	:: [Green]
@@ -67,6 +69,8 @@ private:
 	static LogQueue<100> Logs_HIGH;
 	static LogQueue<100> Logs_MED;
 	static LogQueue<100> Logs_LOW;
+
+	static LogQueue<100> Logs_SUCCESS;
 
 	static LogQueue<1000> Logs_TRACE;
 	static LogQueue<100> Logs_SPAM;

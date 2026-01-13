@@ -11,6 +11,7 @@ LogService::LogQueue<20> LogService::Logs_SECURITY;
 LogService::LogQueue<100> LogService::Logs_HIGH;
 LogService::LogQueue<100> LogService::Logs_MED;
 LogService::LogQueue<100> LogService::Logs_LOW;
+LogService::LogQueue<100> LogService::Logs_SUCCESS;
 LogService::LogQueue<1000> LogService::Logs_TRACE;
 LogService::LogQueue<100> LogService::Logs_SPAM;
 LogService::LogQueue<100> LogService::Logs_CATCH;
@@ -40,27 +41,28 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 			ConsoleColours::getColourCode(AnsiColours::GREEN);
 
 		switch (logType) {
-		case LogType::CRITICAL: { std::cout << "CRITICAL"; break; }
-		case LogType::ERROR: { std::cout << "ERROR"; break; }
-		case LogType::ABNORM: { std::cout << "ABNORM"; break; }
-		case LogType::WIP: { std::cout << "WIP"; break; }
-		case LogType::SECURITY: { std::cout << "SECURITY"; break; }
-		case LogType::HIGH: { std::cout << "HIGH"; break; }
-		case LogType::MED: { std::cout << "MEDIUM"; break; }
-		case LogType::LOW: { std::cout << "LOW"; break; }
-		case LogType::TRACE: { std::cout << "TRACE"; break; }
-		case LogType::SPAM: { std::cout << "SPAM"; break; }
-		case LogType::CATCH: { std::cout << "CATCH"; break; }
+		case LogType::CRITICAL:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "CRITICAL"; /**/ break; }
+		case LogType::ERROR:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ERROR";	/**/ break; }
+		case LogType::ABNORM:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ABNORM";	/**/ break; }
+		case LogType::WIP:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "WIP";		/**/ break; }
+		case LogType::SECURITY:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)			/**/ << "SECURITY";	/**/ break; }
+		case LogType::HIGH:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "HIGH";		/**/ break; }
+		case LogType::MED:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "MEDIUM";	/**/ break; }
+		case LogType::LOW:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT)		/**/ << "LOW";		/**/ break; }
+		case LogType::SUCCESS:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_DARK)			/**/ << "SUCCESS";	/**/ break; }
+		case LogType::TRACE:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_DARK)	/**/ << "TRACE";	/**/ break; }
+		case LogType::SPAM:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_DARK)			/**/ << "SPAM";		/**/ break; }
+		case LogType::CATCH:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_BRIGHT)			/**/ << "CATCH";	/**/ break; }
 		default: { std::cout << ConsoleColours::getColourCode(AnsiColours::RED) << "UNKNOWN"; }
 		}
 
 		std::cout <<
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]s=[" <<
-			ConsoleColours::getColourCode(AnsiColours::BLUE) << source <<
+			ConsoleColours::getColourCode(AnsiColours::ORANGE_DARK) << source <<
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]f=[" <<
-			ConsoleColours::getColourCode(AnsiColours::MAGENTA) << function <<
+			ConsoleColours::getColourCode(AnsiColours::YELLOW_DARK) << function <<
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]m=[" <<
-			ConsoleColours::getColourCode(AnsiColours::RED) << message <<
+			ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) << message <<
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "]}\n";
 	}
 
