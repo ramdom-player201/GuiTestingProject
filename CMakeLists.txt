@@ -13,6 +13,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # output directory, 
 
 include(FetchContent)
 
+# Note, ensure [[Git for Windows]] is enabled if using Visual Studio, to allow CMake to import required dependencies
+
 # Download SFML
 FetchContent_Declare(
     SFML
@@ -36,12 +38,18 @@ FetchContent_MakeAvailable(SFML)
 
 # Added additonal debug notes based on: https://stackoverflow.com/questions/77840729/why-is-cmake-find-packagevulkan-not-outputting-any-environment-variable
 message("Attempting to find vulkan")
-
 find_package(Vulkan QUIET) # fallback to default error message.
-
-message("Vulkan found? [" ${VULKAN_FOUND} "]")
-message("Alright, where is it? [" ${Vulkan_LIBRARIES} "]")
-message("And I can include it? [" ${Vulkan_INCLUDE_DIRS} "]")
+message("Vulkan install status: [" ${VULKAN_FOUND} "]")
+message("Vulkan location: [" ${Vulkan_LIBRARIES} "]")
+message("Vulkan include directory: [" ${Vulkan_INCLUDE_DIRS} "]")
+if (NOT Vulkan_FOUND)
+    message(
+        FATAL_ERROR
+        "Vulkan SDK not found.\n"
+        "Please install it manually from https://vulkan.lunarg.com/sdk/home and try again.\n"
+        "Note that you may have to close and re-open your IDE after install."
+    )
+endif()
 #find_package(Vulkan REQUIRED COMPONENTS glslc glslangValidator) # Not used right now, do more research
 
 # Download GLFW
