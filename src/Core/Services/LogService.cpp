@@ -37,14 +37,15 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 {
 	{
 		std::cout <<
-			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Temp -> LogService :: {t=[" <<
-			ConsoleColours::getColourCode(AnsiColours::GREEN);
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) <<
+			ConsoleColours::getColourCode(AnsiColours::FLASH) << "Temp -> LogService" <<
+			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << " :: {t = [";
 
 		switch (logType) {
 		case LogType::CRITICAL:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "CRITICAL"; /**/ break; }
 		case LogType::ERROR:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ERROR";	/**/ break; }
 		case LogType::ABNORM:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ABNORM";	/**/ break; }
-		case LogType::WIP:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "WIP";		/**/ break; }
+		case LogType::WIP:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::FLASH) << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "WIP";		/**/ break; }
 		case LogType::SECURITY:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)			/**/ << "SECURITY";	/**/ break; }
 		case LogType::HIGH:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "HIGH";		/**/ break; }
 		case LogType::MED:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "MEDIUM";	/**/ break; }

@@ -101,6 +101,22 @@ Program::Program()
 	std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_DARK)			/**/ << "Grey Dark\n";
 	std::cout << ConsoleColours::getColourCode(AnsiColours::BLACK)				/**/ << "Black\n";
 
+	LogService::Log(LogType::CRITICAL,className,"Constructor","Testing LogTypes");
+	LogService::Log(LogType::ERROR, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::ABNORM, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::WIP, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::SECURITY, className, "Constructor", "Testing LogTypes");
+
+	LogService::Log(LogType::HIGH, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::MED, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::LOW, className, "Constructor", "Testing LogTypes");
+
+	LogService::Log(LogType::SUCCESS, className, "Constructor", "Testing LogTypes");
+
+	LogService::Log(LogType::TRACE, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::SPAM, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::CATCH, className, "Constructor", "Testing LogTypes");
+
 	//std::cout <<
 	//	"\033[0m" << "Test ansi colours" << "\033[0m" <<
 	//	"\033[1m" << " 1m " << "\033[0m" <<
