@@ -70,10 +70,16 @@ jobs:
 
     - name: Debug Vulkan env (Windows)
       if: runner.os == 'Windows'
+      shell: pwsh
       run: |
-          echo VULKAN_SDK=%VULKAN_SDK%
-          dir "%VULKAN_SDK%\Include"
-          dir "%VULKAN_SDK%\Lib"
+          Write-Host "VULKAN_SDK = $env:VULKAN_SDK"
+          if (-not $env:VULKAN_SDK) { Write-Host "VULKAN_SDK not set"; exit 1 }
+          Write-Host "Include exists: $(Test-Path \"$env:VULKAN_SDK\\Include\")"
+          Write-Host "Lib exists: $(Test-Path \"$env:VULKAN_SDK\\Lib\")"
+          Get-ChildItem "$env:VULKAN_SDK\\Include" -ErrorAction SilentlyContinue
+          Get-ChildItem "$env:VULKAN_SDK\\Lib" -ErrorAction SilentlyContinue
+
+
 
     # -- Linux
 
