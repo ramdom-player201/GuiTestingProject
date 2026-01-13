@@ -2,11 +2,11 @@
 
 #include <string>
 #include <iostream>
-#include <cstdint>
+#include <cstdint>  // <- needed to compile in Linux GCC in order to use uint8_t
 
 //class ColouredConsole;
 
-enum class AnsiColours :uint8_t {
+enum class AnsiColours : uint8_t {
 	DEFAULT,
 	// Reds
 	RED,

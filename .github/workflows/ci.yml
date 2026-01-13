@@ -68,6 +68,13 @@ jobs:
         version: 1.4.335.0
         cache: true
 
+    - name: Debug Vulkan env (Windows)
+      if: runner.os == 'Windows'
+      run: |
+          echo VULKAN_SDK=%VULKAN_SDK%
+          dir "%VULKAN_SDK%\Include"
+          dir "%VULKAN_SDK%\Lib"
+
     # -- Linux
 
     - name: Install Vulkan SDK (Linux)
