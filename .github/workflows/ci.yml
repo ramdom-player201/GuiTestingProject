@@ -128,7 +128,7 @@ jobs:
         # Use VULKAN_SDK if set; otherwise rely on system packages or CMAKE_PREFIX_PATH
         cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} \
           -DVulkan_INCLUDE_DIR="${VULKAN_SDK}/include" \
-          -DVulkan_LIBRARY="${VULKAN_SDK}/lib/libvulkan.so" || true
+          -DVulkan_LIBRARY="${VULKAN_SDK}/lib/libvulkan.dylib" || true
       shell: bash
     
     - name: Configure (Linux)
