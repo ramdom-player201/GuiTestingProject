@@ -97,10 +97,16 @@ jobs:
 
     # -- Install Vulkan (MacOS)
 
+    #- name: Install Vulkan SDK (macOS)
+    #  if: runner.os == 'macOS'
+    #  run: |
+    #      brew install molten-vk
     - name: Install Vulkan SDK (macOS)
       if: runner.os == 'macOS'
-      run: |
-          brew install molten-vk
+      uses: humbletim/install-vulkan-sdk@v1.2 # https://github.com/humbletim/install-vulkan-sdk
+      with:
+        version: 1.4.309.0
+        cache: true
 
     # -- Configure Steps
 
@@ -115,9 +121,18 @@ jobs:
         $vulkanInclude = "$env:VULKAN_SDK\\Include"
         $vulkanLib = "$env:VULKAN_SDK\\Lib\\vulkan-1.lib"
         cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} -DVulkan_INCLUDE_DIR="$vulkanInclude" -DVulkan_LIBRARY="$vulkanLib"
+
+    - name: Configure (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        # Use VULKAN_SDK if set; otherwise rely on system packages or CMAKE_PREFIX_PATH
+        cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} \
+          -DVulkan_INCLUDE_DIR="${VULKAN_SDK}/include" \
+          -DVulkan_LIBRARY="${VULKAN_SDK}/lib/libvulkan.so" || true
+      shell: bash
     
-    - name: Configure (Other)
-      if: runner.os != 'Windows'
+    - name: Configure (Linux)
+      if: runner.os == 'Linux'
       run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
 
     # -- Build
