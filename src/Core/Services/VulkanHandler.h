@@ -1,10 +1,16 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include <string>
 
 class VulkanHandler {
 private:
 	static VkInstance vulkanInstance;
+public:
+	static void Initialise();
+
+	// ClassName
+	static constexpr std::string_view className{ "VulkanHandler" };
 };
 
 // Vulkan Notes

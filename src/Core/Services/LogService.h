@@ -15,6 +15,7 @@ enum class LogType : uint8_t {
 	MED,		// something lower priority		:: [Yellow]
 	LOW,		// something low priority		:: [White]
 
+	TEST,
 	SUCCESS,
 
 	TRACE,		// tracks the chain of operations of the program between activities														:: [Cyan]
@@ -71,6 +72,7 @@ private:
 	static LogQueue<100> Logs_LOW;
 
 	static LogQueue<100> Logs_SUCCESS;
+	static LogQueue<100> Logs_TEST;
 
 	static LogQueue<1000> Logs_TRACE;
 	static LogQueue<100> Logs_SPAM;
@@ -82,7 +84,7 @@ public:
 
 	static void Log(const LogType logType, const std::string_view source, const std::string_view function, const std::string_view message);
 
-	//static size_t GetCurrentDataUsage();
+	static size_t GetCurrentDataUsage();
 
 	// logType	<- how important the log is
 	// source	<- which class created the log

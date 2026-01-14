@@ -7,6 +7,7 @@
 int main()
 {
     // quick tests
+    LogService::Log(LogType::TEST, "main", "main", "Running temporary file manager tests.");
     FileManager::ValidatePath("Place");
     FileManager::ValidatePath("Place/A/B");
     FileManager::ValidatePath("Place/A/B/../D");

@@ -9,6 +9,7 @@
 #include "Services/WindowManager.h"
 #include "Services/ObjectManager.h"
 #include "Services/LogService.h"
+#include "Services/VulkanHandler.h"
 
 enum class ServiceType {
 	CommandConsole,

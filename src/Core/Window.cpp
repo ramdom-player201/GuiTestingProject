@@ -12,33 +12,33 @@
 //
 //	// process inputs for window and redraw if necassary
 //	/*if (window.isOpen()) {
-		// handle window-specific events
-		while (const std::optional event = window.pollEvent())
-		{
-			if (event->is<sf::Event::Closed>()) // window closed, return closed for deletion
-			{
-				window.close();
-				returnData.WindowClosed = true;
-				returnData.UserCommandBreak = true; // debug
-
-			}
-			else if (event->is<sf::Event::Resized>()) { // window resized, force redraw
-			}
-			else if (event->is<sf::Event::FocusGained>()) {
-				windowInFocus = true;
-				returnData.FocusChanged = true;
-			}
-			else if (event->is<sf::Event::FocusLost>()) {
-				windowInFocus = false;
-				returnData.FocusChanged = true;
-			}
-
-		}
-		// request inputs if primary
-		//<>
-		// call draw for all UI components
-		//<>
-	}*/
+//		// handle window-specific events
+//		while (const std::optional event = window.pollEvent())
+//		{
+//			if (event->is<sf::Event::Closed>()) // window closed, return closed for deletion
+//			{
+//				window.close();
+//				returnData.WindowClosed = true;
+//				returnData.UserCommandBreak = true; // debug
+//
+//			}
+//			else if (event->is<sf::Event::Resized>()) { // window resized, force redraw
+//			}
+//			else if (event->is<sf::Event::FocusGained>()) {
+//				windowInFocus = true;
+//				returnData.FocusChanged = true;
+//			}
+//			else if (event->is<sf::Event::FocusLost>()) {
+//				windowInFocus = false;
+//				returnData.FocusChanged = true;
+//			}
+//
+//		}
+//		// request inputs if primary
+//		//<>
+//		// call draw for all UI components
+//		//<>
+//	}*/
 //
 //	// ---------------------------------------------------------------------------- //
 //	// GLFW implementation

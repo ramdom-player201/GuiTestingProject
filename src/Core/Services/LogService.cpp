@@ -12,6 +12,7 @@ LogService::LogQueue<100> LogService::Logs_HIGH;
 LogService::LogQueue<100> LogService::Logs_MED;
 LogService::LogQueue<100> LogService::Logs_LOW;
 LogService::LogQueue<100> LogService::Logs_SUCCESS;
+LogService::LogQueue<100> LogService::Logs_TEST;
 LogService::LogQueue<1000> LogService::Logs_TRACE;
 LogService::LogQueue<100> LogService::Logs_SPAM;
 LogService::LogQueue<100> LogService::Logs_CATCH;
@@ -45,12 +46,13 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 		case LogType::CRITICAL:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "CRITICAL"; /**/ break; }
 		case LogType::ERROR:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ERROR";	/**/ break; }
 		case LogType::ABNORM:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED)					/**/ << "ABNORM";	/**/ break; }
-		case LogType::WIP:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::FLASH) << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "WIP";		/**/ break; }
+		case LogType::WIP:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::FLASH) << ConsoleColours::getColourCode(AnsiColours::PINK)			/**/ << "WIP";	/**/ break; }
 		case LogType::SECURITY:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)			/**/ << "SECURITY";	/**/ break; }
 		case LogType::HIGH:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "HIGH";		/**/ break; }
 		case LogType::MED:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "MEDIUM";	/**/ break; }
 		case LogType::LOW:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT)		/**/ << "LOW";		/**/ break; }
-		case LogType::SUCCESS:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_DARK)			/**/ << "SUCCESS";	/**/ break; }
+		case LogType::SUCCESS:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN)				/**/ << "SUCCESS";	/**/ break; }
+		case LogType::TEST:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::FLASH) << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)	/**/ << "TEST";	/**/ break; }
 		case LogType::TRACE:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_DARK)	/**/ << "TRACE";	/**/ break; }
 		case LogType::SPAM:		/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_DARK)			/**/ << "SPAM";		/**/ break; }
 		case LogType::CATCH:	/**/ { std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_BRIGHT)			/**/ << "CATCH";	/**/ break; }
@@ -78,52 +80,22 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 
 	switch (logType) {
 		//-----------------//
-	case LogType::CRITICAL: {
-		Logs_CRITICAL.pushLog(newEntry);
-		break;
-	}
-	case LogType::ERROR: {
-		Logs_ERROR.pushLog(newEntry);
-		break;
-	}
-	case LogType::ABNORM: {
-		Logs_ABNORM.pushLog(newEntry);
-		break;
-	}
-	case LogType::WIP: {
-		Logs_WIP.pushLog(newEntry);
-		break;
-	}
-	case LogType::SECURITY: {
-		Logs_SECURITY.pushLog(newEntry);
-		break;
-	}
+	case LogType::CRITICAL: { Logs_CRITICAL.pushLog(newEntry); break; }
+	case LogType::ERROR: { Logs_ERROR.pushLog(newEntry); break; }
+	case LogType::ABNORM: { Logs_ABNORM.pushLog(newEntry); break; }
+	case LogType::WIP: { Logs_WIP.pushLog(newEntry); break; }
+	case LogType::SECURITY: { Logs_SECURITY.pushLog(newEntry); break; }
 						  //-----------------//
-	case LogType::HIGH: {
-		Logs_HIGH.pushLog(newEntry);
-		break;
-	}
-	case LogType::MED: {
-		Logs_MED.pushLog(newEntry);
-		break;
-	}
-	case LogType::LOW: {
-		Logs_LOW.pushLog(newEntry);
-		break;
-	}
+	case LogType::HIGH: { Logs_HIGH.pushLog(newEntry); break; }
+	case LogType::MED: { Logs_MED.pushLog(newEntry); break; }
+	case LogType::LOW: { Logs_LOW.pushLog(newEntry); break; }
 					 //-----------------//
-	case LogType::TRACE: {
-		Logs_TRACE.pushLog(newEntry);
-		break;
-	}
-	case LogType::SPAM: {
-		Logs_SPAM.pushLog(newEntry);
-		break;
-	}
-	case LogType::CATCH: {
-		Logs_CATCH.pushLog(newEntry);
-		break;
-	}
+	case LogType::SUCCESS: { Logs_SUCCESS.pushLog(newEntry); break; }
+	case LogType::TEST: { Logs_TEST.pushLog(newEntry); break; }
+					  //-----------------//
+	case LogType::TRACE: { Logs_TRACE.pushLog(newEntry); break; }
+	case LogType::SPAM: { Logs_SPAM.pushLog(newEntry); break; }
+	case LogType::CATCH: { Logs_CATCH.pushLog(newEntry);	break; }
 					   //-----------------//
 	default: {
 		Logs_ERROR.pushLog(
@@ -139,10 +111,27 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 	}
 }
 
-//size_t LogService::GetCurrentDataUsage()
-//{
-//	// get size of each log, then add together
-//	size_t totalSize{ 0 };
-//
-//	return size_t();
-//}
+size_t LogService::GetCurrentDataUsage()
+{
+	// get size of each log, then add together
+	size_t totalSize{ 0 };
+
+	totalSize += Logs_CRITICAL.getQueueSize();
+	totalSize += Logs_ERROR.getQueueSize();
+	totalSize += Logs_ABNORM.getQueueSize();
+	totalSize += Logs_WIP.getQueueSize();
+	totalSize += Logs_SECURITY.getQueueSize();
+
+	totalSize += Logs_HIGH.getQueueSize();
+	totalSize += Logs_MED.getQueueSize();
+	totalSize += Logs_LOW.getQueueSize();
+
+	totalSize += Logs_SUCCESS.getQueueSize();
+	totalSize += Logs_TEST.getQueueSize();
+
+	totalSize += Logs_TRACE.getQueueSize();
+	totalSize += Logs_SPAM.getQueueSize();
+	totalSize += Logs_CATCH.getQueueSize();
+
+	return totalSize;
+}

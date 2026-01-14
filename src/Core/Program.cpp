@@ -8,6 +8,14 @@ void Program::Run()
 {
 	std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN) << "Starting "
 		<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "program\n";
+	LogService::Log(
+		LogType::TRACE,
+		className,
+		"Run",
+		"Program Start"
+	);
+
+	VulkanHandler::Initialise();
 
 	Services::initialise();
 	//auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
@@ -53,53 +61,9 @@ Program::Program()
 			"Constructor",
 			"GLFW initialised successfully"
 		);
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-			<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Constructor] :: "
-			<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "GLFW initialised successfully\n";
 	}
 
-	std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "Red Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::RED)				/**/ << "Red\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::RED_DARK)			/**/ << "Red Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "Orange Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE)				/**/ << "Orange\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_DARK)		/**/ << "Orange Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT)		/**/ << "Yellow Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW)				/**/ << "Yellow\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_DARK)		/**/ << "Yellow Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_BRIGHT)		/**/ << "Green Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN)				/**/ << "Green\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_DARK)			/**/ << "Green Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_BRIGHT)		/**/ << "Cyan Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN)				/**/ << "Cyan\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_DARK)			/**/ << "Cyan Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)		/**/ << "Blue Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE)				/**/ << "Blue\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_DARK)			/**/ << "Blue Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_BRIGHT)		/**/ << "Purple Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE)				/**/ << "Purple\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_DARK)		/**/ << "Purple Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "Magenta Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA)			/**/ << "Magenta\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_DARK)		/**/ << "Magenta Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_BRIGHT)		/**/ << "Pink Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "Pink\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_DARK)			/**/ << "Pink Dark\n";
-
-	std::cout << ConsoleColours::getColourCode(AnsiColours::WHITE)				/**/ << "White\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_BRIGHT)		/**/ << "Grey Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT)	/**/ << "Grey Medium Bright\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_DARK)	/**/ << "Grey Medium Dark\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_DARK)			/**/ << "Grey Dark\n";
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLACK)				/**/ << "Black\n";
+	ConsoleColours::PrintTestColours();
 
 	LogService::Log(LogType::CRITICAL,className,"Constructor","Testing LogTypes");
 	LogService::Log(LogType::ERROR, className, "Constructor", "Testing LogTypes");
@@ -135,9 +99,11 @@ Program::Program()
 
 Program::~Program()
 {
-	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Program > "
-		<< ConsoleColours::getColourCode(AnsiColours::YELLOW) << "[Destructor] :: "
-		<< ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "Program closing\n";
-	//glfwTerminate(); // Note: in the event of multiple program creations,
+	LogService::Log(LogType::TRACE, className, "Destructor", "Program Closing");
+	LogService::Log(LogType::WIP, className, "Destructor", "Note: WindowManager needs to clear all windows prior to GLFW Terminate");
+	glfwTerminate(); // Note: in the event of multiple program creations,
 					   //       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
+					   // ??? window creation or program? program already initialises when created. 
+	                   // If program goes out of scope, WindowManager persists as is static.
+	LogService::Log(LogType::TRACE, className, "Destructor", "GLFW Terminated");
 }
