@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
-#include <expected>
+//#include <expected>
 #include <string>
 
 class FileManager {
@@ -13,8 +13,14 @@ private:
 
 public: // temporary access
 
+	struct PathValidationResult {
+		std::filesystem::path path;
+		bool errored{ true }; // defaults to error except where success
+		std::string error{ "" };
+	};
+
 	// Helper function to sanitise relativePaths to ensure they don't escape the directory
-	static std::expected<std::filesystem::path,std::string> ValidatePath(const std::string& relativePath);
+	static PathValidationResult ValidatePath(const std::string& relativePath);
 
 public:
 
@@ -27,7 +33,7 @@ public:
 	// consider using a "File" class to automatically manage file opening/closing via constructor/destructor
 
 	// ClassName
-	static constexpr std::string_view className{"FileManager"};
+	static constexpr std::string_view className{ "FileManager" };
 };
 
 // used to create/edit/delete files and folders

@@ -7,7 +7,7 @@ std::filesystem::path FileManager::programDirectory{ std::filesystem::current_pa
 
 // FUNCTIONS //
 
-std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(const std::string& relativePath)
+FileManager::PathValidationResult FileManager::ValidatePath(const std::string& relativePath)
 {
 	constexpr std::string_view functionName{ "ValidatePath" };
 
@@ -39,7 +39,8 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 			functionName,
 			"SECURITY: ACCESS DENIED"
 		);
-		return std::unexpected("Security Error, failed to access file because {Out of Bounds}");
+		//return std::unexpected("Security Error, failed to access file because {Out of Bounds}");
+		return { "",true,"Security Error, failed to access file because {Out of Bounds}" };
 	} // code exits here if trying to access out of bounds
 
 	// Check if directory or file path
@@ -85,7 +86,8 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 					functionName,
 					"Failed to create file"
 				);
-				return std::unexpected("Failed to create file: " + normalised.string());
+				//return std::unexpected("Failed to create file: " + normalised.string());
+				return { "",true,"Failed to create file: " + normalised.string() };
 			}
 		}
 	}
@@ -109,5 +111,6 @@ std::expected<std::filesystem::path, std::string> FileManager::ValidatePath(cons
 			std::filesystem::create_directories(normalised);
 		}
 	}
-	return normalised;
+	//return normalised;
+	return{ normalised, false };
 }
