@@ -35,9 +35,16 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 	}
 	switch (type) {
 	case WindowTypes::TooltipWindow: {
+		LogService::Log(
+			LogType::TRACE,
+			className,
+			functionName,
+			"Creating new window of type <TooltipWindow>..."
+		);
+		//
 		std::shared_ptr<TooltipWindow> window = std::make_shared<TooltipWindow>(currentId); // create new window
 		windows[currentId] = window;
-
+		//
 		LogService::Log(
 			LogType::TRACE,
 			className,
@@ -47,9 +54,16 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 		break;
 	}
 	case WindowTypes::ContextWindow: {
+		LogService::Log(
+			LogType::TRACE,
+			className,
+			functionName,
+			"Creating new window of type <ContextWindow>..."
+		);
+		//
 		std::shared_ptr<ContextWindow> window = std::make_shared<ContextWindow>(currentId); // create new window
 		windows[currentId] = window;
-
+		//
 		LogService::Log(
 			LogType::TRACE,
 			className,
@@ -59,9 +73,16 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 		break;
 	}
 	case WindowTypes::TiledWindow: {
+		LogService::Log(
+			LogType::TRACE,
+			className,
+			functionName,
+			"Creating new window of type <TiledWindow>..."
+		);
+		//
 		std::shared_ptr<TiledWindow> window = std::make_shared<TiledWindow>(currentId); // create new window
 		windows[currentId] = window;
-
+		//
 		LogService::Log(
 			LogType::TRACE,
 			className,
@@ -71,9 +92,16 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 		break;
 	}
 	case WindowTypes::DedicatedWindow: {
+		LogService::Log(
+			LogType::TRACE,
+			className,
+			functionName,
+			"Creating new window of type <DedicatedWindow>..."
+		);
+		//
 		std::shared_ptr<DedicatedWindow> window = std::make_shared<DedicatedWindow>(currentId); // create new window
 		windows[currentId] = window;
-
+		//
 		LogService::Log(
 			LogType::TRACE,
 			className,
@@ -83,9 +111,16 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 		break;
 	}
 	case WindowTypes::TestWindow: {
+		LogService::Log(
+			LogType::TRACE,
+			className,
+			functionName,
+			"Creating new window of type <TestWindow>..."
+		);
+		//
 		std::shared_ptr<TestWindow> window = std::make_shared<TestWindow>(currentId); // create new window
 		windows[currentId] = window;
-
+		//
 		LogService::Log(
 			LogType::TRACE,
 			className,

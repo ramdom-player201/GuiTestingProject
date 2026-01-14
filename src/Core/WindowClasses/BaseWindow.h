@@ -15,6 +15,7 @@ private:
 	BaseWindow() {}; // Cannot contruct a BaseWindow without an id.
 protected:
 	size_t windowId{ 0 };
+	GLFWwindow* window{ nullptr };
 public:
 	WindowReturnData Update();
 

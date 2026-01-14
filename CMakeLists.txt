@@ -64,6 +64,14 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)       # turn off tests         <- 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)        # turn off documentation <- this is available offline
 FetchContent_MakeAvailable(glfw)
 
+# Download GLM          #https://github.com/g-truc/glm
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	0af55ccecd98d4e5a8d1fad7de25ba429d60e863 #refs/tags/1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
 add_executable(
     main src/main.cpp
     "src/Core/Program.cpp"
@@ -104,6 +112,7 @@ target_link_libraries(
     main PRIVATE
     SFML::Graphics
     Vulkan::Vulkan
+    glm::glm
     glfw
     glad
 )
