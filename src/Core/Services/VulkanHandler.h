@@ -5,9 +5,10 @@
 
 class VulkanHandler {
 private:
-	static VkInstance vulkanInstance;
+	static inline VkInstance vulkanInstance;
 public:
-	static void Initialise();
+	static void  Initialise();
+	static void Cleanup();
 
 	// ClassName
 	static constexpr std::string_view className{ "VulkanHandler" };

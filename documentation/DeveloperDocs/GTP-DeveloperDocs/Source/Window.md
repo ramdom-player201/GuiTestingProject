@@ -19,3 +19,5 @@ BaseWindow:
      Displays a list of clickable context options, which themselves can have nested options.
 ⨽ DedicatedWindow
      Holds a single UiPanel that renders things as normal, no tiling and no toolbar. Headers and footers are included as normal.
+⨽ TestWindow
+     Handles its own rendering and input management independent of other services to test features ahead of full implementation.

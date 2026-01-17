@@ -30,10 +30,17 @@ WindowReturnData BaseWindow::Update()
 	return WRD;
 }
 
-BaseWindow::BaseWindow(size_t id) {
+BaseWindow::BaseWindow(size_t id) { // Constructor
 	windowId = id;
 
 	// https://vulkan-tutorial.com/Development_environment
+
+	LogService::Log(
+		LogType::TRACE,
+		"BaseWindow",
+		"Constructor",
+		"Creating window with id: [" + std::to_string(windowId) + "] "
+	);
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);

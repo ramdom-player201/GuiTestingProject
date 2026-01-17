@@ -16,8 +16,6 @@ void Program::Run()
 		"Program Start"
 	);
 
-	VulkanHandler::Initialise();
-
 	//Services::initialise();
 	//auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
 	//auto windowManager2 = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
@@ -45,12 +43,16 @@ void Program::Run()
 
 Program::Program()
 {
+	constexpr std::string_view functionName{ "Constructor" };
+
+	LogService::Log(LogType::TRACE, className, functionName, "Running program initialisations");
+
 	// Initialise GLFW
 	if (!glfwInit()) {
 		LogService::Log(
 			LogType::CRITICAL,
 			className,
-			"Constructor",
+			functionName,
 			"GLFW failed to initialise"
 		);
 		std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -59,28 +61,35 @@ Program::Program()
 		LogService::Log(
 			LogType::SUCCESS,
 			className,
-			"Constructor",
+			functionName,
 			"GLFW initialised successfully"
 		);
 	}
 
+	// Initialise Vulkan
+
+	VulkanHandler::Initialise();
+
+	// Temporary test stuff
+
 	ConsoleColours::PrintTestColours();
 
-	LogService::Log(LogType::CRITICAL,className,"Constructor","Testing LogTypes");
-	LogService::Log(LogType::ERROR, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::ABNORM, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::WIP, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::SECURITY, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::TEST, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::CRITICAL,className, functionName,"Testing LogTypes");
+	LogService::Log(LogType::ERROR, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::ABNORM, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::WIP, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::SECURITY, className, functionName, "Testing LogTypes");
 
-	LogService::Log(LogType::HIGH, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::MED, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::LOW, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::HIGH, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::MED, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::LOW, className, functionName, "Testing LogTypes");
 
-	LogService::Log(LogType::SUCCESS, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::SUCCESS, className, functionName, "Testing LogTypes");
 
-	LogService::Log(LogType::TRACE, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::SPAM, className, "Constructor", "Testing LogTypes");
-	LogService::Log(LogType::CATCH, className, "Constructor", "Testing LogTypes");
+	LogService::Log(LogType::TRACE, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::SPAM, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::CATCH, className, functionName, "Testing LogTypes");
 
 	//std::cout <<
 	//	"\033[0m" << "Test ansi colours" << "\033[0m" <<
@@ -100,11 +109,14 @@ Program::Program()
 
 Program::~Program()
 {
-	LogService::Log(LogType::TRACE, className, "Destructor", "Program Closing");
-	LogService::Log(LogType::WIP, className, "Destructor", "Note: WindowManager needs to clear all windows prior to GLFW Terminate");
+	constexpr std::string_view functionName{ "Destructor" };
+
+	LogService::Log(LogType::TRACE, className, functionName, "Program Closing");
+	VulkanHandler::Cleanup(); // cleanup vulkan before glfw
+	LogService::Log(LogType::WIP, className, functionName, "Note: WindowManager needs to clear all windows prior to GLFW Terminate");
 	glfwTerminate(); // Note: in the event of multiple program creations,
 					   //       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
 					   // ??? window creation or program? program already initialises when created. 
 	                   // If program goes out of scope, WindowManager persists as is static.
-	LogService::Log(LogType::TRACE, className, "Destructor", "GLFW Terminated");
+	LogService::Log(LogType::SUCCESS, className, functionName, "GLFW Terminated");
 }
