@@ -2,6 +2,19 @@
 
 #include "LogService.h"
 #include <GLFW/glfw3.h>
+#include <map>
+
+bool isDeviceSuitable(VkPhysicalDevice device) {
+
+	VkPhysicalDeviceProperties deviceProperties;
+	vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+	VkPhysicalDeviceFeatures deviceFeatures;
+	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+	// unknown what features are needed at this stage, so return true for any
+	return true;
+}
 
 void VulkanHandler::Initialise() {
 	constexpr std::string_view functionName{ "Initialise" };
@@ -63,6 +76,37 @@ void VulkanHandler::Initialise() {
 		);
 	}
 
+	// Choose PhysicalDevice
+
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+	uint32_t deviceCount{ 0 };
+	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, nullptr); // count vulkan compatible devices
+	LogService::Log(LogType::TRACE, className, functionName,
+		"Vulkan found [" + std::to_string(deviceCount) + "] compatible devices"
+	);
+
+	if (deviceCount == 0) { // log critical and crash if no supported GPUs
+		LogService::Log(LogType::CRITICAL, className, functionName,
+			"Failed to find GPU with Vulkan support"
+		);
+		throw std::runtime_error("Failed to find GPU with Vulkan support");
+	}
+
+	std::vector<VkPhysicalDevice> devices(deviceCount); // check features of supported devices and choose first
+	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data());
+	for (const auto& device : devices) {
+		if (isDeviceSuitable(device)) {
+			physicalDevice = device;
+		}
+	}
+
+	if (physicalDevice == VK_NULL_HANDLE) {
+		LogService::Log(LogType::CRITICAL, className, functionName,
+			"Failed to select a suitable GPU"
+		);
+		throw std::runtime_error("Failed to select a suitable GPU");
+	}
 }
 
 void VulkanHandler::Cleanup()

@@ -3,9 +3,12 @@
 #include "Core/Program.h"
 #include "Core/Services/LogService.h"
 #include "Core/Services/FileManager.h"
+#include <iostream>
 
 int main()
 {
+    //std::cout << "Log size: " << LogService::GetCurrentDataUsage() << std::endl;
+
     // quick tests
     LogService::Log(LogType::TEST, "main", "main", "Running temporary file manager tests.");
     FileManager::ValidatePath("Place");
@@ -22,4 +25,6 @@ int main()
     Program p;  // create program
     p.Run();    // run program
     LogService::Flush();
+
+    //std::cout << "Log size: " << LogService::GetCurrentDataUsage() << std::endl;
 }

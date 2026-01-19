@@ -75,7 +75,7 @@ Program::Program()
 	ConsoleColours::PrintTestColours();
 
 	LogService::Log(LogType::TEST, className, functionName, "Testing LogTypes");
-	LogService::Log(LogType::CRITICAL,className, functionName,"Testing LogTypes");
+	LogService::Log(LogType::CRITICAL, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::ERROR, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::ABNORM, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::WIP, className, functionName, "Testing LogTypes");
@@ -115,8 +115,8 @@ Program::~Program()
 	VulkanHandler::Cleanup(); // cleanup vulkan before glfw
 	LogService::Log(LogType::WIP, className, functionName, "Note: WindowManager needs to clear all windows prior to GLFW Terminate");
 	glfwTerminate(); // Note: in the event of multiple program creations,
-					   //       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
-					   // ??? window creation or program? program already initialises when created. 
-	                   // If program goes out of scope, WindowManager persists as is static.
+	//       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution
+	// ??? window creation or program? program already initialises when created. 
+	// If program goes out of scope, WindowManager persists as is static.
 	LogService::Log(LogType::SUCCESS, className, functionName, "GLFW Terminated");
 }
