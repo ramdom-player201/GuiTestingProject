@@ -3,6 +3,7 @@
 #include "LogService.h"
 #include <GLFW/glfw3.h>
 #include <map>
+#include <vector>
 
 bool isDeviceSuitable(VkPhysicalDevice device) {
 
