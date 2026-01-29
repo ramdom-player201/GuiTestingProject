@@ -16,15 +16,15 @@ include(FetchContent)
 # Note, ensure [[Git for Windows]] is enabled if using Visual Studio, to allow CMake to import required dependencies
 
 # Download SFML
-FetchContent_Declare(
-    SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 3.0.1   # defines project version, SFML 3.0.1 in this case
-    GIT_SHALLOW ON  # only download the latest version, and not full version history
-    EXCLUDE_FROM_ALL
-    SYSTEM
-)
-FetchContent_MakeAvailable(SFML)
+#FetchContent_Declare(
+#    SFML
+#    GIT_REPOSITORY https://github.com/SFML/SFML.git
+#    GIT_TAG 3.0.1   # defines project version, SFML 3.0.1 in this case
+#    GIT_SHALLOW ON  # only download the latest version, and not full version history
+#    EXCLUDE_FROM_ALL
+#    SYSTEM
+#)
+#FetchContent_MakeAvailable(SFML)
 
 # Import VULKAN -- SDK needs to be installed manually :: https://vulkan.lunarg.com/sdk/home
 #find_package(Vulkan QUIET)
@@ -113,7 +113,7 @@ target_include_directories(
 
 target_link_libraries(
     main PRIVATE
-    SFML::Graphics
+    #SFML::Graphics
     Vulkan::Vulkan
     #glm::glm           # not supported as a linked library
     glfw

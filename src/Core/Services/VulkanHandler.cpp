@@ -3,7 +3,7 @@
 #include "LogService.h"
 #include <GLFW/glfw3.h>
 #include <map>
-#include <vector>
+#include <vector> // needed to build for MacOS
 
 bool isDeviceSuitable(VkPhysicalDevice device) {
 

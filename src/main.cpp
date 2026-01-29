@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+//#include <SFML/Graphics.hpp>
 
 #include "Core/Program.h"
 #include "Core/Services/LogService.h"
