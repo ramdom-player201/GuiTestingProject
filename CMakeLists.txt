@@ -70,6 +70,8 @@ FetchContent_Declare(
     GIT_REPOSITORY	https://github.com/g-truc/glm.git
 	GIT_TAG 	0af55ccecd98d4e5a8d1fad7de25ba429d60e863 #refs/tags/1.0.1
 )
+set(GLM_BUILD_TESTS OFF CACHE BOOL "" FORCE)        # Do not build a library target, enforce header-only usage
+set(GLM_ENABLE_CXX_20_GCC ON CACHE BOOL "" FORCE)   # Optional: ensures C++20 standard is respected
 FetchContent_MakeAvailable(glm)
 
 add_executable(
@@ -112,7 +114,7 @@ target_link_libraries(
     main PRIVATE
     SFML::Graphics
     Vulkan::Vulkan
-    glm::glm
+    #glm::glm           # not supported as a linked library
     glfw
     glad
 )
