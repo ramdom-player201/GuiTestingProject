@@ -108,7 +108,7 @@ add_library(
 target_include_directories(
     glad PUBLIC
     external/glad/include
-    ${glm_SOURCE_DIR}
+    ${glm_SOURCE_DIR}       # link GLM as static library
 )
 
 target_link_libraries(
