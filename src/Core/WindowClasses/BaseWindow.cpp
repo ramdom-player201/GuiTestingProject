@@ -2,9 +2,9 @@
 
 #include "../Services/LogService.h"
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.h> // This include takes priority, since removing it causes compile error
 
-#define GLFW_INCLUDE_VULKAN
+//#define GLFW_INCLUDE_VULKAN // we already require vulkan manually
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS

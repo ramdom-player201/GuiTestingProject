@@ -128,47 +128,47 @@ public:
 	static void PrintTestColours() {
 		LogService::Log(LogType::TEST, "ConsoleColours", "PrintTestColours", "Testing printable Colours");
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "Red Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::RED)				/**/ << "Red\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::RED_DARK)			/**/ << "Red Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::RED_BRIGHT)			/**/ << "Red Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::RED)				/**/ << "Red >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::RED_DARK)			/**/ << "Red Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "Orange Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE)				/**/ << "Orange\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_DARK)		/**/ << "Orange Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_BRIGHT)		/**/ << "Orange Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE)				/**/ << "Orange >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::ORANGE_DARK)		/**/ << "Orange Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT)		/**/ << "Yellow Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW)				/**/ << "Yellow\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_DARK)		/**/ << "Yellow Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT)		/**/ << "Yellow Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW)				/**/ << "Yellow >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::YELLOW_DARK)		/**/ << "Yellow Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_BRIGHT)		/**/ << "Green Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN)				/**/ << "Green\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_DARK)			/**/ << "Green Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_BRIGHT)		/**/ << "Green Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN)				/**/ << "Green >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREEN_DARK)			/**/ << "Green Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_BRIGHT)		/**/ << "Cyan Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN)				/**/ << "Cyan\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_DARK)			/**/ << "Cyan Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_BRIGHT)		/**/ << "Cyan Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN)				/**/ << "Cyan >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::CYAN_DARK)			/**/ << "Cyan Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)		/**/ << "Blue Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE)				/**/ << "Blue\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_DARK)			/**/ << "Blue Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_BRIGHT)		/**/ << "Blue Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE)				/**/ << "Blue >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE_DARK)			/**/ << "Blue Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_BRIGHT)		/**/ << "Purple Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE)				/**/ << "Purple\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_DARK)		/**/ << "Purple Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_BRIGHT)		/**/ << "Purple Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE)				/**/ << "Purple >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PURPLE_DARK)		/**/ << "Purple Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "Magenta Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA)			/**/ << "Magenta\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_DARK)		/**/ << "Magenta Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_BRIGHT)		/**/ << "Magenta Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA)			/**/ << "Magenta >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::MAGENTA_DARK)		/**/ << "Magenta Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_BRIGHT)		/**/ << "Pink Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "Pink\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_DARK)			/**/ << "Pink Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_BRIGHT)		/**/ << "Pink Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK)				/**/ << "Pink >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::PINK_DARK)			/**/ << "Pink Dark >";
 
-		std::cout << ConsoleColours::getColourCode(AnsiColours::WHITE)				/**/ << "White\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_BRIGHT)		/**/ << "Grey Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT)	/**/ << "Grey Medium Bright\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_DARK)	/**/ << "Grey Medium Dark\n";
-		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_DARK)			/**/ << "Grey Dark\n";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::WHITE)				/**/ << "White >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_BRIGHT)		/**/ << "Grey Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT)	/**/ << "Grey Medium Bright >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_DARK)	/**/ << "Grey Medium Dark >";
+		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_DARK)			/**/ << "Grey Dark >";
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLACK)				/**/ << "Black\n";
 	}
 };

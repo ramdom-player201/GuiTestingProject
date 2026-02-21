@@ -5,7 +5,7 @@
 
 class VulkanHandler {
 private:
-	static inline VkInstance vulkanInstance;
+	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in Initialise() function
 public:
 	static void  Initialise();
 	static void Cleanup();
@@ -26,7 +26,7 @@ public:
 //- VkPhysicalDevice						:: Handle representing a GPU, choose GPU, query GPU capabilities
 // ::
 // --------------------------------------- --------------------------------------- --------------------------------------- ---------------------------------------
-//- VkDevice + queues						:: Interface to GPU, queue fpr commands
+//- VkDevice + queues						:: Interface to GPU, queue for commands
 // ::
 // --------------------------------------- --------------------------------------- --------------------------------------- ---------------------------------------
 //- VkSwapchainKHR							:: Rotating set of images displayed to screen
