@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -16,6 +17,7 @@ private:
 protected:
 	size_t windowId{ 0 };
 	GLFWwindow* window{ nullptr };
+	VkSurfaceKHR surface{ VK_NULL_HANDLE };
 public:
 	WindowReturnData Update();
 
@@ -23,4 +25,7 @@ public:
 
 	BaseWindow(size_t id);	// instantiate a window
 	~BaseWindow();			// cleanup window by deleting glfwWindow
+
+	// ClassName
+	static constexpr std::string_view className{ "BaseWindow" };
 };

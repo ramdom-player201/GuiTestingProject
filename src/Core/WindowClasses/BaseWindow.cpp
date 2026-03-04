@@ -2,15 +2,12 @@
 
 #include "../Services/LogService.h"
 
-#include <vulkan/vulkan.h> // This include takes priority, since removing it causes compile error
-
-//#define GLFW_INCLUDE_VULKAN // we already require vulkan manually
-#include <GLFW/glfw3.h>
-
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include "../Services/VulkanHandler.h"
+
 
 WindowReturnData BaseWindow::Update()
 {
@@ -31,29 +28,37 @@ WindowReturnData BaseWindow::Update()
 }
 
 BaseWindow::BaseWindow(size_t id) { // Constructor
+	constexpr std::string_view functionName{ "Constructor" };
+
 	windowId = id;
 
 	// https://vulkan-tutorial.com/Development_environment
 
-	LogService::Log(
-		LogType::TRACE,
-		"BaseWindow",
-		"Constructor",
-		"Creating window with id: [" + std::to_string(windowId) + "] "
-	);
+	LogService::Log(LogType::TRACE, className, functionName, "Creating window with id: [" + std::to_string(windowId) + "] ");
 
+
+	// CREATE GLFW WINDOW HINT
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
+
+	// CREATE GLFW WINDOW SURFACE
+
+	VkInstance vkInstance = VulkanHandler::GetInstance();
+	if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
+		LogService::Log(LogType::SUCCESS, className, functionName, "Created glfw-vulkan window surface");
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, functionName, "Failed to create window surface");
+	}
+
+	// CHECK EXTENSIONS?
 
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
-	LogService::Log(
-		LogType::TRACE,
-		"BaseWindow",
-		"Constructor",
-		"Vulkan supported extensions: [" + std::to_string(extensionCount) + "] "
-	);
+	LogService::Log(LogType::TRACE, className, functionName, "Vulkan supported extensions: [" + std::to_string(extensionCount) + "] ");
+
+	// SOMETHING MATHS (WIP)
 
 	glm::mat4 matrix;
 	glm::vec4 vec;
@@ -61,11 +66,7 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 }
 
 BaseWindow::~BaseWindow() {
-	LogService::Log(
-		LogType::TRACE,
-		"BaseWindow",
-		"Destructor",
-		"Destroying window :: id = [" + std::to_string(windowId) + "] "
-	);
+	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window :: id = [" + std::to_string(windowId) + "] ");
+	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
 	glfwDestroyWindow(window);
 }

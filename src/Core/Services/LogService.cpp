@@ -19,7 +19,8 @@ LogService::LogQueue<100> LogService::Logs_CATCH;
 
 void LogService::Initialise()
 {
-	std::cout << "LogService::Initialise()" << std::endl;
+	std::cout << "LogService::Initialise()\n";
+	std::cout << "WIP, initialise does nothing right now" << std::endl;
 }
 
 void LogService::Flush()
