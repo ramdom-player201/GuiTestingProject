@@ -8,6 +8,9 @@
 class VulkanHandler {
 private:
 	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in Initialise() function
+	static inline VkDevice logicalDevice; // initialised via vkCreateDevice in Initialise() function
+
+	static inline VkQueue graphicsQueue;
 
 	static bool IsDeviceSuitable(VkPhysicalDevice device);
 public:

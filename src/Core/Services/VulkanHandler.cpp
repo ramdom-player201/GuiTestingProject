@@ -135,22 +135,22 @@ void VulkanHandler::Initialise() {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Define VKInstanceCreateInfo
+	// Define VKInstanceCreateInfo (uses VkApplicationInfo)
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// https://docs.vulkan.org/refpages/latest/refpages/source/VkInstanceCreateInfo.html
 
-	VkInstanceCreateInfo createInfo{};
+	VkInstanceCreateInfo instanceCreateInfo{};
 	{
-		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO; // reflection for struct type
-		createInfo.pApplicationInfo = &appInfo; // << application metadata
+		instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO; // reflection for struct type
+		instanceCreateInfo.pApplicationInfo = &appInfo; // << application metadata
 
 		// Extensions
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions; // null-terminated UTF-8 string
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		createInfo.enabledExtensionCount = glfwExtensionCount;	// number of global extensions to enable
-		createInfo.ppEnabledExtensionNames = glfwExtensions;	// array of strings with the names of each extension to enable
+		instanceCreateInfo.enabledExtensionCount = glfwExtensionCount;	// number of global extensions to enable
+		instanceCreateInfo.ppEnabledExtensionNames = glfwExtensions;	// array of strings with the names of each extension to enable
 
 		// Debug log extensions
 		std::string extensionsList;
@@ -169,19 +169,19 @@ void VulkanHandler::Initialise() {
 		// See end of: https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Instance
 
 		// Layers <- what do they do?
-		createInfo.enabledLayerCount = 0; // number of global layers to enable
+		instanceCreateInfo.enabledLayerCount = 0; // number of global layers to enable
 		LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers: none <- what are these for?");
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Create VkInstance (stored as member variable)
+	// Create VkInstance (stored as member variable) (uses VKInstanceCreateInfo)
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	{
-		LogService::Log(LogType::TRACE, className, functionName, "Creating vkInstance");
+		LogService::Log(LogType::TRACE, className, functionName, "Creating VkInstance");
 		LogService::Log(LogType::WIP, className, functionName, "Do we need second parameter at some point?");
 
-		VkResult result = vkCreateInstance(&createInfo, nullptr, &vulkanInstance);
+		VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &vulkanInstance);
 
 		// app metadata, allocation callbacks? and the instance object
 
@@ -200,8 +200,8 @@ void VulkanHandler::Initialise() {
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
 
+	VkPhysicalDevice chosenGpu = VK_NULL_HANDLE; // handle for a GPU, defaults to null
 	{
-		VkPhysicalDevice chosenGpu = VK_NULL_HANDLE; // handle for a GPU, defaults to null
 
 		uint32_t deviceCount{ 0 };
 		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, nullptr); // count vulkan compatible devices
@@ -271,6 +271,52 @@ void VulkanHandler::Initialise() {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Create Logical Device
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	QueueFamilyIndices indices = findQueueFamilies(chosenGpu);
+	{
+		LogService::Log(LogType::TRACE, className, functionName, "Creating VkDevice");
+
+		VkDeviceQueueCreateInfo queueCreateInfo{}; // https://docs.vulkan.org/refpages/latest/refpages/source/VkDeviceQueueCreateInfo.html
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+		queueCreateInfo.queueCount = 1;
+		float queuePriority = 1.f;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+
+		VkPhysicalDeviceFeatures deviceFeatures{};
+
+		VkDeviceCreateInfo deviceCreateInfo{};
+		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+		deviceCreateInfo.queueCreateInfoCount = 1;
+		deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+
+		deviceCreateInfo.enabledExtensionCount = 0;
+		deviceCreateInfo.enabledLayerCount = 0;
+		// validation layers are not setup (see documentation)
+		// https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Logical_device_and_queues
+		// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Validation_layers
+
+		if (vkCreateDevice(chosenGpu, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan Logical Device Created");
+		}
+		else {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create Vulkan Logical Device");
+			throw std::runtime_error("Failed to create Vulkan Logical Device!");
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// SETUP QUEUES
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	{
+		vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// END OF INITIALISE()
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -281,6 +327,8 @@ void VulkanHandler::Initialise() {
 
 void VulkanHandler::Cleanup()
 {
-	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan instance");
+	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Logical Device");
+	vkDestroyDevice(logicalDevice, nullptr);
+	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan Instance");
 	vkDestroyInstance(vulkanInstance, nullptr);
 }
