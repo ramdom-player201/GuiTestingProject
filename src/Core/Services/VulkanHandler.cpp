@@ -5,17 +5,96 @@
 #include <map>
 #include <vector> // needed to build for MacOS
 
-bool isDeviceSuitable(VkPhysicalDevice device) {
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VkPhysicalDeviceProperties deviceProperties;
+
+struct QueueFamilyIndices {
+	// Struct containing the indexes for each supported queue family.
+	// Optional is used to indicate whether each is supported or not.
+	std::optional<uint32_t> graphicsFamily;
+};
+
+QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+	QueueFamilyIndices indices;
+
+	// QUEUE FAMILIES
+	uint32_t queueFamilyCount{ 0 };
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+	int i = 0;
+	for (const auto& queueFamily : queueFamilies) {
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) { // check if queueFamily is GRAPHICS
+			indices.graphicsFamily = i; // store GRAPHICS index to struct
+		}
+		i++;
+	}
+
+	return indices;
+}
+
+bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device) {
+	constexpr std::string_view functionName{ "IsDeviceSuitable" };
+
+	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
+
+	bool suitable{ true }; // default true unless proven false
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// GET DEVICE DATA
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// DEVICE PROPERTIES
+	VkPhysicalDeviceProperties deviceProperties; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-	VkPhysicalDeviceFeatures deviceFeatures;
+	// DEVICE FEATURES
+	VkPhysicalDeviceFeatures deviceFeatures; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceFeatures.html
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
+	// DEVICE QUEUES
+	QueueFamilyIndices indices = findQueueFamilies(device);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// LOG MESSAGE
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	{
+		std::string outputLog = "Checking suitability of [";
+		outputLog += deviceProperties.deviceName;
+		outputLog += "]";
+		LogService::Log(LogType::TRACE, className, functionName, outputLog);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DO CHECKS HERE
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	if (!indices.graphicsFamily.has_value()) {
+		LogService::Log(LogType::FAIL, className, functionName, "GPU lacks graphics queue family");
+		suitable = false;
+	}
+	else {
+		LogService::Log(LogType::SUCCESS, className, functionName, "GPU has graphics queue family");
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// END OF CHECKS
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	LogService::Log(LogType::WIP, className, functionName, "GPU required features may need to be updated over time");
+
 	// unknown what features are needed at this stage, so return true for any
-	return true;
+	return suitable;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void VulkanHandler::Initialise() {
 	constexpr std::string_view functionName{ "Initialise" };
@@ -86,6 +165,9 @@ void VulkanHandler::Initialise() {
 			+ " ::\n extensions: " + extensionsList
 		);
 
+		// Note, if VK_ERROR_INCOMPATIBLE_DRIVER on MacOS, further modification may be required
+		// See end of: https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Instance
+
 		// Layers <- what do they do?
 		createInfo.enabledLayerCount = 0; // number of global layers to enable
 		LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers: none <- what are these for?");
@@ -116,13 +198,15 @@ void VulkanHandler::Initialise() {
 	// Choose PhysicalDevice
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
+
 	{
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		VkPhysicalDevice chosenGpu = VK_NULL_HANDLE; // handle for a GPU, defaults to null
 
 		uint32_t deviceCount{ 0 };
 		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, nullptr); // count vulkan compatible devices
 		LogService::Log(LogType::TRACE, className, functionName,
-			"Vulkan found [" + std::to_string(deviceCount) + "] compatible devices"
+			"Vulkan found [" + std::to_string(deviceCount) + "] compatible GPUs"
 		);
 
 		if (deviceCount == 0) { // log critical and crash if no supported GPUs
@@ -132,20 +216,57 @@ void VulkanHandler::Initialise() {
 			throw std::runtime_error("Failed to find GPU with Vulkan support");
 		}
 
-		std::vector<VkPhysicalDevice> devices(deviceCount); // check features of supported devices and choose first
-		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data());
+		std::vector<VkPhysicalDevice> devices(deviceCount);  // create vector of VkPhysicalDevice objects size deviceCount
+		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data()); // takes array of VkPhysicalDevices and writes info to each
+
+		// debug print all GPUs
 		for (const auto& device : devices) {
-			if (isDeviceSuitable(device)) {
-				physicalDevice = device;
+			// https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
+			VkPhysicalDeviceProperties gpuProperties;
+			vkGetPhysicalDeviceProperties(device, &gpuProperties);
+			std::string outputData;
+			outputData += "\nGPU Name = [";
+			outputData += gpuProperties.deviceName;
+			outputData += "]\nVendor Id = [";
+			outputData += std::to_string(gpuProperties.vendorID);
+			outputData += "]\nDevice Type = [";
+			switch (gpuProperties.deviceType) { // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceType.html
+			case 0:
+				outputData += "OTHER";
+				break;
+			case 1:
+				outputData += "INTEGRATED_GPU";
+				break;
+			case 2:
+				outputData += "DISCRETE_GPU";
+				break;
+			case 3:
+				outputData += "VIRTUAL_GPU";
+				break;
+			case 4:
+				outputData += "CPU";
+				break;
+			default:
+				outputData += "UNDEFINED";
+			}
+			LogService::Log(LogType::TRACE, className, functionName, outputData);
+		}
+
+		// check features of supported GPUs and choose first
+		// https://docs.vulkan.org/refpages/latest/refpages/source/vkEnumeratePhysicalDevices.html
+		for (const auto& device : devices) {
+			if (IsDeviceSuitable(device)) { // suitability check doesn't do anything yet
+				chosenGpu = device; // select gpu to use for application
 				break;
 			}
 		}
 
-		if (physicalDevice == VK_NULL_HANDLE) {
-			LogService::Log(LogType::CRITICAL, className, functionName,
-				"Failed to select a suitable GPU"
-			);
+		if (chosenGpu == VK_NULL_HANDLE) {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to select a suitable GPU");
 			throw std::runtime_error("Failed to select a suitable GPU");
+		}
+		else {
+			LogService::Log(LogType::SUCCESS, className, functionName, "GPU identified as suitable");
 		}
 	}
 
@@ -153,6 +274,10 @@ void VulkanHandler::Initialise() {
 	// END OF INITIALISE()
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void VulkanHandler::Cleanup()
 {

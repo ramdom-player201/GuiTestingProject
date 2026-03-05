@@ -76,13 +76,14 @@ Program::Program()
 	LogService::Log(LogType::ABNORM, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::WIP, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::SECURITY, className, functionName, "Testing LogTypes");
-	LogService::Log(LogType::USER, className, functionName, "Testing LogTypes");
 
 	LogService::Log(LogType::HIGH, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::MED, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::LOW, className, functionName, "Testing LogTypes");
 
+	LogService::Log(LogType::USER, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::SUCCESS, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::FAIL, className, functionName, "Testing LogTypes");
 
 	LogService::Log(LogType::TRACE, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::SPAM, className, functionName, "Testing LogTypes");

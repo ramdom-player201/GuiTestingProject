@@ -8,15 +8,17 @@
 class VulkanHandler {
 private:
 	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in Initialise() function
+
+	static bool IsDeviceSuitable(VkPhysicalDevice device);
 public:
 	static VkInstance& GetInstance() {
 		if (vulkanInstance == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, "VulkanHandler.h", "GetInstance", "VkInstance was not initialised (VK_NULL_HANDLE");
 		}
-		return vulkanInstance; 
+		return vulkanInstance;
 	}
 
-	static void  Initialise();
+	static void Initialise();
 	static void Cleanup();
 
 	// ClassName

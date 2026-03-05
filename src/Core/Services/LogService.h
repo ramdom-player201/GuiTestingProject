@@ -10,14 +10,15 @@ enum class LogType : uint8_t {
 	ABNORM,		// shouldn't crash, but something is outside of standard operational parameters											:: [Purple]
 	WIP,		// missing/incomplete feature, should include todo message in log														:: [Magenta]
 	SECURITY,	// program attempts to do something not allowed, such as access a file outside of its directory							:: [Blue]
-	USER,		// trace user inputs, such as clicking a button, etc																	:: [Orange]
 
 	HIGH,		// something important			:: [Orange]
 	MED,		// something lower priority		:: [Yellow]
 	LOW,		// something low priority		:: [White]
 
-	TEST,
-	SUCCESS,
+	USER,		// trace user inputs, such as clicking a button, etc																	:: [Orange]
+	TEST,		// temporarily test a feature
+	SUCCESS,	// something occured successfully
+	FAIL,		// something failed, but is not unrecoverable (not an error)
 
 	TRACE,		// tracks the chain of operations of the program between activities														:: [Cyan]
 	SPAM,		// rapidly called and not stored																						:: [Grey]
@@ -69,14 +70,15 @@ private:
 	static inline LogQueue<100> Logs_ABNORM;
 	static inline LogQueue<100> Logs_WIP;
 	static inline LogQueue<20> Logs_SECURITY;
-	static inline LogQueue<20> Logs_USER;
 
 	static inline LogQueue<100> Logs_HIGH;
 	static inline LogQueue<100> Logs_MED;
 	static inline LogQueue<100> Logs_LOW;
 
-	static inline LogQueue<100> Logs_SUCCESS;
+	static inline LogQueue<20> Logs_USER;
 	static inline LogQueue<100> Logs_TEST;
+	static inline LogQueue<100> Logs_SUCCESS;
+	static inline LogQueue<100> Logs_FAIL;
 
 	static inline LogQueue<1000> Logs_TRACE;
 	static inline LogQueue<100> Logs_SPAM;
