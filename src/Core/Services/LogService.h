@@ -10,6 +10,7 @@ enum class LogType : uint8_t {
 	ABNORM,		// shouldn't crash, but something is outside of standard operational parameters											:: [Purple]
 	WIP,		// missing/incomplete feature, should include todo message in log														:: [Magenta]
 	SECURITY,	// program attempts to do something not allowed, such as access a file outside of its directory							:: [Blue]
+	USER,		// trace user inputs, such as clicking a button, etc																	:: [Orange]
 
 	HIGH,		// something important			:: [Orange]
 	MED,		// something lower priority		:: [Yellow]
@@ -29,7 +30,7 @@ struct LogEntry {
 	std::string source;
 	std::string function;
 	std::string message;
-	uint16_t copies;
+	uint16_t copies{ 0 };
 };
 
 class LogService {
@@ -61,26 +62,32 @@ private:
 
 
 	// list of category circular queues
-	static LogQueue<20> Logs_CRITICAL;
-	static LogQueue<250> Logs_ERROR;
-	static LogQueue<100> Logs_ABNORM;
-	static LogQueue<100> Logs_WIP;
-	static LogQueue<20> Logs_SECURITY;
+	static inline LogQueue<20> Logs_CRITICAL;
+	static inline LogQueue<250> Logs_ERROR;
+	static inline LogQueue<100> Logs_ABNORM;
+	static inline LogQueue<100> Logs_WIP;
+	static inline LogQueue<20> Logs_SECURITY;
+	static inline LogQueue<20> Logs_USER;
 
-	static LogQueue<100> Logs_HIGH;
-	static LogQueue<100> Logs_MED;
-	static LogQueue<100> Logs_LOW;
+	static inline LogQueue<100> Logs_HIGH;
+	static inline LogQueue<100> Logs_MED;
+	static inline LogQueue<100> Logs_LOW;
 
-	static LogQueue<100> Logs_SUCCESS;
-	static LogQueue<100> Logs_TEST;
+	static inline LogQueue<100> Logs_SUCCESS;
+	static inline LogQueue<100> Logs_TEST;
 
-	static LogQueue<1000> Logs_TRACE;
-	static LogQueue<100> Logs_SPAM;
-	static LogQueue<100> Logs_CATCH;
+	static inline LogQueue<1000> Logs_TRACE;
+	static inline LogQueue<100> Logs_SPAM;
+	static inline LogQueue<100> Logs_CATCH;
+
+	// Used for separating logs in output
+	static inline std::string previousSource;
 
 public:
 	static void Initialise();	// setup LogService, create LogService folder if needed
 	static void Flush();		// flush cached logs to file (rate limited)
+
+	static void Separator();
 
 	static void Log(const LogType logType, const std::string_view source, const std::string_view function, const std::string_view message);
 

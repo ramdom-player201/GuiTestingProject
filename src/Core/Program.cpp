@@ -9,12 +9,7 @@ void Program::Run()
 	std::cout
 		<< ConsoleColours::getColourCode(AnsiColours::GREEN) << "Starting "
 		<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "program\n";
-	LogService::Log(
-		LogType::TRACE,
-		className,
-		"Run",
-		"Program Start"
-	);
+	LogService::Log(LogType::TRACE, className, "Run", "Program Start");
 
 	//Services::initialise();
 	//auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
@@ -39,6 +34,7 @@ void Program::Run()
 		//	commandConsole->parseCommand();
 		//}
 	}
+	LogService::Log(LogType::TRACE, className, "Run", "Program End");
 }
 
 Program::Program()
@@ -80,6 +76,7 @@ Program::Program()
 	LogService::Log(LogType::ABNORM, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::WIP, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::SECURITY, className, functionName, "Testing LogTypes");
+	LogService::Log(LogType::USER, className, functionName, "Testing LogTypes");
 
 	LogService::Log(LogType::HIGH, className, functionName, "Testing LogTypes");
 	LogService::Log(LogType::MED, className, functionName, "Testing LogTypes");

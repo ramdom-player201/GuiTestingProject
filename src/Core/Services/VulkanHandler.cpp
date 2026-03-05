@@ -21,6 +21,7 @@ void VulkanHandler::Initialise() {
 	constexpr std::string_view functionName{ "Initialise" };
 
 	LogService::Log(LogType::TRACE, className, functionName, "Initialising Vulkan");
+	LogService::Log(LogType::WIP, className, functionName, "What happens if initialise is called twice?\n Consider adding debounce");
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Instance
 
@@ -72,8 +73,22 @@ void VulkanHandler::Initialise() {
 		createInfo.enabledExtensionCount = glfwExtensionCount;	// number of global extensions to enable
 		createInfo.ppEnabledExtensionNames = glfwExtensions;	// array of strings with the names of each extension to enable
 
+		// Debug log extensions
+		std::string extensionsList;
+		for (uint32_t i = 0; i < glfwExtensionCount; i++) {
+			extensionsList += glfwExtensions[i];
+			if (i < glfwExtensionCount - 1) {
+				extensionsList += ", ";
+			}
+		}
+		LogService::Log(LogType::TRACE, className, functionName,
+			"Vulkan extensions needed [" + std::to_string(glfwExtensionCount) + "]"
+			+ " ::\n extensions: " + extensionsList
+		);
+
 		// Layers <- what do they do?
 		createInfo.enabledLayerCount = 0; // number of global layers to enable
+		LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers: none <- what are these for?");
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,29 +97,18 @@ void VulkanHandler::Initialise() {
 
 	{
 		LogService::Log(LogType::TRACE, className, functionName, "Creating vkInstance");
-		LogService::Log(LogType::WIP, className, functionName,
-			"Do we need second parameter at some point?");
+		LogService::Log(LogType::WIP, className, functionName, "Do we need second parameter at some point?");
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &vulkanInstance);
 
 		// app metadata, allocation callbacks? and the instance object
 
 		if (result != VK_SUCCESS) {
-			LogService::Log(
-				LogType::CRITICAL,
-				className,
-				functionName,
-				"Failed to Initialise Vulkan"
-			);
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to Initialise Vulkan");
 			throw std::runtime_error("failed to create instance!");
 		}
 		else {
-			LogService::Log(
-				LogType::SUCCESS,
-				className,
-				functionName,
-				"Vulkan initialised successfully"
-			);
+			LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan initialised successfully");
 		}
 	}
 
@@ -152,11 +156,6 @@ void VulkanHandler::Initialise() {
 
 void VulkanHandler::Cleanup()
 {
-	LogService::Log(
-		LogType::TRACE,
-		className,
-		"Cleanup",
-		"Cleaning Vulkan instance"
-	);
+	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan instance");
 	vkDestroyInstance(vulkanInstance, nullptr);
 }

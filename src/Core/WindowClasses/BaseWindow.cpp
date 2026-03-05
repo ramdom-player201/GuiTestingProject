@@ -27,6 +27,7 @@ WindowReturnData BaseWindow::Update()
 	return WRD;
 }
 
+bool printedExtensions{ false };
 BaseWindow::BaseWindow(size_t id) { // Constructor
 	constexpr std::string_view functionName{ "Constructor" };
 
@@ -56,7 +57,20 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
-	LogService::Log(LogType::TRACE, className, functionName, "Vulkan supported extensions: [" + std::to_string(extensionCount) + "] ");
+	if (!printedExtensions) {
+		std::string extensionsList;
+		//for (uint32_t i = 0; i < extensionCount; i++) {
+		//	extensionsList += glfwExtensions[i];
+		//	if (i < extensionCount - 1) {
+		//		extensionsList += ", ";
+		//	}
+		//}
+		LogService::Log(LogType::TRACE, className, functionName,
+			"Vulkan supported extensions: [" + std::to_string(extensionCount) + "]"
+			+ " ::\n extensions: " + extensionsList
+		);
+		printedExtensions = true;
+	}
 
 	// SOMETHING MATHS (WIP)
 
@@ -66,7 +80,8 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 }
 
 BaseWindow::~BaseWindow() {
-	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window :: id = [" + std::to_string(windowId) + "] ");
+	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window surface :: id = [" + std::to_string(windowId) + "] ");
 	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
+	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window :: id = [" + std::to_string(windowId) + "] ");
 	glfwDestroyWindow(window);
 }
