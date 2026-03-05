@@ -41,9 +41,9 @@ private:
 	class LogQueue {
 	private:
 		std::array<LogEntry, queueSize> queue; // collection of logs
-		size_t head{ 0 }; // position of head in circular queue
-		size_t fillCount{ 0 }; // counts up until one full cycle
-		size_t dropped{ 0 }; // number of logs overwritten
+		size_t head; // position of head in circular queue
+		size_t fillCount; // counts up until one full cycle
+		size_t dropped; // number of logs overwritten
 	public:
 		void pushLog(const LogEntry& entry) {
 			queue[head] = entry; // add entry to queue at current head position
@@ -57,6 +57,8 @@ private:
 		}
 		size_t getQueueSize() { return sizeof(queue); } // return size of queue array, in bytes
 		size_t getDropCount() { return dropped; } // return number of expired logs
+
+		constexpr LogQueue() : head(0), fillCount(0), dropped(0) {} // initialisation of variables must be done here, because class is nested
 	};
 	// LogQueue nested class end
 
