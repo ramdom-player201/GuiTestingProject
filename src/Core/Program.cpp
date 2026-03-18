@@ -64,7 +64,8 @@ Program::Program()
 
 	// Initialise Vulkan
 
-	VulkanHandler::Initialise();
+	//VulkanHandler::Initialise();
+	VulkanHandler::CreateVulkanInstance();
 
 	// Temporary test stuff
 

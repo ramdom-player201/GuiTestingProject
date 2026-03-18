@@ -8,6 +8,8 @@
 #include <glm/mat4x4.hpp>
 #include "../Services/VulkanHandler.h"
 
+#include "../ConsoleColours.h"
+
 
 WindowReturnData BaseWindow::Update()
 {
@@ -35,7 +37,12 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 
 	// https://vulkan-tutorial.com/Development_environment
 
-	LogService::Log(LogType::TRACE, className, functionName, "Creating window with id: [" + std::to_string(windowId) + "] ");
+	LogService::Log(LogType::TRACE, className, functionName,
+		"Creating window with id: [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+		std::to_string(windowId) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
+	);
 
 
 	// CREATE GLFW WINDOW HINT
@@ -44,33 +51,35 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 
 	// CREATE GLFW WINDOW SURFACE
 
-	VkInstance vkInstance = VulkanHandler::GetInstance();
-	if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
-		LogService::Log(LogType::SUCCESS, className, functionName, "Created glfw-vulkan window surface");
-	}
-	else {
-		LogService::Log(LogType::ERROR, className, functionName, "Failed to create window surface");
-	}
+	VulkanHandler::SetupWindowSurface(window, nullptr, surface);
+
+	//VkInstance vkInstance = VulkanHandler::GetInstance();
+	//if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
+	//	LogService::Log(LogType::SUCCESS, className, functionName, "Created glfw-vulkan window surface");
+	//}
+	//else {
+	//	LogService::Log(LogType::ERROR, className, functionName, "Failed to create window surface");
+	//}
 
 	// CHECK EXTENSIONS?
 
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-	if (!printedExtensions) {
-		std::string extensionsList;
-		//for (uint32_t i = 0; i < extensionCount; i++) {
-		//	extensionsList += glfwExtensions[i];
-		//	if (i < extensionCount - 1) {
-		//		extensionsList += ", ";
-		//	}
-		//}
-		LogService::Log(LogType::TRACE, className, functionName,
-			"Vulkan supported extensions: [" + std::to_string(extensionCount) + "]"
-			+ " ::\n extensions: " + extensionsList
-		);
-		printedExtensions = true;
-	}
+	//uint32_t extensionCount = 0;
+	//vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+	//
+	//if (!printedExtensions) {
+	//	std::string extensionsList;
+	//	//for (uint32_t i = 0; i < extensionCount; i++) {
+	//	//	extensionsList += glfwExtensions[i];
+	//	//	if (i < extensionCount - 1) {
+	//	//		extensionsList += ", ";
+	//	//	}
+	//	//}
+	//	LogService::Log(LogType::TRACE, className, functionName,
+	//		"Vulkan supported extensions: [" + std::to_string(extensionCount) + "]"
+	//		+ " ::\n extensions: " + extensionsList
+	//	);
+	//	printedExtensions = true;
+	//}
 
 	// SOMETHING MATHS (WIP)
 
@@ -80,8 +89,18 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 }
 
 BaseWindow::~BaseWindow() {
-	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window surface :: id = [" + std::to_string(windowId) + "] ");
+	LogService::Log(LogType::TRACE, className, "Destructor", 
+		"Destroying window surface :: id = ["+
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+		std::to_string(windowId) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) +"]"
+	);
 	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
-	LogService::Log(LogType::TRACE, className, "Destructor", "Destroying window :: id = [" + std::to_string(windowId) + "] ");
+	LogService::Log(LogType::TRACE, className, "Destructor",
+		"Destroying window :: id = [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + 
+		std::to_string(windowId) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
+	);
 	glfwDestroyWindow(window);
 }

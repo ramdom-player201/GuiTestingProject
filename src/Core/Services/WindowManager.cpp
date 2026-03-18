@@ -47,12 +47,22 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 			// CREATE TOOLTIP // CREATE TOOLTIP //
 			////////////////////////////////////////////////////
 
-			LogService::Log(LogType::TRACE, className, functionName, "Creating new window of type <TooltipWindow>...");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Creating new window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
+			);
 
 			std::shared_ptr<TooltipWindow> window = std::make_shared<TooltipWindow>(currentId); // create new window
 			windows[currentId] = window;
 
-			LogService::Log(LogType::TRACE, className, functionName, "Created window of type <TooltipWindow>");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Created window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
+			);
 			break;
 
 		}
@@ -61,12 +71,22 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 			// CREATE CONTEXT // CREATE CONTEXT //
 			////////////////////////////////////////////////////
 
-			LogService::Log(LogType::TRACE, className, functionName, "Creating new window of type <ContextWindow>...");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Creating new window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
+			);
 
 			std::shared_ptr<ContextWindow> window = std::make_shared<ContextWindow>(currentId); // create new window
 			windows[currentId] = window;
 
-			LogService::Log(LogType::TRACE, className, functionName, "Created window of type <ContextWindow>");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Created window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
+			);
 			break;
 
 		}
@@ -75,12 +95,22 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 			// CREATE TILED // CREATE TILED //
 			////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			LogService::Log(LogType::TRACE, className, functionName, "Creating new window of type <TiledWindow>...");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Creating new window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
+			);
 
 			std::shared_ptr<TiledWindow> window = std::make_shared<TiledWindow>(currentId); // create new window
 			windows[currentId] = window;
 
-			LogService::Log(LogType::TRACE, className, functionName, "Created window of type <TiledWindow>");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Created window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
+			);
 			break;
 
 		}
@@ -89,12 +119,22 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 			// CREATE DEDICATED // CREATE DEDICATED //
 			////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			LogService::Log(LogType::TRACE, className, functionName, "Creating new window of type <DedicatedWindow>...");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Creating new window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
+			);
 
 			std::shared_ptr<DedicatedWindow> window = std::make_shared<DedicatedWindow>(currentId); // create new window
 			windows[currentId] = window;
 
-			LogService::Log(LogType::TRACE, className, functionName, "Created window of type <DedicatedWindow>");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Created window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
+			);
 			break;
 
 		}
@@ -103,12 +143,22 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 			// CREATE TEST // CREATE TEST //
 			////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			LogService::Log(LogType::TRACE, className, functionName, "Creating new window of type <TestWindow>...");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Creating new window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
+			);
 
 			std::shared_ptr<TestWindow> window = std::make_shared<TestWindow>(currentId); // create new window
 			windows[currentId] = window;
 
-			LogService::Log(LogType::TRACE, className, functionName, "Created window of type <TestWindow>");
+			LogService::Log(LogType::TRACE, className, functionName,
+				"Created window of type <" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+				"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
+			);
 			break;
 
 		}

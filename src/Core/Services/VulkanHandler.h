@@ -2,17 +2,21 @@
 
 #include "LogService.h"
 
-#include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+//#include <vulkan/vulkan.h>
 #include <string>
 
 class VulkanHandler {
 private:
-	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in Initialise() function
+	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in CreateVulkanInstance() function
 	static inline VkDevice logicalDevice; // initialised via vkCreateDevice in Initialise() function
 
 	static inline VkQueue graphicsQueue;
+	static inline VkQueue presentQueue;
 
-	static bool IsDeviceSuitable(VkPhysicalDevice device);
+	static bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surface);
 public:
 	static VkInstance& GetInstance() {
 		if (vulkanInstance == VK_NULL_HANDLE) {
@@ -20,6 +24,11 @@ public:
 		}
 		return vulkanInstance;
 	}
+
+	static void CreateVulkanInstance(); // creates VulkanInstance
+	static void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface);
+	// ^^^ calls creates GLFW surface and setups logical devices and queues
+	static void GenerateSwapChains(GLFWwindow* window); // WIP declaration
 
 	static void Initialise();
 	static void Cleanup();
