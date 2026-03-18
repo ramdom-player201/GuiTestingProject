@@ -273,7 +273,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	LogService::Log(LogType::TRACE, className, functionName, "Choosing from available physical devices");
-	VkPhysicalDevice chosenPhysicalDevice = VK_NULL_HANDLE; // handle for a GPU, defaults to null
+	VkPhysicalDevice chosenPhysicalDevice{ VK_NULL_HANDLE }; // handle for a GPU, defaults to null
 	{
 		uint32_t deviceCount{ 0 };
 		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, nullptr); // count vulkan compatible devices
@@ -371,8 +371,8 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	// it's possible that graphicsFamily and presentFamily have the same value
 	std::set<uint32_t> uniqueQueueFamilies =
 	{
-		indices.graphicsFamily.has_value(),
-		indices.presentFamily.has_value()
+		indices.graphicsFamily.value(),
+		indices.presentFamily.value()
 	};
 
 	float queuePriority = 1.0f;
@@ -390,6 +390,12 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	LogService::Log(LogType::TRACE, className, functionName, "Creating VkDevice (Logical Device)");
+	LogService::Log(LogType::WIP, className, functionName,
+		"How might we reuse existing logical devices instead of creating new ones for each new window?"
+	);
+	LogService::Log(LogType::WIP, className, functionName,
+		"Queues are owned by Logical Device, logical device can be shared"
+	);
 
 	VkPhysicalDeviceFeatures deviceFeatures{};
 
@@ -415,7 +421,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	}
 
 	// Add queues to created device
-	 LogService::Log(LogType::TRACE, className, functionName, "Linking queues to VkDevice");
+	LogService::Log(LogType::TRACE, className, functionName, "Linking queues to VkDevice");
 	//https://docs.vulkan.org/refpages/latest/refpages/source/vkGetDeviceQueue.html
 	vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentQueue);
@@ -425,6 +431,8 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	LogService::Log(LogType::WIP, className, functionName, "Next step is SwapChains");
+
+	GenerateSwapChains(window);
 
 	// called from BaseWindow
 
@@ -437,11 +445,35 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	// 6 create logical device									[/]
 	// 7 create swapchain										[
 
+	// Global (Once in handler)
+	// VkInstance
+	// VkPhysicalDevice (not created)
+	// VkDevice (logical device, created after window, but windows still share)
+	// VkQueue (owned by device)
+	// VkDescriptorSetLayout
+	// VkPipelineLayout
+	// VkPipeine
+
+	// Per-Window
+	// VkSurfaceKHR
+	// VkSwapchainKHR
+	// VkImage
+	// VkImageView
+	// VkFramebuffer
+	// VkRenderPass
+	// VkSemaphore, VkFence
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void VulkanHandler::GenerateSwapChains(GLFWwindow* window) {
+
+	// https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
+	//https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation
+}
 
 void VulkanHandler::Cleanup()
 {

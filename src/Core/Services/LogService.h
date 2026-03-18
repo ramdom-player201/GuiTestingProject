@@ -4,6 +4,8 @@
 #include <chrono>
 #include <array>
 
+//#include "../ConsoleColours.h" // allow anything using console to use colours ERROR: cannot use because ConsoleColours uses logs
+
 enum class LogType : uint8_t {
 	CRITICAL,	// immediate fault that may lead to crash or data corruption, may lead to a forced exit									:: [Dark Red]
 	ERROR,		// like assertion, should never be encountered, indicative of a problem in program that may have have undefined results :: [Red]
