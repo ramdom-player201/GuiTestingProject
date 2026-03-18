@@ -58,6 +58,7 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceK
 		i++;
 	}
 
+	// Not all indices are guaranteed to be found, rely on IsDeviceSuitable to confirm
 	return indices;
 }
 
@@ -100,7 +101,7 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surf
 	// DO CHECKS HERE
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (!indices.graphicsFamily.has_value()) {
+	if (!indices.TheyAllExist()) {
 		LogService::Log(LogType::FAIL, className, functionName, "GPU lacks graphics queue family");
 		suitable = false;
 	}
@@ -347,6 +348,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 			}
 		}
 
+		// Ensure at least one valid GPU was found, and handle if none
 		if (chosenPhysicalDevice == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to select a suitable GPU");
 			throw std::runtime_error("Failed to select a suitable GPU");
