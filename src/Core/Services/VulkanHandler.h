@@ -8,15 +8,32 @@
 //#include <vulkan/vulkan.h>
 #include <string>
 
+struct QueueFamilyIndices {
+	// Struct containing the indexes for each supported queue family.
+	// Optional is used to indicate whether each is supported or not.
+	std::optional<uint32_t> graphicsFamily;
+	std::optional<uint32_t> presentFamily;
+
+	bool TheyAllExist() {
+		return
+			graphicsFamily.has_value() &&
+			presentFamily.has_value();
+	}
+};
+
 class VulkanHandler {
 private:
 	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in CreateVulkanInstance() function
 	static inline VkDevice logicalDevice; // initialised via vkCreateDevice in Initialise() function
 
+	// queues
 	static inline VkQueue graphicsQueue;
 	static inline VkQueue presentQueue;
 
+	// utility functions
 	static bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surface);
+	static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface);
+
 public:
 	static VkInstance& GetInstance() {
 		if (vulkanInstance == VK_NULL_HANDLE) {

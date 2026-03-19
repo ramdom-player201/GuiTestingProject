@@ -31,12 +31,12 @@ public:
 	static inline bool debugMode{ false };
 
 	// service-specific functionality
-	static size_t createWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
-	static size_t countWindows();											// returns number of windows in list
-	static std::shared_ptr<BaseWindow> getWindowById(size_t id);			// returns a copy of a pointer to the window, based on its position in the vector
-	static void closeWindow(size_t id);										// closes the referenced window
+	static size_t CreateWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
+	static size_t CountWindows();											// returns number of windows in list
+	static std::shared_ptr<BaseWindow> GetWindowById(size_t id);			// returns a copy of a pointer to the window, based on its position in the vector
+	static void CloseWindow(size_t id);										// closes the referenced window
 
-	static bool updateWindows();											// loop through windows, calling update on each one. Return true if command line break;
+	static bool UpdateWindows();											// loop through windows, calling update on each one. Return true if command line break;
 
 	// ClassName
 	static constexpr std::string_view className{ "WindowManager" };

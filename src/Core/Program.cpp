@@ -19,17 +19,17 @@ void Program::Run()
 
 	WindowManager::debugMode = true;
 
-	WindowManager::countWindows();
-	WindowManager::createWindow("Window 1", WindowTypes::TestWindow);
-	WindowManager::createWindow("Window 2", WindowTypes::TestWindow);
-	WindowManager::countWindows();
+	WindowManager::CountWindows();
+	WindowManager::CreateWindow("Window 1", WindowTypes::TestWindow);
+	WindowManager::CreateWindow("Window 2", WindowTypes::TestWindow);
+	WindowManager::CountWindows();
 
-	WindowManager::createWindow("Window 33", WindowTypes::TestWindow);
+	WindowManager::CreateWindow("Window 33", WindowTypes::TestWindow);
 
 	WindowManager::debugMode = false;
-	while (WindowManager::countWindows() > 0) {
+	while (WindowManager::CountWindows() > 0) {
 		// program should get call console to get commands
-		bool commandLinePause = WindowManager::updateWindows();
+		bool commandLinePause = WindowManager::UpdateWindows();
 		//if (commandLinePause) {
 		//	commandConsole->parseCommand();
 		//}

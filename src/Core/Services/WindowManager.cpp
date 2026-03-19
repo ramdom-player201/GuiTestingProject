@@ -18,13 +18,17 @@
 //	// may be removed, may be replaced with destructor or something? depends on whether IService can support that.
 //}
 
-size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
+size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 	constexpr std::string_view functionName{ "CreateWindow" };
 
 	// creates a new Window and adds it to map
 	// intialise the new Window and supply it with an id
 	LogService::Log(LogType::TRACE, className, functionName,
-		"New window :: Title = [" + title + "] :: Id = [" + std::to_string(currentId) + "]"
+		"New window :: Title = [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + title +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] :: Id = [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + std::to_string(currentId) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
 	);
 
 
@@ -49,8 +53,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TooltipWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
@@ -59,8 +62,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TooltipWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -73,8 +75,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"ContextWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
@@ -83,8 +84,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"ContextWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -97,8 +97,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TiledWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
@@ -107,8 +106,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TiledWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -121,8 +119,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"DedicatedWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
@@ -131,8 +128,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"DedicatedWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -145,8 +141,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TestWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
@@ -155,8 +150,7 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-				"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TestWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -174,18 +168,26 @@ size_t WindowManager::createWindow(const std::string& title, WindowTypes type) {
 	return currentId++;
 }
 
-size_t WindowManager::countWindows()
+int temp{ 0 };
+
+size_t WindowManager::CountWindows()
 {
 	constexpr std::string_view functionName{ "CountWindows" };
 
-	if (debugMode) {
-		LogService::Log(LogType::TRACE, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
-	}
+	//if (debugMode) {
+		LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
+	//}
+
+		temp++;
+		if (temp > 1000000) {
+			temp = 0;
+			LogService::Log(LogType::SPAM, className, functionName, "To Differ");
+		}
 
 	return windows.size();
 }
 
-std::shared_ptr<BaseWindow> WindowManager::getWindowById(size_t id)
+std::shared_ptr<BaseWindow> WindowManager::GetWindowById(size_t id)
 {
 	constexpr std::string_view functionName{ "GetWindowById" };
 
@@ -199,11 +201,16 @@ std::shared_ptr<BaseWindow> WindowManager::getWindowById(size_t id)
 	return std::shared_ptr<BaseWindow>();
 }
 
-void WindowManager::closeWindow(size_t id)
+void WindowManager::CloseWindow(size_t id)
 {
 	constexpr std::string_view functionName{ "CloseWindow" };
 
-	LogService::Log(LogType::TRACE, className, functionName, "Closing window [" + std::to_string(id) + "]");
+	LogService::Log(LogType::TRACE, className, functionName,
+		"Closing window [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+		std::to_string(id) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
+	);
 	//std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Windows Manager > " <<
 	//	ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "CloseWIndows() :: " <<
 	//	ConsoleColours::getColourCode(AnsiColours::YELLOW) << "Closing Window" <<
@@ -211,7 +218,7 @@ void WindowManager::closeWindow(size_t id)
 	windows.erase(id);
 }
 
-bool WindowManager::updateWindows()
+bool WindowManager::UpdateWindows()
 {
 	constexpr std::string_view functionName{ "UpdateWindows" };
 
@@ -226,12 +233,16 @@ bool WindowManager::updateWindows()
 		if (winData.WindowClosed) {
 			// delete window from vector and update id
 			LogService::Separator();
-			LogService::Log(LogType::USER, className, functionName, "WINDOW CLOSE REQUESTED");
+			LogService::Log(LogType::USER, className, functionName,
+				ConsoleColours::getColourCode(AnsiColours::GREEN_BRIGHT) +
+				"WINDOW CLOSE REQUESTED" +
+				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT)
+			);
 			toClose.push_back(windowPair.first); // cannot close window directly in loop
 		}
 	}
 	for (size_t id : toClose) { // wait until after updating to close
-		closeWindow(id);
+		CloseWindow(id);
 	}
 	if (debugPause) {
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<

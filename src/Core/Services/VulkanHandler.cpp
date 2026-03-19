@@ -12,21 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-struct QueueFamilyIndices {
-	// Struct containing the indexes for each supported queue family.
-	// Optional is used to indicate whether each is supported or not.
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool TheyAllExist() {
-		return
-			graphicsFamily.has_value() &&
-			presentFamily.has_value();
-	}
-};
-
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
+QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
 	QueueFamilyIndices indices;
 
 	// QUEUE FAMILIES
@@ -82,7 +68,7 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surf
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
 	// DEVICE QUEUES
-	QueueFamilyIndices indices = findQueueFamilies(device, surface);
+	QueueFamilyIndices indices = FindQueueFamilies(device, surface);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// LOG MESSAGE
@@ -362,7 +348,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	// Query queues
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QueueFamilyIndices indices = findQueueFamilies(chosenPhysicalDevice, surface);
+	QueueFamilyIndices indices = FindQueueFamilies(chosenPhysicalDevice, surface);
 
 	LogService::Log(LogType::TRACE, className, functionName, "Creating Queues");
 
@@ -479,6 +465,9 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window) {
 
 void VulkanHandler::Cleanup()
 {
+	// Window surfaces are destroyed in the BaseWindow destructor
+	// VulkanHandler::Cleanup() is only called after all windows are closed
+	LogService::Log(LogType::WIP, className, "Cleanup", "Check with WindowManager to enforce all window closure before cleanup");
 	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Logical Device");
 	vkDestroyDevice(logicalDevice, nullptr);
 	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan Instance");
