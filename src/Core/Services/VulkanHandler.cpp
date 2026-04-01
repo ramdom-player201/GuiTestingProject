@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 #include <map>
 #include <set>
-#include <vector> // needed to build for MacOS
 #include <algorithm>
 
 #include "../ConsoleColours.h"

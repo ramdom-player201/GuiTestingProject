@@ -7,6 +7,7 @@
 
 //#include <vulkan/vulkan.h>
 #include <string>
+#include <vector> // needed to build for MacOS
 
 struct QueueFamilyIndices {
 	// Struct containing the indexes for each supported queue family.
