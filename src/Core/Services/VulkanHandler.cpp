@@ -5,8 +5,10 @@
 #include <map>
 #include <set>
 #include <vector> // needed to build for MacOS
+#include <algorithm>
 
 #include "../ConsoleColours.h"
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +50,106 @@ QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDev
 	return indices;
 }
 
-bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surface) {
+SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface)
+{
+	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
+
+	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
+
+	SwapChainSupportDetails details;
+
+	// SURFACE FORMATS
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr);
+
+	if (formatCount != 0) {
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, details.formats.data());
+	}
+
+	// PRESENT MODE
+
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr);
+
+	if (presentModeCount != 0) {
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount,
+			details.presentModes.data()
+		);
+	}
+
+	return details;
+}
+
+VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+{
+	constexpr std::string_view functionName{ "ChooseSwapSurfaceFormat" };
+
+	LogService::Log(LogType::WIP, className, functionName, "Can we print full list?");
+	for (const auto& theFormat : availableFormats) {
+		if (theFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+			theFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Chosen BGRA_SRGB");
+			return theFormat;
+		}
+	}
+	LogService::Log(LogType::FAIL, className, functionName, "Fallback default");
+	LogService::Log(LogType::WIP, className, functionName, "Which was it?");
+	return availableFormats[0];
+}
+
+VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+{
+	constexpr std::string_view functionName{ "ChooseSwapPresentMode" };
+
+	LogService::Log(LogType::WIP, className, functionName, "Note that mailbox can stress the GPU if framerate is not limited");
+	for (const auto& thePresentMode : availablePresentModes) {
+		if (thePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Gone with Mailbox mode");
+			return thePresentMode;
+		}
+	}
+	LogService::Log(LogType::FAIL, className, functionName, "Defaulted to present mode");
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
+{
+	constexpr std::string_view functionName{ "ChooseSwapExtent" };
+
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		LogService::Log(LogType::TRACE, className, functionName, "Within limits, use current");
+		return capabilities.currentExtent;
+	}
+	else {
+		LogService::Log(LogType::TRACE, className, functionName, "Screen and DPI may differ, calculating new");
+
+		int width{ 0 };
+		int height{ 0 };
+		glfwGetFramebufferSize(window, &width, &height);
+
+		VkExtent2D actualExtent{
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)
+		};
+
+		actualExtent.width = std::clamp(
+			actualExtent.width,
+			capabilities.minImageExtent.width,
+			capabilities.maxImageExtent.width
+		);
+		actualExtent.height = std::clamp(
+			actualExtent.height,
+			capabilities.minImageExtent.height,
+			capabilities.maxImageExtent.height
+		);
+
+		return actualExtent;
+	}
+}
+
+bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "IsDeviceSuitable" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
@@ -61,14 +162,24 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surf
 
 	// DEVICE PROPERTIES
 	VkPhysicalDeviceProperties deviceProperties; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
-	vkGetPhysicalDeviceProperties(device, &deviceProperties);
+	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+	// ^^^ used for debug print to output device name
 
 	// DEVICE FEATURES
 	VkPhysicalDeviceFeatures deviceFeatures; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceFeatures.html
-	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+	// ^^^ what is this needed for?
+
+	// DEVICE EXTENSIONS
+	const std::vector<const char*> deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	}; // we need to test for swapchain support
+	LogService::Log(LogType::WIP, className, functionName,
+		"DeviceExtensions variable is created twice in separate functions, shouldn't this be only once?"
+	);
 
 	// DEVICE QUEUES
-	QueueFamilyIndices indices = FindQueueFamilies(device, surface);
+	QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// LOG MESSAGE
@@ -87,16 +198,57 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surf
 	// DO CHECKS HERE
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// Check queue families
+	LogService::Log(LogType::TRACE, className, functionName, "Checking queue families");
 	if (!indices.TheyAllExist()) {
-		LogService::Log(LogType::FAIL, className, functionName, "GPU lacks graphics queue family");
+		LogService::Log(LogType::FAIL, className, functionName, "GPU lacks required queue families");
 		suitable = false;
+		return false;
 	}
 	else {
-		LogService::Log(LogType::SUCCESS, className, functionName, "GPU has graphics queue family");
+		LogService::Log(LogType::SUCCESS, className, functionName, "GPU has required queue families");
 	}
-	LogService::Log(LogType::WIP, className, functionName,
-		"Missing checks for present, look into the QueueFamilyIndices struct in tutorial"
-	);
+
+	// Check device extensions https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
+	LogService::Log(LogType::TRACE, className, functionName, "Checking device extensions");
+	{
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName); // remove from list if available
+		}
+
+		if (!requiredExtensions.empty()) { // run if at least one required is not available
+			LogService::Log(LogType::FAIL, className, functionName, "GPU lacks required extensions");
+			suitable = false;
+			return false;
+		}
+		else {
+			LogService::Log(LogType::SUCCESS, className, functionName, "GPU has required extensions");
+		}
+	}
+
+	// Check swap chain sufficiency
+	LogService::Log(LogType::TRACE, className, functionName, "Checking swap chain adequacy");
+	// extension support is required for swap chains, but missing extensions should return early above
+	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
+	if (swapChainSupport.formats.empty() || swapChainSupport.presentModes.empty()) {
+		LogService::Log(LogType::FAIL, className, functionName, "Swap chain is not adequate");
+		suitable = false;
+		return false;
+	}
+	else {
+		LogService::Log(LogType::SUCCESS, className, functionName, "Swap chain is adequate");
+	}
+
+	// Swap chain settings
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// END OF CHECKS
@@ -393,7 +545,16 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfoVector.data();
 	deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 
-	deviceCreateInfo.enabledExtensionCount = 0;
+	const std::vector<const char*> deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+	LogService::Log(LogType::WIP, className, functionName,
+		"DeviceExtensions variable is created twice in separate functions, shouldn't this be only once?"
+	);
+
+	deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+	deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
 	deviceCreateInfo.enabledLayerCount = 0;
 	// validation layers are not setup (see documentation)
 		// https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Logical_device_and_queues
@@ -420,7 +581,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 	LogService::Log(LogType::WIP, className, functionName, "Next step is SwapChains");
 
-	GenerateSwapChains(window);
+	GenerateSwapChains(window,surface,chosenPhysicalDevice);
 
 	// called from BaseWindow
 
@@ -457,10 +618,16 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::GenerateSwapChains(GLFWwindow* window) {
+void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkPhysicalDevice physicalDevice) {
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
 	//https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation
+
+	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
+
+	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
 }
 
 void VulkanHandler::Cleanup()

@@ -21,6 +21,12 @@ struct QueueFamilyIndices {
 	}
 };
 
+struct SwapChainSupportDetails {
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
+
 class VulkanHandler {
 private:
 	static inline VkInstance vulkanInstance; // initialised via vkCreateInstance in CreateVulkanInstance() function
@@ -31,8 +37,13 @@ private:
 	static inline VkQueue presentQueue;
 
 	// utility functions
-	static bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR& surface);
+	static bool IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface);
 	static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface);
+
+	static SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface);
+	static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+	static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
 
 public:
 	static VkInstance& GetInstance() {
@@ -45,7 +56,7 @@ public:
 	static void CreateVulkanInstance(); // creates VulkanInstance
 	static void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface);
 	// ^^^ calls creates GLFW surface and setups logical devices and queues
-	static void GenerateSwapChains(GLFWwindow* window); // WIP declaration
+	static void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkPhysicalDevice physicalDevice); // WIP declaration
 
 	static void Initialise();
 	static void Cleanup();

@@ -4,6 +4,12 @@
 #include <chrono>
 #include <array>
 
+#include <source_location>
+
+#define FILE_NAME std::source_location::current().file_name()
+#define FUNC_NAME std::source_location::current().function_name()
+#define LINE_NUMB std::source_location::current().line()
+
 //#include "../ConsoleColours.h" // allow anything using console to use colours ERROR: cannot use because ConsoleColours uses logs
 
 enum class LogType : uint8_t {

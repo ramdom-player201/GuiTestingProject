@@ -168,7 +168,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 	return currentId++;
 }
 
-int temp{ 0 };
+// int temp{ 0 };
 
 size_t WindowManager::CountWindows()
 {
@@ -178,11 +178,11 @@ size_t WindowManager::CountWindows()
 		LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
 	//}
 
-		temp++;
-		if (temp > 1000000) {
-			temp = 0;
-			LogService::Log(LogType::SPAM, className, functionName, "To Differ");
-		}
+		//temp++;
+		//if (temp > 1000000) {
+		//	temp = 0;
+		//	LogService::Log(LogType::SPAM, className, functionName, "To Differ");
+		//}
 
 	return windows.size();
 }
