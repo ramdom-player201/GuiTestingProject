@@ -18,6 +18,7 @@ protected:
 	size_t windowId{ 0 };
 	GLFWwindow* window{ nullptr };
 	VkSurfaceKHR surface{ VK_NULL_HANDLE };
+	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
 public:
 	WindowReturnData Update();
 

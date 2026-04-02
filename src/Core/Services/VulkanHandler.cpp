@@ -8,6 +8,46 @@
 
 #include "../ConsoleColours.h"
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Validation layers
+
+const std::vector<const char*> validationLayers{
+	"VK_LAYER_KHRONOS_validation"
+};
+#ifdef NDEBUG
+const bool enableValidationLayers{ false };
+#else
+const bool enableValidationLayers{ true };
+#endif
+
+bool CheckValidationLayerSupport() {
+	uint32_t layerCount{ 0 };
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+	std::vector<VkLayerProperties> availableLayers(layerCount);
+	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+	for (const char* layerName : validationLayers) {
+		bool layerFound{ false };
+
+		for (const auto& layerProperties : availableLayers) {
+			if (strcmp(layerName, layerProperties.layerName) == 0) {
+				layerFound = true;
+				break;
+			}
+		}
+
+		if (!layerFound) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,13 +89,15 @@ QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDev
 	return indices;
 }
 
-SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface)
-{
+SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
 
 	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
 
 	SwapChainSupportDetails details;
+
+	// DEVICE CAPABILITIES
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities);
 
 	// SURFACE FORMATS
 	uint32_t formatCount;
@@ -81,8 +123,7 @@ SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice ph
 	return details;
 }
 
-VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
-{
+VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	constexpr std::string_view functionName{ "ChooseSwapSurfaceFormat" };
 
 	LogService::Log(LogType::WIP, className, functionName, "Can we print full list?");
@@ -98,8 +139,7 @@ VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSu
 	return availableFormats[0];
 }
 
-VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
-{
+VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
 	constexpr std::string_view functionName{ "ChooseSwapPresentMode" };
 
 	LogService::Log(LogType::WIP, className, functionName, "Note that mailbox can stress the GPU if framerate is not limited");
@@ -109,12 +149,11 @@ VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresen
 			return thePresentMode;
 		}
 	}
-	LogService::Log(LogType::FAIL, className, functionName, "Defaulted to present mode");
+	LogService::Log(LogType::FAIL, className, functionName, "Defaulted to present FIFO mode");
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
-{
+VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
 	constexpr std::string_view functionName{ "ChooseSwapExtent" };
 
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
@@ -148,12 +187,18 @@ VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capab
 	}
 }
 
+//bool skipFirst{ true };	// << temporary debug stuff, only second GPU has mailbox support on primary development device
 bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "IsDeviceSuitable" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
 
 	bool suitable{ true }; // default true unless proven false
+
+	//if (skipFirst) {		// << temporary debug stuff, only second GPU has mailbox support on primary development device
+	//	skipFirst = false;	// << temporary debug stuff, only second GPU has mailbox support on primary development device
+	//	suitable = false;	// << temporary debug stuff, only second GPU has mailbox support on primary development device
+	//}						// << temporary debug stuff, only second GPU has mailbox support on primary development device
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// GET DEVICE DATA
@@ -263,11 +308,21 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceK
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::CreateVulkanInstance()
-{
+void VulkanHandler::CreateVulkanInstance() {
 	constexpr std::string_view functionName{ "CreateVulkanInstance" };
 
 	LogService::Log(LogType::TRACE, className, functionName, "0 - Initialising Vulkan");
+
+	if (enableValidationLayers && !CheckValidationLayerSupport()) {
+		LogService::Log(LogType::ERROR, className, functionName, 
+			"Validation layers requested, but not available. Check to see if they are enabled in your Vulkan SDK"
+		);
+	}
+	else {
+		LogService::Log(LogType::LOW, className, functionName,
+			"Validation layers requested and available"
+		);
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Ensure this only runs once
@@ -346,9 +401,16 @@ void VulkanHandler::CreateVulkanInstance()
 		// Note, if VK_ERROR_INCOMPATIBLE_DRIVER on MacOS, further modification may be required
 		// See end of: https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Instance
 
-		// Layers <- what do they do?
-		instanceCreateInfo.enabledLayerCount = 0; // number of global layers to enable
-		LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers: none <- what are these for?");
+		// Vulkan debugging layers
+		if (enableValidationLayers && CheckValidationLayerSupport()) {
+			instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+			LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers enabled");
+		}
+		else {
+			instanceCreateInfo.enabledLayerCount = 0;
+			LogService::Log(LogType::TRACE, className, functionName, "Vulkan layers disabled");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,8 +445,7 @@ void VulkanHandler::CreateVulkanInstance()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool hasDebugListedPhysicalDevices{ false };
-void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks* callbacks, VkSurfaceKHR& surface)
-{
+void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks* callbacks, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain) {
 	constexpr std::string_view functionName{ "SetupWindowSurface" };
 
 	LogService::Log(LogType::TRACE, className, functionName, "Setting up window surface");
@@ -559,6 +620,10 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 		// https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Logical_device_and_queues
 		// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Validation_layers
 
+	if (logicalDevice != VK_NULL_HANDLE) {
+		LogService::Log(LogType::ERROR, className, functionName, "Logical device already exists");
+	}
+
 	// This is where logical device is created
 	if (vkCreateDevice(chosenPhysicalDevice, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
 		LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan Logical Device Created");
@@ -580,7 +645,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 	LogService::Log(LogType::WIP, className, functionName, "Next step is SwapChains");
 
-	GenerateSwapChains(window,surface,chosenPhysicalDevice);
+	GenerateSwapChains(window, surface, swapChain, chosenPhysicalDevice);
 
 	// called from BaseWindow
 
@@ -617,7 +682,8 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkPhysicalDevice physicalDevice) {
+void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain, VkPhysicalDevice physicalDevice) {
+	constexpr std::string_view functionName{ "GenerateSwapChains" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
 	//https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation
@@ -627,10 +693,91 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
 	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
 	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
+
+	uint32_t imageCount{ swapChainSupport.capabilities.minImageCount + 1 };
+	// clamp image count to maximum if needed
+	if (swapChainSupport.capabilities.maxImageCount > 0 &&
+		imageCount > swapChainSupport.capabilities.maxImageCount)
+	{
+
+	}
+
+	LogService::Log(LogType::TRACE, className, functionName, "Creating SwapchainCreateInfo");
+
+	VkSwapchainCreateInfoKHR createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	createInfo.surface = surface;
+	createInfo.minImageCount = imageCount;
+	createInfo.imageFormat = surfaceFormat.format;
+	createInfo.imageColorSpace = surfaceFormat.colorSpace;
+	createInfo.imageExtent = extent;
+	createInfo.imageArrayLayers = 1;
+	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // << may need changing later
+
+	LogService::Log(LogType::WIP, className, functionName,
+		"May need to change ImageUsage to allow for layered/asynchronous rendering in the future"
+	);
+
+	QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
+	uint32_t queueFamilyIndices[]{
+		indices.graphicsFamily.value(),
+		indices.presentFamily.value()
+	};
+
+	LogService::Log(LogType::WIP, className, functionName,
+		"Evaluate concurrent vs exclusive, what is the difference and which is best?"
+	);
+	if (indices.graphicsFamily != indices.presentFamily) {
+		LogService::Log(LogType::TRACE, className, functionName, "Concurrent");
+		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		createInfo.queueFamilyIndexCount = 2;
+		createInfo.pQueueFamilyIndices = queueFamilyIndices;
+	}
+	else {
+		LogService::Log(LogType::TRACE, className, functionName, "Exclusive");
+		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		createInfo.queueFamilyIndexCount = 0;
+		createInfo.pQueueFamilyIndices = nullptr;
+	}
+	// Concurrent is simplest; tutorial suggests using it when available for now
+	// Exclusive is for better performance
+
+	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+	// https://docs.vulkan.org/refpages/latest/refpages/source/VkSurfaceTransformFlagBitsKHR.html
+
+	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	// https://docs.vulkan.org/refpages/latest/refpages/source/VkCompositeAlphaFlagBitsKHR.html
+
+	createInfo.presentMode = presentMode;
+	createInfo.clipped = VK_TRUE;
+
+	if (swapChain == VK_NULL_HANDLE) {
+		LogService::Log(LogType::TRACE, className, functionName, "No existing swap chain");
+	}
+	else {
+		LogService::Log(LogType::TRACE, className, functionName, "Swap chain exists");
+	}
+
+	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	LogService::Log(LogType::WIP, className, functionName, "Swap chains are not currently recreated");
+
+	//LogService::Log(LogType::WIP, className, functionName, "Swap chains should be stored/accessed via window");
+	//VkSwapchainKHR swapChain; // later, this will need to be stored in the window
+
+	LogService::Log(LogType::WIP, className, functionName,
+		"When might creating a swapchain fail and how could it be handled better if other windows exist?"
+	);
+	if (vkCreateSwapchainKHR(logicalDevice, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create swap chain");
+		throw std::runtime_error("Failed to create swap chain");
+	}
+	else {
+		LogService::Log(LogType::SUCCESS, className, functionName, "Successfully created swap chain");
+	}
+
 }
 
-void VulkanHandler::Cleanup()
-{
+void VulkanHandler::Cleanup() {
 	// Window surfaces are destroyed in the BaseWindow destructor
 	// VulkanHandler::Cleanup() is only called after all windows are closed
 	LogService::Log(LogType::WIP, className, "Cleanup", "Check with WindowManager to enforce all window closure before cleanup");

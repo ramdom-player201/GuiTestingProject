@@ -51,7 +51,7 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 
 	// CREATE GLFW WINDOW SURFACE
 
-	VulkanHandler::SetupWindowSurface(window, nullptr, surface);
+	VulkanHandler::SetupWindowSurface(window, nullptr, surface, swapChain);
 
 	//VkInstance vkInstance = VulkanHandler::GetInstance();
 	//if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
@@ -89,16 +89,17 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 }
 
 BaseWindow::~BaseWindow() {
-	LogService::Log(LogType::TRACE, className, "Destructor", 
-		"Destroying window surface :: id = ["+
+	LogService::Log(LogType::TRACE, className, "Destructor",
+		"Destroying window surface :: id = [" +
 		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
 		std::to_string(windowId) +
-		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) +"]"
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
 	);
+	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChain, nullptr);
 	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
 	LogService::Log(LogType::TRACE, className, "Destructor",
 		"Destroying window :: id = [" +
-		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + 
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
 		std::to_string(windowId) +
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
 	);
