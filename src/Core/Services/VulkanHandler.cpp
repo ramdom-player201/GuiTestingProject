@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <cstring>
 
 #include "../ConsoleColours.h"
 
