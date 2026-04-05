@@ -9,45 +9,54 @@
 #include <string>
 #include <vector> // needed to build for MacOS
 
-struct QueueFamilyIndices {
-	// Struct containing the indexes for each supported queue family.
-	// Optional is used to indicate whether each is supported or not.
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool TheyAllExist() {
-		return
-			graphicsFamily.has_value() &&
-			presentFamily.has_value();
-	}
-};
-
-struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities; //https://docs.vulkan.org/refpages/latest/refpages/source/VkSurfaceCapabilitiesKHR.html
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
 class VulkanHandler {
 private:
+
+	// structs
+	struct QueueFamilyIndices {
+		// Struct containing the indexes for each supported queue family.
+		// Optional is used to indicate whether each is supported or not.
+		std::optional<uint32_t> graphicsFamily;
+		std::optional<uint32_t> presentFamily;
+
+		bool TheyAllExist() const {
+			return
+				graphicsFamily.has_value() &&
+				presentFamily.has_value();
+		}
+	};
+
+	struct SwapChainSupportDetails {
+		VkSurfaceCapabilitiesKHR capabilities{}; //https://docs.vulkan.org/refpages/latest/refpages/source/VkSurfaceCapabilitiesKHR.html
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
+	};
+
+	// member variables
 	static inline VkInstance vulkanInstance{ VK_NULL_HANDLE }; // initialised via vkCreateInstance in CreateVulkanInstance() function
 	static inline VkDevice logicalDevice{ VK_NULL_HANDLE }; // initialised via vkCreateDevice in Initialise() function
 	static inline VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE }; // handle for a GPU, defaults to null
 
 	// queues
-	static inline VkQueue graphicsQueue;
-	static inline VkQueue presentQueue;
+	static inline VkQueue graphicsQueue{ VK_NULL_HANDLE };
+	static inline VkQueue presentQueue{ VK_NULL_HANDLE };
 
 	// utility functions
-	static bool IsDeviceSuitable(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface);
-	static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface);
+	static bool IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface);
+	static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface);
 
-	static SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface);
+	static SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice physicalDevice, const VkSurfaceKHR& surface);
 	static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
 
+	// static-only class
+	VulkanHandler() = delete;
+	~VulkanHandler() = delete;
+	VulkanHandler(const VulkanHandler&) = delete;
+
 public:
+	// Getters, since some vulkan stuff is used in BaseWindow
 	static const VkInstance& GetInstance() {
 		if (vulkanInstance == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, "GetInstance", "VkInstance was not initialised (VK_NULL_HANDLE)");
@@ -58,6 +67,7 @@ public:
 		LogService::Log(LogType::WIP, className, "GetLogicalDevice",
 			"If logical device is shared between windows, but not guaranteed, should we require surface to be passed to ensure correct LogicalDevice is always obtained?"
 		);
+		// logicalDevice is supposed to be shared, and should never be recreated since the requirements are the same for all windows
 		if (logicalDevice == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, "GetLogicalDevice", "No logical device exists (VK_NULL_HANDLE)");
 		}

@@ -54,142 +54,8 @@ bool CheckValidationLayerSupport() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
-	QueueFamilyIndices indices;
-
-	// QUEUE FAMILIES
-
-	// count number of queues for queried device
-	uint32_t queueFamilyCount{ 0 };
-	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, nullptr);
-
-	// enumerate queue families belonging to queried device
-	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, queueFamilies.data());
-
-	int i = 0;
-	for (const auto& queueFamily : queueFamilies) {
-
-		// graphics
-		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) { // check if queueFamily is GRAPHICS
-			indices.graphicsFamily = i; // store GRAPHICS index to struct
-		}
-
-		// present
-		VkBool32 presentSupport;
-		vkGetPhysicalDeviceSurfaceSupportKHR(deviceToCheck, i, surface, &presentSupport);
-		if (presentSupport == VK_TRUE) {
-			indices.presentFamily = i;
-		}
-
-		// family index increment
-		i++;
-	}
-
-	// Not all indices are guaranteed to be found, rely on IsDeviceSuitable to confirm
-	return indices;
-}
-
-SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
-	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
-
-	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
-
-	SwapChainSupportDetails details;
-
-	// DEVICE CAPABILITIES
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(deviceToCheck, surface, &details.capabilities);
-
-	// SURFACE FORMATS
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, nullptr);
-
-	if (formatCount != 0) {
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, details.formats.data());
-	}
-
-	// PRESENT MODE
-
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount, nullptr);
-
-	if (presentModeCount != 0) {
-		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount,
-			details.presentModes.data()
-		);
-	}
-
-	return details;
-}
-
-VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
-	constexpr std::string_view functionName{ "ChooseSwapSurfaceFormat" };
-
-	LogService::Log(LogType::WIP, className, functionName, "Can we print full list?");
-	for (const auto& theFormat : availableFormats) {
-		if (theFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-			theFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-			LogService::Log(LogType::SUCCESS, className, functionName, "Chosen BGRA_SRGB");
-			return theFormat;
-		}
-	}
-	LogService::Log(LogType::FAIL, className, functionName, "Fallback default");
-	LogService::Log(LogType::WIP, className, functionName, "Which was it?");
-	return availableFormats[0];
-}
-
-VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
-	constexpr std::string_view functionName{ "ChooseSwapPresentMode" };
-
-	LogService::Log(LogType::WIP, className, functionName, "Note that mailbox can stress the GPU if framerate is not limited");
-	for (const auto& thePresentMode : availablePresentModes) {
-		if (thePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			LogService::Log(LogType::SUCCESS, className, functionName, "Gone with Mailbox mode");
-			return thePresentMode;
-		}
-	}
-	LogService::Log(LogType::FAIL, className, functionName, "Defaulted to present FIFO mode");
-	return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
-	constexpr std::string_view functionName{ "ChooseSwapExtent" };
-
-	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		LogService::Log(LogType::TRACE, className, functionName, "Within limits, use current");
-		return capabilities.currentExtent;
-	}
-	else {
-		LogService::Log(LogType::TRACE, className, functionName, "Screen and DPI may differ, calculating new");
-
-		int width{ 0 };
-		int height{ 0 };
-		glfwGetFramebufferSize(window, &width, &height);
-
-		VkExtent2D actualExtent{
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)
-		};
-
-		actualExtent.width = std::clamp(
-			actualExtent.width,
-			capabilities.minImageExtent.width,
-			capabilities.maxImageExtent.width
-		);
-		actualExtent.height = std::clamp(
-			actualExtent.height,
-			capabilities.minImageExtent.height,
-			capabilities.maxImageExtent.height
-		);
-
-		return actualExtent;
-	}
-}
-
 //bool skipFirst{ true };	// << temporary debug stuff, only second GPU has mailbox support on primary development device
-bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
+bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "IsDeviceSuitable" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
@@ -303,6 +169,140 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, VkSurfaceKH
 
 	// unknown what features are needed at this stage, so return true for any
 	return suitable;
+}
+
+VulkanHandler::QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
+	QueueFamilyIndices indices;
+
+	// QUEUE FAMILIES
+
+	// count number of queues for queried device
+	uint32_t queueFamilyCount{ 0 };
+	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, nullptr);
+
+	// enumerate queue families belonging to queried device
+	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, queueFamilies.data());
+
+	int i = 0;
+	for (const auto& queueFamily : queueFamilies) {
+
+		// graphics
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) { // check if queueFamily is GRAPHICS
+			indices.graphicsFamily = i; // store GRAPHICS index to struct
+		}
+
+		// present
+		VkBool32 presentSupport;
+		vkGetPhysicalDeviceSurfaceSupportKHR(deviceToCheck, i, surface, &presentSupport);
+		if (presentSupport == VK_TRUE) {
+			indices.presentFamily = i;
+		}
+
+		// family index increment
+		i++;
+	}
+
+	// Not all indices are guaranteed to be found, rely on IsDeviceSuitable to confirm
+	return indices;
+}
+
+VulkanHandler::SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
+	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
+
+	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
+
+	SwapChainSupportDetails details;
+
+	// DEVICE CAPABILITIES
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(deviceToCheck, surface, &details.capabilities);
+
+	// SURFACE FORMATS
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, nullptr);
+
+	if (formatCount != 0) {
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, details.formats.data());
+	}
+
+	// PRESENT MODE
+
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount, nullptr);
+
+	if (presentModeCount != 0) {
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount,
+			details.presentModes.data()
+		);
+	}
+
+	return details;
+}
+
+VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+	constexpr std::string_view functionName{ "ChooseSwapSurfaceFormat" };
+
+	LogService::Log(LogType::WIP, className, functionName, "Can we print full list?");
+	for (const auto& theFormat : availableFormats) {
+		if (theFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+			theFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Chosen BGRA_SRGB");
+			return theFormat;
+		}
+	}
+	LogService::Log(LogType::FAIL, className, functionName, "Fallback default");
+	LogService::Log(LogType::WIP, className, functionName, "Which was it?");
+	return availableFormats[0];
+}
+
+VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+	constexpr std::string_view functionName{ "ChooseSwapPresentMode" };
+
+	LogService::Log(LogType::WIP, className, functionName, "Note that mailbox can stress the GPU if framerate is not limited");
+	for (const auto& thePresentMode : availablePresentModes) {
+		if (thePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Gone with Mailbox mode");
+			return thePresentMode;
+		}
+	}
+	LogService::Log(LogType::FAIL, className, functionName, "Defaulted to present FIFO mode");
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
+	constexpr std::string_view functionName{ "ChooseSwapExtent" };
+
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		LogService::Log(LogType::TRACE, className, functionName, "Within limits, use current");
+		return capabilities.currentExtent;
+	}
+	else {
+		LogService::Log(LogType::TRACE, className, functionName, "Screen and DPI may differ, calculating new");
+
+		int width{ 0 };
+		int height{ 0 };
+		glfwGetFramebufferSize(window, &width, &height);
+
+		VkExtent2D actualExtent{
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)
+		};
+
+		actualExtent.width = std::clamp(
+			actualExtent.width,
+			capabilities.minImageExtent.width,
+			capabilities.maxImageExtent.width
+		);
+		actualExtent.height = std::clamp(
+			actualExtent.height,
+			capabilities.minImageExtent.height,
+			capabilities.maxImageExtent.height
+		);
+
+		return actualExtent;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -445,7 +445,6 @@ void VulkanHandler::CreateVulkanInstance() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool hasDebugListedPhysicalDevices{ false };
 void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks* callbacks, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain) {
 	constexpr std::string_view functionName{ "SetupWindowSurface" };
 
@@ -503,47 +502,40 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data()); // takes array of VkPhysicalDevices and writes info to each
 
 		// debug print all GPUs
-		if (!hasDebugListedPhysicalDevices) {
-			for (int i = 0; i < devices.size(); i++) {
-				// https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
-				VkPhysicalDeviceProperties gpuProperties;
-				vkGetPhysicalDeviceProperties(devices[i], &gpuProperties);
-				std::string outputData = "Check index: [";
-				outputData += std::to_string(i + 1);
-				outputData += "]";
-				outputData += ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT);
-				outputData += "\n-> GPU Name = [";
-				outputData += gpuProperties.deviceName;
-				outputData += "]\n-> Vendor Id = [";
-				outputData += std::to_string(gpuProperties.vendorID);
-				outputData += "]\n-> Device Type = [";
-				switch (gpuProperties.deviceType) { // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceType.html
-				case 0:
-					outputData += "OTHER";
-					break;
-				case 1:
-					outputData += "INTEGRATED_GPU";
-					break;
-				case 2:
-					outputData += "DISCRETE_GPU";
-					break;
-				case 3:
-					outputData += "VIRTUAL_GPU";
-					break;
-				case 4:
-					outputData += "CPU";
-					break;
-				default:
-					outputData += "UNDEFINED";
-				}
-				LogService::Log(LogType::TRACE, className, functionName, outputData);
+		for (int i = 0; i < devices.size(); i++) {
+			// https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
+			VkPhysicalDeviceProperties gpuProperties;
+			vkGetPhysicalDeviceProperties(devices[i], &gpuProperties);
+			std::string outputData = "Check index: [";
+			outputData += std::to_string(i + 1);
+			outputData += "]";
+			outputData += ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT);
+			outputData += "\n-> GPU Name = [";
+			outputData += gpuProperties.deviceName;
+			outputData += "]\n-> Vendor Id = [";
+			outputData += std::to_string(gpuProperties.vendorID);
+			outputData += "]\n-> Device Type = [";
+			switch (gpuProperties.deviceType) { // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceType.html
+			case 0:
+				outputData += "OTHER";
+				break;
+			case 1:
+				outputData += "INTEGRATED_GPU";
+				break;
+			case 2:
+				outputData += "DISCRETE_GPU";
+				break;
+			case 3:
+				outputData += "VIRTUAL_GPU";
+				break;
+			case 4:
+				outputData += "CPU";
+				break;
+			default:
+				outputData += "UNDEFINED";
 			}
-			hasDebugListedPhysicalDevices = true;
+			LogService::Log(LogType::TRACE, className, functionName, outputData);
 		}
-		else {
-			LogService::Log(LogType::TRACE, className, functionName, "Already listed physical devices earlier, no need to repeat");
-		}
-
 
 		// Check features of supported GPUs and choose first
 		// https://docs.vulkan.org/refpages/latest/refpages/source/vkEnumeratePhysicalDevices.html
