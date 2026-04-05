@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
-#include <cstring>
+#include <cstring> // Required for Linux to compile
 
 #include "../ConsoleColours.h"
 
@@ -700,7 +700,7 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 	if (swapChainSupport.capabilities.maxImageCount > 0 &&
 		imageCount > swapChainSupport.capabilities.maxImageCount)
 	{
-
+		imageCount = swapChainSupport.capabilities.maxImageCount;
 	}
 
 	LogService::Log(LogType::TRACE, className, functionName, "Creating SwapchainCreateInfo");
