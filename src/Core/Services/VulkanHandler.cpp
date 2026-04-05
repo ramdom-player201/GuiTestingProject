@@ -54,18 +54,18 @@ bool CheckValidationLayerSupport() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
+QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
 	QueueFamilyIndices indices;
 
 	// QUEUE FAMILIES
 
 	// count number of queues for queried device
 	uint32_t queueFamilyCount{ 0 };
-	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, nullptr);
 
 	// enumerate queue families belonging to queried device
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
+	vkGetPhysicalDeviceQueueFamilyProperties(deviceToCheck, &queueFamilyCount, queueFamilies.data());
 
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies) {
@@ -77,7 +77,7 @@ QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDev
 
 		// present
 		VkBool32 presentSupport;
-		vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
+		vkGetPhysicalDeviceSurfaceSupportKHR(deviceToCheck, i, surface, &presentSupport);
 		if (presentSupport == VK_TRUE) {
 			indices.presentFamily = i;
 		}
@@ -90,7 +90,7 @@ QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice physicalDev
 	return indices;
 }
 
-SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
+SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
 
 	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
@@ -98,25 +98,25 @@ SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice ph
 	SwapChainSupportDetails details;
 
 	// DEVICE CAPABILITIES
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(deviceToCheck, surface, &details.capabilities);
 
 	// SURFACE FORMATS
 	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, nullptr);
 
 	if (formatCount != 0) {
 		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, details.formats.data());
+		vkGetPhysicalDeviceSurfaceFormatsKHR(deviceToCheck, surface, &formatCount, details.formats.data());
 	}
 
 	// PRESENT MODE
 
 	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount, nullptr);
 
 	if (presentModeCount != 0) {
 		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount,
+		vkGetPhysicalDeviceSurfacePresentModesKHR(deviceToCheck, surface, &presentModeCount,
 			details.presentModes.data()
 		);
 	}
@@ -189,7 +189,7 @@ VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capab
 }
 
 //bool skipFirst{ true };	// << temporary debug stuff, only second GPU has mailbox support on primary development device
-bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR& surface) {
+bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, VkSurfaceKHR& surface) {
 	constexpr std::string_view functionName{ "IsDeviceSuitable" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
@@ -207,12 +207,12 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceK
 
 	// DEVICE PROPERTIES
 	VkPhysicalDeviceProperties deviceProperties; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceProperties.html
-	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+	vkGetPhysicalDeviceProperties(deviceToCheck, &deviceProperties);
 	// ^^^ used for debug print to output device name
 
 	// DEVICE FEATURES
 	VkPhysicalDeviceFeatures deviceFeatures; // https://docs.vulkan.org/refpages/latest/refpages/source/VkPhysicalDeviceFeatures.html
-	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+	vkGetPhysicalDeviceFeatures(deviceToCheck, &deviceFeatures);
 	// ^^^ what is this needed for?
 
 	// DEVICE EXTENSIONS
@@ -224,7 +224,7 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceK
 	);
 
 	// DEVICE QUEUES
-	QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
+	QueueFamilyIndices indices = FindQueueFamilies(deviceToCheck, surface);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// LOG MESSAGE
@@ -258,10 +258,10 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceK
 	LogService::Log(LogType::TRACE, className, functionName, "Checking device extensions");
 	{
 		uint32_t extensionCount;
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+		vkEnumerateDeviceExtensionProperties(deviceToCheck, nullptr, &extensionCount, nullptr);
 
 		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+		vkEnumerateDeviceExtensionProperties(deviceToCheck, nullptr, &extensionCount, availableExtensions.data());
 
 		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
@@ -282,7 +282,7 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceK
 	// Check swap chain sufficiency
 	LogService::Log(LogType::TRACE, className, functionName, "Checking swap chain adequacy");
 	// extension support is required for swap chains, but missing extensions should return early above
-	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
+	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(deviceToCheck, surface);
 	if (swapChainSupport.formats.empty() || swapChainSupport.presentModes.empty()) {
 		LogService::Log(LogType::FAIL, className, functionName, "Swap chain is not adequate");
 		suitable = false;
@@ -315,7 +315,7 @@ void VulkanHandler::CreateVulkanInstance() {
 	LogService::Log(LogType::TRACE, className, functionName, "0 - Initialising Vulkan");
 
 	if (enableValidationLayers && !CheckValidationLayerSupport()) {
-		LogService::Log(LogType::ERROR, className, functionName, 
+		LogService::Log(LogType::ERROR, className, functionName,
 			"Validation layers requested, but not available. Check to see if they are enabled in your Vulkan SDK"
 		);
 	}
@@ -467,14 +467,21 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	else {
 		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create window surface");
 	}
+	LogService::Log(LogType::WIP, className, functionName, "In which scenarios might this fail, and how might best to handle it?");
+	// multi-window project, ideally we should fail to create the window without crashing everything
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Choose Physical Device
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	LogService::Log(LogType::TRACE, className, functionName, "Choosing from available physical devices");
-	VkPhysicalDevice chosenPhysicalDevice{ VK_NULL_HANDLE }; // handle for a GPU, defaults to null
-	{
+
+	if (physicalDevice != VK_NULL_HANDLE) {
+		LogService::Log(LogType::LOW, className, functionName, "Physical device already selected");
+	}
+	else {
+		LogService::Log(LogType::LOW, className, functionName, "No physical device selected");
+
 		uint32_t deviceCount{ 0 };
 		vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, nullptr); // count vulkan compatible devices
 		LogService::Log(LogType::TRACE, className, functionName,
@@ -540,15 +547,15 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 		// Check features of supported GPUs and choose first
 		// https://docs.vulkan.org/refpages/latest/refpages/source/vkEnumeratePhysicalDevices.html
-		for (const auto& device : devices) {
-			if (IsDeviceSuitable(device, surface)) { // suitability check doesn't do anything yet
-				chosenPhysicalDevice = device; // select gpu to use for application
+		for (const auto& deviceToCheck : devices) {
+			if (IsDeviceSuitable(deviceToCheck, surface)) { // suitability check doesn't do anything yet
+				physicalDevice = deviceToCheck; // select gpu to use for application
 				break;
 			}
 		}
 
 		// Ensure at least one valid GPU was found, and handle if none
-		if (chosenPhysicalDevice == VK_NULL_HANDLE) {
+		if (physicalDevice == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to select a suitable GPU");
 			throw std::runtime_error("Failed to select a suitable GPU");
 		}
@@ -561,7 +568,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	// Query queues
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QueueFamilyIndices indices = FindQueueFamilies(chosenPhysicalDevice, surface);
+	QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
 
 	LogService::Log(LogType::TRACE, className, functionName, "Creating Queues");
 
@@ -623,10 +630,11 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 	if (logicalDevice != VK_NULL_HANDLE) {
 		LogService::Log(LogType::ERROR, className, functionName, "Logical device already exists");
+		LogService::Log(LogType::WIP, className, functionName, "Need to reuse Logical device if requested features match");
 	}
 
 	// This is where logical device is created
-	if (vkCreateDevice(chosenPhysicalDevice, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
+	if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
 		LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan Logical Device Created");
 	}
 	else {
@@ -646,7 +654,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 	LogService::Log(LogType::WIP, className, functionName, "Next step is SwapChains");
 
-	GenerateSwapChains(window, surface, swapChain, chosenPhysicalDevice);
+	GenerateSwapChains(window, surface, swapChain);
 
 	// called from BaseWindow
 
@@ -683,7 +691,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain, VkPhysicalDevice physicalDevice) {
+void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain) {
 	constexpr std::string_view functionName{ "GenerateSwapChains" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
@@ -761,9 +769,6 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 	LogService::Log(LogType::WIP, className, functionName, "Swap chains are not currently recreated");
-
-	//LogService::Log(LogType::WIP, className, functionName, "Swap chains should be stored/accessed via window");
-	//VkSwapchainKHR swapChain; // later, this will need to be stored in the window
 
 	LogService::Log(LogType::WIP, className, functionName,
 		"When might creating a swapchain fail and how could it be handled better if other windows exist?"
