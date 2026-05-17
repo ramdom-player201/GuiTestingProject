@@ -191,7 +191,7 @@ void LogService::Log(const LogType logType, const std::string_view source, const
 	case LogType::USER: { Logs_USER.pushLog(newEntry); break; }
 	case LogType::TEST: { Logs_TEST.pushLog(newEntry); break; }
 	case LogType::SUCCESS: { Logs_SUCCESS.pushLog(newEntry); break; }
-	case LogType::FAIL: { Logs_SUCCESS.pushLog(newEntry); break; }
+	case LogType::FAIL: { Logs_FAIL.pushLog(newEntry); break; }
 					  //     //-----------------//
 	case LogType::TRACE: { Logs_TRACE.pushLog(newEntry); break; }
 	case LogType::SPAM: { Logs_SPAM.pushLog(newEntry); break; }
@@ -215,24 +215,24 @@ size_t LogService::GetCurrentDataUsage()
 	// get size of each log, then add together
 	size_t totalSize{ 0 };
 
-	totalSize += Logs_CRITICAL.getQueueSize();
-	totalSize += Logs_ERROR.getQueueSize();
-	totalSize += Logs_ABNORM.getQueueSize();
-	totalSize += Logs_WIP.getQueueSize();
-	totalSize += Logs_SECURITY.getQueueSize();
+	totalSize += Logs_CRITICAL.getQueueSizeBytes();
+	totalSize += Logs_ERROR.getQueueSizeBytes();
+	totalSize += Logs_ABNORM.getQueueSizeBytes();
+	totalSize += Logs_WIP.getQueueSizeBytes();
+	totalSize += Logs_SECURITY.getQueueSizeBytes();
 
-	totalSize += Logs_HIGH.getQueueSize();
-	totalSize += Logs_MED.getQueueSize();
-	totalSize += Logs_LOW.getQueueSize();
+	totalSize += Logs_HIGH.getQueueSizeBytes();
+	totalSize += Logs_MED.getQueueSizeBytes();
+	totalSize += Logs_LOW.getQueueSizeBytes();
 
-	totalSize += Logs_USER.getQueueSize();
-	totalSize += Logs_TEST.getQueueSize();
-	totalSize += Logs_SUCCESS.getQueueSize();
-	totalSize += Logs_FAIL.getQueueSize();
+	totalSize += Logs_USER.getQueueSizeBytes();
+	totalSize += Logs_TEST.getQueueSizeBytes();
+	totalSize += Logs_SUCCESS.getQueueSizeBytes();
+	totalSize += Logs_FAIL.getQueueSizeBytes();
 
-	totalSize += Logs_TRACE.getQueueSize();
-	totalSize += Logs_SPAM.getQueueSize();
-	totalSize += Logs_CATCH.getQueueSize();
+	totalSize += Logs_TRACE.getQueueSizeBytes();
+	totalSize += Logs_SPAM.getQueueSizeBytes();
+	totalSize += Logs_CATCH.getQueueSizeBytes();
 
 	return totalSize;
 }

@@ -89,19 +89,30 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 }
 
 BaseWindow::~BaseWindow() {
-	LogService::Log(LogType::TRACE, className, "Destructor",
-		"Destroying window surface :: id = [" +
-		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
-		std::to_string(windowId) +
-		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
-	);
-	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChain, nullptr);
-	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
-	LogService::Log(LogType::TRACE, className, "Destructor",
+
+	constexpr std::string_view functionName{ "Destructor" };
+
+	LogService::Log(LogType::TRACE, className, functionName,
 		"Destroying window :: id = [" +
 		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
 		std::to_string(windowId) +
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
 	);
+	
+	// Destroy swap chain
+	LogService::Log(LogType::TRACE, className, functionName, "Clean swapchain");
+	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChain, nullptr);
+	// Destroy surface
+	LogService::Log(LogType::TRACE, className, functionName, "Clean surface");
+	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
+	// Destroy window
+	LogService::Log(LogType::TRACE, className, functionName, "Clean window");
 	glfwDestroyWindow(window);
+
+	LogService::Log(LogType::TRACE, className, functionName,
+		"Destroyed window :: id = [" +
+		ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +
+		std::to_string(windowId) +
+		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
+	);
 }

@@ -5,60 +5,34 @@
 #include <string>
 #include <iostream>
 #include <cstdint>  // <- needed to compile in Linux GCC in order to use uint8_t
+//#include <unordered_map>
 
 //class ColouredConsole;
 
 enum class AnsiColours : uint8_t {
 	DEFAULT,
 	// Reds
-	RED,
-	RED_BRIGHT,
-	RED_DARK,
+	RED, RED_BRIGHT, RED_DARK,
 	// Oranges
-	ORANGE,
-	ORANGE_BRIGHT,
-	ORANGE_DARK,
+	ORANGE, ORANGE_BRIGHT, ORANGE_DARK,
 	// Yellows
-	YELLOW,
-	YELLOW_BRIGHT,
-	YELLOW_DARK,
+	YELLOW, YELLOW_BRIGHT, YELLOW_DARK,
 	// Greens
-	GREEN,
-	GREEN_BRIGHT,
-	GREEN_DARK,
+	GREEN, GREEN_BRIGHT, GREEN_DARK,
 	// Cyans
-	CYAN,
-	CYAN_BRIGHT,
-	CYAN_DARK,
+	CYAN, CYAN_BRIGHT, CYAN_DARK,
 	// Blues
-	BLUE,
-	BLUE_BRIGHT,
-	BLUE_DARK,
+	BLUE, BLUE_BRIGHT, BLUE_DARK,
 	// Purples
-	PURPLE,
-	PURPLE_BRIGHT,
-	PURPLE_DARK,
+	PURPLE, PURPLE_BRIGHT, PURPLE_DARK,
 	// Magentas
-	MAGENTA,
-	MAGENTA_BRIGHT,
-	MAGENTA_DARK,
+	MAGENTA, MAGENTA_BRIGHT, MAGENTA_DARK,
 	// Pinks
-	PINK,
-	PINK_BRIGHT,
-	PINK_DARK,
+	PINK, PINK_BRIGHT, PINK_DARK,
 	// Greys
-	WHITE,
-	GREY_BRIGHT,
-	GREY_MEDIUM_BRIGHT,
-	GREY_MEDIUM_DARK,
-	GREY_DARK,
-	BLACK,
+	WHITE, GREY_BRIGHT, GREY_MEDIUM_BRIGHT, GREY_MEDIUM_DARK, GREY_DARK, BLACK,
 	// Special
-	FLASH,
-	ITALIC,
-	UNDERLINE,
-	UNDERLINE_DOUBLE,
-	STRIKETHROUGH,
+	FLASH, ITALIC, UNDERLINE, UNDERLINE_DOUBLE, STRIKETHROUGH,
 };
 
 // "\033[38;2;50;250;50m" 
@@ -171,6 +145,13 @@ public:
 		std::cout << ConsoleColours::getColourCode(AnsiColours::GREY_DARK)			/**/ << "Grey Dark >";
 		std::cout << ConsoleColours::getColourCode(AnsiColours::BLACK)				/**/ << "Black\n";
 	}
+private:
+	//static inline const std::unordered_map<AnsiColours, std::string> colourMap{
+	//	{AnsiColours::DEFAULT,			"\033[0m"},
+	//	{AnsiColours::RED,				"\033[38;2;200;0;0m"},
+	//	{AnsiColours::RED_BRIGHT,		"\033[38;2;250;100;100m"},
+	//	{AnsiColours::RED_DARK,			"\033[38;2;150;0;0m"}
+	//};
 };
 
 //#pragma once

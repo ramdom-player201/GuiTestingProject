@@ -17,10 +17,10 @@ LogEntry units have the following fields:
 ⨽ source	<- the class this log is from
 ⨽ function	<- the function in the class this log is from
 ⨽ message	<- the debug message itself
-⨽ copies	<- if this message is sent multiple times in a row, the original will have its copies incremented WIP: not implemented
+⨽ copies	<- if this message is sent multiple times in a row, the original will have its copies incremented (WIP: not implemented)
 
-Logs are written to individual streams depending on their LogType
-Each stream is of limited size, so logs will end up being forgotten once they go out of scope
+Logs are written to individual queues depending on their LogType
+Each queue is of limited size, so logs will end up being forgotten once they go out of scope
 
 LogService uses or will use:
 [[WindowManager]] For creating a DedicatedWindow to view and manage logs

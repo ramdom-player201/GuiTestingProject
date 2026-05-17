@@ -24,7 +24,8 @@ Can remove custom singleton logic and just use static
 
 # Modify CommandConsole to bring console to foreground																					[ ]
 
-# Implement debug logging																												[ ]
+# Implement debug logging																												[X]
+# Configure logs such that they save to file; implement LogManager window																[ ]
 Write debug logs to file, print number of debugs at program termination
 Come up with a structure to define how and when debug logs are cleaned, and ensure memory limits
 Mark logs with categories for sorting: by class, by function, etc

@@ -123,3 +123,34 @@ public:
 //- VkSemaphore / VkFence					::
 // ::
 // --------------------------------------- --------------------------------------- --------------------------------------- ---------------------------------------
+
+
+
+
+
+	// Steps:
+	// 1 load vulkan loader and extensions						[/]
+	// 2 create VkInstanc if null								[/]
+	// 3 create surface from passed window handle and callbacks	[/]
+	// 4 choose physical device									[/]
+	// 5 query queue family										[/]
+	// 6 create logical device									[/]
+	// 7 create swapchain										[
+
+	// Global (Once in handler)
+	// VkInstance
+	// VkPhysicalDevice (not created)
+	// VkDevice (logical device, created after window, but windows still share)
+	// VkQueue (owned by device)
+	// VkDescriptorSetLayout
+	// VkPipelineLayout
+	// VkPipeine
+
+	// Per-Window
+	// VkSurfaceKHR
+	// VkSwapchainKHR
+	// VkImage
+	// VkImageView
+	// VkFramebuffer
+	// VkRenderPass
+	// VkSemaphore, VkFence

@@ -64,7 +64,7 @@ private:
 				dropped++;
 			}
 		}
-		size_t getQueueSize() { return sizeof(queue); } // return size of queue array, in bytes
+		size_t getQueueSizeBytes() { return sizeof(queue); } // return size of queue array, in bytes
 		size_t getDropCount() { return dropped; } // return number of expired logs
 
 		constexpr LogQueue() : head(0), fillCount(0), dropped(0) {} // initialisation of variables must be done here, because class is nested

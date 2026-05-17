@@ -623,15 +623,17 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 	if (logicalDevice != VK_NULL_HANDLE) {
 		LogService::Log(LogType::ERROR, className, functionName, "Logical device already exists");
 		LogService::Log(LogType::WIP, className, functionName, "Need to reuse Logical device if requested features match");
-	}
-
-	// This is where logical device is created
-	if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
-		LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan Logical Device Created");
+		LogService::Log(LogType::WIP, className, functionName, "Assume logical device is always valid, consider whether this is always true?");
 	}
 	else {
-		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create Vulkan Logical Device");
-		throw std::runtime_error("Failed to create Vulkan Logical Device!");
+		// This is where logical device is created
+		if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice) == VK_SUCCESS) {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Vulkan Logical Device Created");
+		}
+		else {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create Vulkan Logical Device");
+			throw std::runtime_error("Failed to create Vulkan Logical Device!");
+		}
 	}
 
 	// Add queues to created device
