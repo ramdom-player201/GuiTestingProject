@@ -98,6 +98,12 @@ BaseWindow::~BaseWindow() {
 		std::to_string(windowId) +
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
 	);
+
+	// Destroy image views
+	LogService::Log(LogType::TRACE, className, functionName, "Clean image views");
+	for (auto imageView : swapChainData.swapChainImageViews) {
+		vkDestroyImageView(VulkanHandler::GetLogicalDevice(), imageView, nullptr);
+	}
 	
 	// Destroy swap chain
 	LogService::Log(LogType::TRACE, className, functionName, "Clean swapchain");

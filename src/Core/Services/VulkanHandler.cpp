@@ -793,11 +793,46 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 
 	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Image_views
 
-	createImageViews();
+	CreateImageViews(swapChainData);
 }
 
-void VulkanHandler::createImageViews()
-{
+void VulkanHandler::CreateImageViews(SwapChainData& swapChainData) {
+	constexpr std::string_view functionName{ "CreateImageViews" };
+
+	LogService::Log(LogType::TRACE, className, functionName, "Creating Image Views");
+
+	swapChainData.swapChainImageViews.resize(swapChainData.swapChainImages.size());
+
+	for (size_t i = 0; i < swapChainData.swapChainImages.size(); i++) {
+		LogService::Log(LogType::TRACE, className, functionName, "Creating view [" + std::to_string(i) + "]");
+		VkImageViewCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.image = swapChainData.swapChainImages[i];
+
+		// how image data should be interpreted (eg 1D, 2D, 3D, cube map)
+		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format = swapChainData.swapChainImageFormat;
+
+		// colour channel mapping, using default
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+
+		if(vkCreateImageView(logicalDevice,&createInfo,nullptr,&swapChainData.swapChainImageViews[i]) != VK_SUCCESS) {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create image view [" + std::to_string(i) + "]");
+			throw std::runtime_error("Failed to create image views!");
+		}
+		else {
+			LogService::Log(LogType::SUCCESS, className, functionName, "Successfully created image view [" + std::to_string(i) + "]");
+		}
+	}
 }
 
 void VulkanHandler::Cleanup() {

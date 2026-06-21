@@ -87,7 +87,7 @@ public:
 	// ^^^ calls creates GLFW surface and setups logical devices and queues
 	static void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, SwapChainData& swapChainData); // WIP declaration
 
-	static void createImageViews();
+	static void CreateImageViews(SwapChainData& swapChainData);
 
 	//static void Initialise(); // <- not used, since CreateVulkanInstance() is called first
 	// consider making initialise call CreateVulkanInstance, purely for keeping things standardised across classes
