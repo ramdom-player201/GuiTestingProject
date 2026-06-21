@@ -445,7 +445,7 @@ void VulkanHandler::CreateVulkanInstance() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks* callbacks, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain) {
+void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks* callbacks, VkSurfaceKHR& surface, SwapChainData& swapChainData) {
 	constexpr std::string_view functionName{ "SetupWindowSurface" };
 
 	LogService::Log(LogType::TRACE, className, functionName, "Setting up window surface");
@@ -648,7 +648,7 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 
 	LogService::Log(LogType::WIP, className, functionName, "Next step is SwapChains");
 
-	GenerateSwapChains(window, surface, swapChain);
+	GenerateSwapChains(window, surface, swapChainData);
 
 	// called from BaseWindow
 
@@ -685,19 +685,21 @@ void VulkanHandler::SetupWindowSurface(GLFWwindow* window, const VkAllocationCal
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain) {
+void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, SwapChainData& swapChainData) {
 	constexpr std::string_view functionName{ "GenerateSwapChains" };
 
+	// called after window setup, and whenever window is resized
+
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
-	//https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation
+	// https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation
 
-	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
+	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);  // what is this?
 
-	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
+	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);		// what is this?
+	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);		// what is this?
+	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);				// what is this?
 
-	uint32_t imageCount{ swapChainSupport.capabilities.minImageCount + 1 };
+	uint32_t imageCount{ swapChainSupport.capabilities.minImageCount + 1 };						// what is an imageCount?
 	// clamp image count to maximum if needed
 	if (swapChainSupport.capabilities.maxImageCount > 0 &&
 		imageCount > swapChainSupport.capabilities.maxImageCount)
@@ -714,7 +716,7 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 	createInfo.imageFormat = surfaceFormat.format;
 	createInfo.imageColorSpace = surfaceFormat.colorSpace;
 	createInfo.imageExtent = extent;
-	createInfo.imageArrayLayers = 1;
+	createInfo.imageArrayLayers = 1;							 // what are these?
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // << may need changing later
 
 	LogService::Log(LogType::WIP, className, functionName,
@@ -730,6 +732,7 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 	LogService::Log(LogType::WIP, className, functionName,
 		"Evaluate concurrent vs exclusive, what is the difference and which is best?"
 	);
+
 	if (indices.graphicsFamily != indices.presentFamily) {
 		LogService::Log(LogType::TRACE, className, functionName, "Concurrent");
 		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
@@ -742,32 +745,36 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 		createInfo.queueFamilyIndexCount = 0;
 		createInfo.pQueueFamilyIndices = nullptr;
 	}
+
 	// Concurrent is simplest; tutorial suggests using it when available for now
 	// Exclusive is for better performance
 
-	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+	createInfo.preTransform = swapChainSupport.capabilities.currentTransform; // for screen rotations (eg mobile, should always be default for PC)
 	// https://docs.vulkan.org/refpages/latest/refpages/source/VkSurfaceTransformFlagBitsKHR.html
 
-	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // will this always be opaque?
 	// https://docs.vulkan.org/refpages/latest/refpages/source/VkCompositeAlphaFlagBitsKHR.html
 
 	createInfo.presentMode = presentMode;
-	createInfo.clipped = VK_TRUE;
+	createInfo.clipped = VK_TRUE; // mask out any pixels obscured by other windows
 
-	if (swapChain == VK_NULL_HANDLE) {
+	if (swapChainData.swapChain == VK_NULL_HANDLE) {
 		LogService::Log(LogType::TRACE, className, functionName, "No existing swap chain");
 	}
 	else {
 		LogService::Log(LogType::TRACE, className, functionName, "Swap chain exists");
 	}
 
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	createInfo.oldSwapchain = VK_NULL_HANDLE; // temporary, this will be updated later
 	LogService::Log(LogType::WIP, className, functionName, "Swap chains are not currently recreated");
 
 	LogService::Log(LogType::WIP, className, functionName,
 		"When might creating a swapchain fail and how could it be handled better if other windows exist?"
 	);
-	if (vkCreateSwapchainKHR(logicalDevice, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+
+	// create swap chain
+
+	if (vkCreateSwapchainKHR(logicalDevice, &createInfo, nullptr, &swapChainData.swapChain) != VK_SUCCESS) {
 		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create swap chain");
 		throw std::runtime_error("Failed to create swap chain");
 	}
@@ -775,6 +782,22 @@ void VulkanHandler::GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface
 		LogService::Log(LogType::SUCCESS, className, functionName, "Successfully created swap chain");
 	}
 
+	// retrieve swap chains?
+
+	vkGetSwapchainImagesKHR(logicalDevice, swapChainData.swapChain, &imageCount, nullptr);
+	swapChainData.swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(logicalDevice, swapChainData.swapChain, &imageCount, swapChainData.swapChainImages.data());
+
+	swapChainData.swapChainImageFormat = surfaceFormat.format;
+	swapChainData.swapChainExtent = extent;
+
+	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Image_views
+
+	createImageViews();
+}
+
+void VulkanHandler::createImageViews()
+{
 }
 
 void VulkanHandler::Cleanup() {

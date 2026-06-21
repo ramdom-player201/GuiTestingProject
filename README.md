@@ -6,3 +6,6 @@ Current libraries/dependencies:
 * GLFW <- new library for windowing
 * Glad <- for OpenGL testing, but vulkan was decided on in the end
 * Vulkan <- library for graphics
+* Luau <- considering whether to use this, not yet implemented
+
+Project is open-source, but still in very early development. Contributions are unlikely to be accepted until I have finished laying the groundwork of the codebase.

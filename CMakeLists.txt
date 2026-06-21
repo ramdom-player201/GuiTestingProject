@@ -62,6 +62,8 @@ FetchContent_Declare(
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)    # turn off examples
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)       # turn off tests         <- validates that GLFW is working, not needed since we're not developing GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)        # turn off documentation <- this is available offline
+#find_package(Vulkan REQUIRED)
+#set(GLFW_VULKAN_STATIC ON CACHE BOOL "" FORCE)      # enable vulkan on glfw
 FetchContent_MakeAvailable(glfw)
 
 # Download GLM          #https://github.com/g-truc/glm
@@ -73,6 +75,22 @@ FetchContent_Declare(
 set(GLM_BUILD_TESTS OFF CACHE BOOL "" FORCE)        # Do not build a library target, enforce header-only usage
 set(GLM_ENABLE_CXX_20_GCC ON CACHE BOOL "" FORCE)   # Optional: ensures C++20 standard is respected
 FetchContent_MakeAvailable(glm)
+
+# Download Luau
+# TEMP_DISABLED # FetchContent_Declare(
+# TEMP_DISABLED #     luau
+# TEMP_DISABLED #     GIT_REPOSITORY  https://github.com/luau-lang/luau.git
+# TEMP_DISABLED #     GIT_TAG 0.707  # Use the latest stable version or a specific hash
+# TEMP_DISABLED #     GIT_SHALLOW ON
+# TEMP_DISABLED # )
+# Disable Luau's built-in tests and CLI tools to speed up compilation
+#set(LUAU_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+#set(LUAU_BUILD_CLI OFF CACHE BOOL "" FORCE)
+# TEMP_DISABLED # FetchContent_MakeAvailable(luau)
+# // #include "Luau/Compiler.h" // <-
+# // #include "luacode.h"       // <-
+# // #include "lua.h"           // <-
+# // #include "lualib.h"        // <-
 
 add_executable(
     main src/main.cpp
@@ -118,6 +136,10 @@ target_link_libraries(
     #glm::glm           # not supported as a linked library
     glfw
     glad
+    # Link luau below
+    # TEMP_DISABLED # Luau.VM
+    # TEMP_DISABLED # Luau.Compiler
+    # TEMP_DISABLED # Luau.Ast
 )
 
 target_compile_features(

@@ -6,9 +6,6 @@
 
 void Program::Run()
 {
-	std::cout
-		<< ConsoleColours::getColourCode(AnsiColours::GREEN) << "Starting "
-		<< ConsoleColours::getColourCode(AnsiColours::CYAN) << "program\n";
 	LogService::Log(LogType::TRACE, className, "Run", "Program Start");
 
 	//Services::initialise();

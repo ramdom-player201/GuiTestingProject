@@ -9,6 +9,14 @@
 #include <string>
 #include <vector> // needed to build for MacOS
 
+struct SwapChainData {
+	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
+	std::vector<VkImage> swapChainImages;
+	VkFormat swapChainImageFormat;
+	VkExtent2D swapChainExtent;
+	std::vector<VkImageView> swapChainImageViews;
+};
+
 class VulkanHandler {
 private:
 
@@ -75,9 +83,11 @@ public:
 	}
 
 	static void CreateVulkanInstance(); // creates VulkanInstance
-	static void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain);
+	static void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface, SwapChainData& swapChainData);
 	// ^^^ calls creates GLFW surface and setups logical devices and queues
-	static void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, VkSwapchainKHR& swapChain); // WIP declaration
+	static void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, SwapChainData& swapChainData); // WIP declaration
+
+	static void createImageViews();
 
 	//static void Initialise(); // <- not used, since CreateVulkanInstance() is called first
 	// consider making initialise call CreateVulkanInstance, purely for keeping things standardised across classes

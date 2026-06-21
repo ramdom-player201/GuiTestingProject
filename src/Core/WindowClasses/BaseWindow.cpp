@@ -51,7 +51,7 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 
 	// CREATE GLFW WINDOW SURFACE
 
-	VulkanHandler::SetupWindowSurface(window, nullptr, surface, swapChain);
+	VulkanHandler::SetupWindowSurface(window, nullptr, surface, swapChainData);
 
 	//VkInstance vkInstance = VulkanHandler::GetInstance();
 	//if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
@@ -101,7 +101,7 @@ BaseWindow::~BaseWindow() {
 	
 	// Destroy swap chain
 	LogService::Log(LogType::TRACE, className, functionName, "Clean swapchain");
-	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChain, nullptr);
+	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChainData.swapChain, nullptr);
 	// Destroy surface
 	LogService::Log(LogType::TRACE, className, functionName, "Clean surface");
 	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
