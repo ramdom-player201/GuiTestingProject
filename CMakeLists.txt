@@ -125,7 +125,7 @@ add_executable(
 add_library(
     glad STATIC
     external/glad/src/glad.c
- "src/Shaders/PipelineBuilder.cpp" "src/Shaders/Renderer.cpp" "src/Shaders/ShaderModule.cpp")
+)
 
 target_include_directories(
     glad PUBLIC
