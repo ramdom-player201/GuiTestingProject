@@ -53,16 +53,15 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TooltipWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			std::shared_ptr<TooltipWindow> window = std::make_shared<TooltipWindow>(currentId); // create new window
-			windows[currentId] = window;
+			windows[currentId] = std::make_unique<TooltipWindow>(currentId, vulkanHandler); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TooltipWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TooltipWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -75,16 +74,15 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "ContextWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			std::shared_ptr<ContextWindow> window = std::make_shared<ContextWindow>(currentId); // create new window
-			windows[currentId] = window;
+			windows[currentId] = std::make_unique<ContextWindow>(currentId, vulkanHandler); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"ContextWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "ContextWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -97,16 +95,15 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TiledWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			std::shared_ptr<TiledWindow> window = std::make_shared<TiledWindow>(currentId); // create new window
-			windows[currentId] = window;
+			windows[currentId] = std::make_unique<TiledWindow>(currentId, vulkanHandler); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TiledWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TiledWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -119,16 +116,15 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "DedicatedWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			std::shared_ptr<DedicatedWindow> window = std::make_shared<DedicatedWindow>(currentId); // create new window
-			windows[currentId] = window;
+			windows[currentId] = std::make_unique<DedicatedWindow>(currentId, vulkanHandler); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"DedicatedWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "DedicatedWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -141,16 +137,15 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +	"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TestWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			std::shared_ptr<TestWindow> window = std::make_shared<TestWindow>(currentId); // create new window
-			windows[currentId] = window;
+			windows[currentId] = std::make_unique<TestWindow>(currentId, vulkanHandler); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) +"TestWindow" +
+				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TestWindow" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
 			);
 			break;
@@ -170,12 +165,12 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 // int temp{ 0 };
 
-size_t WindowManager::CountWindows()
+size_t WindowManager::CountWindows() const
 {
 	constexpr std::string_view functionName{ "CountWindows" };
 
 	//if (debugMode) {
-		LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
+	LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
 	//}
 
 		//temp++;
@@ -187,18 +182,25 @@ size_t WindowManager::CountWindows()
 	return windows.size();
 }
 
-std::shared_ptr<BaseWindow> WindowManager::GetWindowById(size_t id)
+BaseWindow* WindowManager::GetWindowById(size_t id) const
 {
 	constexpr std::string_view functionName{ "GetWindowById" };
 
 	// get window from map by id, error if failed
-	if (debugMode) {
-		std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
-			ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "GetWindowByID() :: " <<
-			ConsoleColours::getColourCode(AnsiColours::RED) << "NOT IMPLEMENTED " <<
-			"\n";
+	//if (debugMode) {
+	//	std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
+	//		ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "GetWindowByID() :: " <<
+	//		ConsoleColours::getColourCode(AnsiColours::RED) << "NOT IMPLEMENTED " <<
+	//		"\n";
+	//}
+	LogService::Log(LogType::HIGH, className, functionName, "This class should have mutexes implemented before use in multi-threading");
+	auto it = windows.find(id);
+	if (it != windows.end()) {
+		LogService::Log(LogType::TRACE, className, functionName, "Found window for id [" + std::to_string(id) + "]");
+		return it->second.get();
 	}
-	return std::shared_ptr<BaseWindow>();
+	LogService::Log(LogType::ERROR, className, functionName, "No window found for id [" + std::to_string(id) + "]");
+	return nullptr;
 }
 
 void WindowManager::CloseWindow(size_t id)
@@ -215,7 +217,14 @@ void WindowManager::CloseWindow(size_t id)
 	//	ConsoleColours::getColourCode(AnsiColours::MAGENTA) << "CloseWIndows() :: " <<
 	//	ConsoleColours::getColourCode(AnsiColours::YELLOW) << "Closing Window" <<
 	//	ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";;
-	windows.erase(id);
+	auto it = windows.find(id);
+	if (it != windows.end()) {
+		LogService::Log(LogType::TRACE, className, functionName, "Closed window");
+		windows.erase(id);
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, functionName, "Failed to close window because invalid id");
+	}
 }
 
 bool WindowManager::UpdateWindows()
@@ -251,4 +260,14 @@ bool WindowManager::UpdateWindows()
 			ConsoleColours::getColourCode(AnsiColours::DEFAULT) << "\n";
 	}
 	return debugPause;
+}
+
+WindowManager::~WindowManager()
+{
+	LogService::Log(LogType::TRACE, className, "Destructor", "WindowManager destroyed");
+	// Force close all windows safely
+	for (auto& pair : windows) {
+		pair.second.reset(); // triggers BaseWindow destructor
+	}
+	windows.clear();
 }

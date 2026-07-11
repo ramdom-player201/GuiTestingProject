@@ -21,22 +21,32 @@ enum class WindowTypes : uint8_t {
 class WindowManager {
 private:
 	//static inline std::vector<std::unique_ptr<Window>> windows;
-	static inline std::unordered_map<size_t, std::shared_ptr<BaseWindow>> windows;	// list of windows with unique numeric id that does not shift
-	static inline size_t currentId{ 0 };											// initial id
+	std::unordered_map<size_t, std::unique_ptr<BaseWindow>> windows;	// list of windows with unique numeric id that does not shift
+	size_t currentId{ 0 };												// initial id
+	VulkanHandler& vulkanHandler;
 public:
 	//void initialise() override;
 	//void shutdown() override;
 
 	// debug
-	static inline bool debugMode{ false };
+	bool debugMode{ false };
 
 	// service-specific functionality
-	static size_t CreateWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
-	static size_t CountWindows();											// returns number of windows in list
-	static std::shared_ptr<BaseWindow> GetWindowById(size_t id);			// returns a copy of a pointer to the window, based on its position in the vector
-	static void CloseWindow(size_t id);										// closes the referenced window
+	size_t CreateWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
+	size_t CountWindows() const;										// returns number of windows in list
+	BaseWindow* GetWindowById(size_t id) const;							// returns a copy of a pointer to the window, based on its position in the vector
+	void CloseWindow(size_t id);										// closes the referenced window
 
-	static bool UpdateWindows();											// loop through windows, calling update on each one. Return true if command line break;
+	bool UpdateWindows();												// loop through windows, calling update on each one. Return true if command line break;
+
+	// safety locks, plus destructor
+	WindowManager(VulkanHandler& vk) :vulkanHandler(vk) {};
+	WindowManager() = delete;
+	WindowManager(const WindowManager&) = delete;
+	WindowManager& operator=(const WindowManager&) = delete;
+	WindowManager(WindowManager&&) = delete;
+	WindowManager& operator=(WindowManager&&) = delete;
+	~WindowManager();
 
 	// ClassName
 	static constexpr std::string_view className{ "WindowManager" };

@@ -30,10 +30,10 @@ WindowReturnData BaseWindow::Update()
 }
 
 bool printedExtensions{ false };
-BaseWindow::BaseWindow(size_t id) { // Constructor
+BaseWindow::BaseWindow(size_t id, VulkanHandler& vk)
+	: windowId(id), vulkanHandler(vk)
+{ // Constructor
 	constexpr std::string_view functionName{ "Constructor" };
-
-	windowId = id;
 
 	// https://vulkan-tutorial.com/Development_environment
 
@@ -51,7 +51,7 @@ BaseWindow::BaseWindow(size_t id) { // Constructor
 
 	// CREATE GLFW WINDOW SURFACE
 
-	VulkanHandler::SetupWindowSurface(window, nullptr, surface, swapChainData);
+	vulkanHandler.SetupWindowSurface(window, nullptr, surface, swapChainData);
 
 	//VkInstance vkInstance = VulkanHandler::GetInstance();
 	//if (glfwCreateWindowSurface(vkInstance, window, nullptr, &surface) == VK_SUCCESS) {
@@ -102,15 +102,30 @@ BaseWindow::~BaseWindow() {
 	// Destroy image views
 	LogService::Log(LogType::TRACE, className, functionName, "Clean image views");
 	for (auto imageView : swapChainData.swapChainImageViews) {
-		vkDestroyImageView(VulkanHandler::GetLogicalDevice(), imageView, nullptr);
+		if (imageView != VK_NULL_HANDLE) {
+			vkDestroyImageView(vulkanHandler.GetLogicalDevice(), imageView, nullptr);
+		}
+		else {
+			LogService::Log(LogType::ERROR, className, functionName, "Could not delete image view because not initialised");
+		}
 	}
-	
+
 	// Destroy swap chain
 	LogService::Log(LogType::TRACE, className, functionName, "Clean swapchain");
-	vkDestroySwapchainKHR(VulkanHandler::GetLogicalDevice(), swapChainData.swapChain, nullptr);
+	if (swapChainData.swapChain != VK_NULL_HANDLE) {
+		vkDestroySwapchainKHR(vulkanHandler.GetLogicalDevice(), swapChainData.swapChain, nullptr);
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, functionName, "Could not delete swapchain because not initialised");
+	}
 	// Destroy surface
 	LogService::Log(LogType::TRACE, className, functionName, "Clean surface");
-	vkDestroySurfaceKHR(VulkanHandler::GetInstance(), surface, nullptr);
+	if (surface != VK_NULL_HANDLE) {
+		vkDestroySurfaceKHR(vulkanHandler.GetInstance(), surface, nullptr);
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, functionName, "Could not delete surface because not initialised");
+	}
 	// Destroy window
 	LogService::Log(LogType::TRACE, className, functionName, "Clean window");
 	glfwDestroyWindow(window);

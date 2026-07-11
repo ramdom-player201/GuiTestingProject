@@ -14,19 +14,19 @@ void Program::Run()
 	//auto commandConsole = dynamic_cast<CommandConsole*>(Services::getService(ServiceType::CommandConsole));
 	//auto objectManager = dynamic_cast<ObjectManager*>(Services::getService(ServiceType::ObjectManager));
 
-	WindowManager::debugMode = true;
+	windowManager.debugMode = true;
 
-	WindowManager::CountWindows();
-	WindowManager::CreateWindow("Window 1", WindowTypes::TestWindow);
-	WindowManager::CreateWindow("Window 2", WindowTypes::TestWindow);
-	WindowManager::CountWindows();
+	windowManager.CountWindows();
+	windowManager.CreateWindow("Window 1", WindowTypes::TestWindow);
+	windowManager.CreateWindow("Window 2", WindowTypes::TestWindow);
+	windowManager.CountWindows();
 
-	WindowManager::CreateWindow("Window 33", WindowTypes::TestWindow);
+	windowManager.CreateWindow("Window 33", WindowTypes::TestWindow);
 
-	WindowManager::debugMode = false;
-	while (WindowManager::CountWindows() > 0) {
+	windowManager.debugMode = false;
+	while (windowManager.CountWindows() > 0) {
 		// program should get call console to get commands
-		bool commandLinePause = WindowManager::UpdateWindows();
+		bool commandLinePause = windowManager.UpdateWindows();
 		//if (commandLinePause) {
 		//	commandConsole->parseCommand();
 		//}
@@ -35,6 +35,8 @@ void Program::Run()
 }
 
 Program::Program()
+	: vulkanHandler(),
+	windowManager(vulkanHandler)
 {
 	constexpr std::string_view functionName{ "Constructor" };
 
@@ -62,7 +64,7 @@ Program::Program()
 	// Initialise Vulkan
 
 	//VulkanHandler::Initialise();
-	VulkanHandler::CreateVulkanInstance();
+	vulkanHandler.CreateVulkanInstance();
 
 	// Temporary test stuff
 
@@ -108,7 +110,7 @@ Program::~Program()
 	constexpr std::string_view functionName{ "Destructor" };
 
 	LogService::Log(LogType::TRACE, className, functionName, "Program Closing");
-	VulkanHandler::Cleanup(); // cleanup vulkan before glfw
+	//VulkanHandler::Cleanup(); // cleanup vulkan before glfw
 	LogService::Log(LogType::WIP, className, functionName, "Note: WindowManager needs to clear all windows prior to GLFW Terminate");
 	glfwTerminate(); // Note: in the event of multiple program creations,
 	//       ensure program keeps track of how many exist so this cannot be deinitialised mid-execution

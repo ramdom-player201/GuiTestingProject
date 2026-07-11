@@ -11,10 +11,10 @@
 
 struct SwapChainData {
 	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
-	std::vector<VkImage> swapChainImages;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
-	std::vector<VkImageView> swapChainImageViews;
+	std::vector<VkImage> swapChainImages{};
+	VkFormat swapChainImageFormat{ VK_FORMAT_UNDEFINED };
+	VkExtent2D swapChainExtent{ 0,0 };
+	std::vector<VkImageView> swapChainImageViews{};
 };
 
 class VulkanHandler {
@@ -41,37 +41,37 @@ private:
 	};
 
 	// member variables
-	static inline VkInstance vulkanInstance{ VK_NULL_HANDLE }; // initialised via vkCreateInstance in CreateVulkanInstance() function
-	static inline VkDevice logicalDevice{ VK_NULL_HANDLE }; // initialised via vkCreateDevice in Initialise() function
-	static inline VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE }; // handle for a GPU, defaults to null
-
-	// queues
-	static inline VkQueue graphicsQueue{ VK_NULL_HANDLE };
-	static inline VkQueue presentQueue{ VK_NULL_HANDLE };
+	VkInstance vulkanInstance{ VK_NULL_HANDLE }; // initialised via vkCreateInstance in CreateVulkanInstance() function
+	VkDevice logicalDevice{ VK_NULL_HANDLE }; // initialised via vkCreateDevice in Initialise() function
+	VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE }; // handle for a GPU, defaults to null
+	VkQueue graphicsQueue{ VK_NULL_HANDLE };
+	VkQueue presentQueue{ VK_NULL_HANDLE };
 
 	// utility functions
-	static bool IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface);
-	static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface);
+	bool IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const;
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const;
 
-	static SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice physicalDevice, const VkSurfaceKHR& surface);
-	static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-	static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-	static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
-
-	// static-only class
-	VulkanHandler() = delete;
-	~VulkanHandler() = delete;
-	VulkanHandler(const VulkanHandler&) = delete;
+	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice physicalDevice, const VkSurfaceKHR& surface) const;
+	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
+	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const;
+	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) const;
 
 public:
+	// Safety locks to prevent copy/move/reassignment
+	VulkanHandler() = default;
+	VulkanHandler(const VulkanHandler&) = delete;
+	VulkanHandler& operator=(const VulkanHandler&) = delete;
+	VulkanHandler(VulkanHandler&&) = delete;
+	VulkanHandler& operator=(VulkanHandler&&) = delete;
+
 	// Getters, since some vulkan stuff is used in BaseWindow
-	static const VkInstance& GetInstance() {
+	const VkInstance& GetInstance() const {
 		if (vulkanInstance == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, "GetInstance", "VkInstance was not initialised (VK_NULL_HANDLE)");
 		}
 		return vulkanInstance;
 	}
-	static const VkDevice& GetLogicalDevice() {
+	const VkDevice& GetLogicalDevice() const {
 		LogService::Log(LogType::WIP, className, "GetLogicalDevice",
 			"If logical device is shared between windows, but not guaranteed, should we require surface to be passed to ensure correct LogicalDevice is always obtained?"
 		);
@@ -82,16 +82,16 @@ public:
 		return logicalDevice;
 	}
 
-	static void CreateVulkanInstance(); // creates VulkanInstance
-	static void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface, SwapChainData& swapChainData);
+	void CreateVulkanInstance(); // creates VulkanInstance
+	void SetupWindowSurface(GLFWwindow* window, const VkAllocationCallbacks*, VkSurfaceKHR& surface, SwapChainData& swapChainData);
 	// ^^^ calls creates GLFW surface and setups logical devices and queues
-	static void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, SwapChainData& swapChainData); // WIP declaration
-
-	static void CreateImageViews(SwapChainData& swapChainData);
+	void GenerateSwapChains(GLFWwindow* window, VkSurfaceKHR& surface, SwapChainData& swapChainData); // WIP declaration
+	void CreateImageViews(SwapChainData& swapChainData);
 
 	//static void Initialise(); // <- not used, since CreateVulkanInstance() is called first
 	// consider making initialise call CreateVulkanInstance, purely for keeping things standardised across classes
-	static void Cleanup();
+	//static void Cleanup();
+	~VulkanHandler(); // replace cleanup with destructor
 
 	// ClassName
 	static constexpr std::string_view className{ "VulkanHandler" };
@@ -145,7 +145,7 @@ public:
 	// 4 choose physical device									[/]
 	// 5 query queue family										[/]
 	// 6 create logical device									[/]
-	// 7 create swapchain										[
+	// 7 create swapchain										[/]
 
 	// Global (Once in handler)
 	// VkInstance

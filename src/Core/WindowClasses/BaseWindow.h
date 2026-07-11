@@ -16,22 +16,25 @@ struct WindowReturnData {
 
 class BaseWindow {
 private:
-	BaseWindow() {}; // Cannot contruct a BaseWindow without an id.
+	VulkanHandler& vulkanHandler; // reference to vulkan instance
 protected:
 	size_t windowId{ 0 };
 	GLFWwindow* window{ nullptr };
 	VkSurfaceKHR surface{ VK_NULL_HANDLE };
-	//VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
-	//std::vector<VkImage> swapChainImages;
-	//VkFormat swapChainImageFormat;
-	//VkExtent2D swapChainExtent;
 	SwapChainData swapChainData;
 public:
 	WindowReturnData Update();
 
 	size_t getId() const { return windowId; }
 
-	BaseWindow(size_t id);	// instantiate a window
+	// safety locks to prevent move/copy/assignment
+	BaseWindow() = delete;
+	BaseWindow(const BaseWindow&) = delete;
+	BaseWindow& operator=(const BaseWindow&) = delete;
+	BaseWindow(BaseWindow&&) = delete;
+	BaseWindow& operator=(BaseWindow&&) = delete;
+
+	BaseWindow(size_t id, VulkanHandler& vk);	// instantiate a window
 	~BaseWindow();			// cleanup window by deleting glfwWindow
 
 	// ClassName

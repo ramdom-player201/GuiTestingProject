@@ -55,7 +55,7 @@ bool CheckValidationLayerSupport() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //bool skipFirst{ true };	// << temporary debug stuff, only second GPU has mailbox support on primary development device
-bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
+bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const {
 	constexpr std::string_view functionName{ "IsDeviceSuitable" };
 
 	// https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
@@ -171,7 +171,7 @@ bool VulkanHandler::IsDeviceSuitable(VkPhysicalDevice deviceToCheck, const VkSur
 	return suitable;
 }
 
-VulkanHandler::QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
+VulkanHandler::QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const {
 	QueueFamilyIndices indices;
 
 	// QUEUE FAMILIES
@@ -207,7 +207,7 @@ VulkanHandler::QueueFamilyIndices VulkanHandler::FindQueueFamilies(VkPhysicalDev
 	return indices;
 }
 
-VulkanHandler::SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) {
+VulkanHandler::SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const {
 	constexpr std::string_view functionName{ "QuerySwapChainSupport" };
 
 	// https://vulkan-tutorial.com/en/Drawing_a_triangle/Presentation/Swap_chain
@@ -241,7 +241,7 @@ VulkanHandler::SwapChainSupportDetails VulkanHandler::QuerySwapChainSupport(VkPh
 	return details;
 }
 
-VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const {
 	constexpr std::string_view functionName{ "ChooseSwapSurfaceFormat" };
 
 	LogService::Log(LogType::WIP, className, functionName, "Can we print full list?");
@@ -257,7 +257,7 @@ VkSurfaceFormatKHR VulkanHandler::ChooseSwapSurfaceFormat(const std::vector<VkSu
 	return availableFormats[0];
 }
 
-VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const {
 	constexpr std::string_view functionName{ "ChooseSwapPresentMode" };
 
 	LogService::Log(LogType::WIP, className, functionName, "Note that mailbox can stress the GPU if framerate is not limited");
@@ -271,7 +271,7 @@ VkPresentModeKHR VulkanHandler::ChooseSwapPresentMode(const std::vector<VkPresen
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
+VkExtent2D VulkanHandler::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) const {
 	constexpr std::string_view functionName{ "ChooseSwapExtent" };
 
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
@@ -825,7 +825,7 @@ void VulkanHandler::CreateImageViews(SwapChainData& swapChainData) {
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		if(vkCreateImageView(logicalDevice,&createInfo,nullptr,&swapChainData.swapChainImageViews[i]) != VK_SUCCESS) {
+		if (vkCreateImageView(logicalDevice, &createInfo, nullptr, &swapChainData.swapChainImageViews[i]) != VK_SUCCESS) {
 			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create image view [" + std::to_string(i) + "]");
 			throw std::runtime_error("Failed to create image views!");
 		}
@@ -835,12 +835,36 @@ void VulkanHandler::CreateImageViews(SwapChainData& swapChainData) {
 	}
 }
 
-void VulkanHandler::Cleanup() {
+VulkanHandler::~VulkanHandler()
+{
 	// Window surfaces are destroyed in the BaseWindow destructor
 	// VulkanHandler::Cleanup() is only called after all windows are closed
 	LogService::Log(LogType::WIP, className, "Cleanup", "Check with WindowManager to enforce all window closure before cleanup");
 	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Logical Device");
-	vkDestroyDevice(logicalDevice, nullptr);
+	if (logicalDevice != VK_NULL_HANDLE) {
+		vkDeviceWaitIdle(logicalDevice);
+		vkDestroyDevice(logicalDevice, nullptr);
+		logicalDevice = VK_NULL_HANDLE;
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, "Cleanup", "Logical device didn't exist to delete");
+	}
 	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan Instance");
-	vkDestroyInstance(vulkanInstance, nullptr);
+	if (vulkanInstance != VK_NULL_HANDLE) {
+		vkDestroyInstance(vulkanInstance, nullptr);
+		vulkanInstance = VK_NULL_HANDLE;
+	}
+	else {
+		LogService::Log(LogType::ERROR, className, "Cleanup", "Vulkan instance didn't exist to delete");
+	}
 }
+
+//void VulkanHandler::Cleanup() {
+//	// Window surfaces are destroyed in the BaseWindow destructor
+//	// VulkanHandler::Cleanup() is only called after all windows are closed
+//	LogService::Log(LogType::WIP, className, "Cleanup", "Check with WindowManager to enforce all window closure before cleanup");
+//	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Logical Device");
+//	vkDestroyDevice(logicalDevice, nullptr);
+//	LogService::Log(LogType::TRACE, className, "Cleanup", "Cleaning Vulkan Instance");
+//	vkDestroyInstance(vulkanInstance, nullptr);
+//}
