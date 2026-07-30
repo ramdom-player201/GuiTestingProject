@@ -6,7 +6,7 @@
 
 class Program {
 private:
-	VulkanHandler vulkanHandler;
+	VulkanHandler vulkanHandler; // must outlive windowManager, create first and destroy last
 	WindowManager windowManager;
 public:
 	void Run();

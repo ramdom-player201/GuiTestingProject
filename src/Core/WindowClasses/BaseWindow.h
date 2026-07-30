@@ -1,9 +1,12 @@
 #pragma once
 
-//#define GLFW_INCLUDE_VULKAN
-//#include <GLFW/glfw3.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 //#include <string>
 //#include <vector>
+
+#include "../Rendering/LayoutCompositor.h"
+#include "../Services/VulkanHandler.h"
 
 struct WindowReturnData {
 	bool WindowClosed = false;
@@ -12,11 +15,10 @@ struct WindowReturnData {
 	bool WindowInFocus = false;
 };
 
-#include "../Services/VulkanHandler.h"
-
 class BaseWindow {
 private:
 	VulkanHandler& vulkanHandler; // reference to vulkan instance
+	LayoutCompositor compositor;
 protected:
 	size_t windowId{ 0 };
 	GLFWwindow* window{ nullptr };

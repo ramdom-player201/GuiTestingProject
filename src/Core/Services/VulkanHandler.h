@@ -64,14 +64,14 @@ public:
 	VulkanHandler(VulkanHandler&&) = delete;
 	VulkanHandler& operator=(VulkanHandler&&) = delete;
 
-	// Getters, since some vulkan stuff is used in BaseWindow
-	const VkInstance& GetInstance() const {
+	// Getters, since some vulkan stuff is used in BaseWindow and Renderer
+	VkInstance GetInstance() const {
 		if (vulkanInstance == VK_NULL_HANDLE) {
 			LogService::Log(LogType::CRITICAL, className, "GetInstance", "VkInstance was not initialised (VK_NULL_HANDLE)");
 		}
 		return vulkanInstance;
 	}
-	const VkDevice& GetLogicalDevice() const {
+	 VkDevice GetLogicalDevice() const {
 		LogService::Log(LogType::WIP, className, "GetLogicalDevice",
 			"If logical device is shared between windows, but not guaranteed, should we require surface to be passed to ensure correct LogicalDevice is always obtained?"
 		);
@@ -80,6 +80,24 @@ public:
 			LogService::Log(LogType::CRITICAL, className, "GetLogicalDevice", "No logical device exists (VK_NULL_HANDLE)");
 		}
 		return logicalDevice;
+	}
+	const VkPhysicalDevice& GetPhysicalDevice() const {
+		if (physicalDevice == VK_NULL_HANDLE) {
+			LogService::Log(LogType::CRITICAL, className, "GetPhysicalDevice", "PhysicalDevice not created (VK_NULL_HANDLE)");
+		}
+		return physicalDevice;
+	}
+	VkQueue GetGraphicsQueue() const {
+		if (graphicsQueue == VK_NULL_HANDLE) {
+			LogService::Log(LogType::CRITICAL, className, "GetGraphicsQueue", "Graphics queue not created (VK_NULL_HANDLE)");
+		}
+		return graphicsQueue;
+	}
+	VkQueue GetPresentQueue() const {
+		if (presentQueue == VK_NULL_HANDLE) {
+			LogService::Log(LogType::CRITICAL, className, "GetPresentQueue", "Present queue not created (VK_NULL_HANDLE)");
+		}
+		return presentQueue;
 	}
 
 	void CreateVulkanInstance(); // creates VulkanInstance

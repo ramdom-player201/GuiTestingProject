@@ -31,7 +31,9 @@ WindowReturnData BaseWindow::Update()
 
 bool printedExtensions{ false };
 BaseWindow::BaseWindow(size_t id, VulkanHandler& vk)
-	: windowId(id), vulkanHandler(vk)
+	: vulkanHandler(vk), // init BaseWindow with a ref to the VulkanHandler
+	compositor(*this, vk), // initialise compositor in BaseWindow, passing self and vk ref
+	windowId(id) // initialise with self's window id
 { // Constructor
 	constexpr std::string_view functionName{ "Constructor" };
 
