@@ -4,11 +4,19 @@
 #include <vector>
 #include <cstdint>
 #include <unordered_map>
+#include <memory>
 
 #include "LayoutTypes.h" // Required for DrawRect (possibly PanelType, but that is stub right now)
+#include "UiWidget.h"
 
 // Forward declarations
 class VulkanHandler;
+
+enum class PageMode :uint8_t {
+	DockableEditor,
+	DedicatedViewer,
+	SplashScreen
+};
 
 class GuiLayout {
 public:
@@ -17,6 +25,9 @@ public:
 
 	// Core rendering interface
 	void Render(); // Render on the main thread
+
+	// Handle inputs
+	InputEventResult ProcessInput(const InputEvent& event);
 
 	// Texture output for compositor
 	VkImageView GetBaseTextureView() const;
@@ -27,6 +38,9 @@ public:
 
 	// Sizing interface, called by LayoutCompositor when window resizes
 	void Resize(uint32_t windowWidth, uint32_t windowHeight);
+
+	// Load gui tree based on app state
+	void LoadPage(PageMode mode, const std::string& layoutFilePath);
 
 	// Safety locks
 	GuiLayout() = delete;
@@ -40,7 +54,9 @@ private:
 	uint32_t currentWindowWidth{ 0 };
 	uint32_t currentWindowHeight{ 0 };
 
-	// Stored map for viewport layout data
+	std::unique_ptr<UiWidget> rootWidget;
+
+	// Cached map for viewport layout data (populated during CalculateLayout by finding ViewportWidgets)
 	std::unordered_map<uint32_t, DrawRect> viewportLayoutRequests;
 
 	// Internal render targets for GUI

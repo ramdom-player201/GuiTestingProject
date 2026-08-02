@@ -41,6 +41,10 @@ VkImageView Viewport::GetLatestTextureView() {
 	return renderTargetView;
 }
 
+void Viewport::ProcessInput(const InputEvent& event, float localMouseX, float localMouseY)
+{
+}
+
 void Viewport::Resize(uint32_t newWidth, uint32_t newHeight) {
 	// TODO: Recreate images, memory, image views to fit new size
 	currentWidth = newWidth;

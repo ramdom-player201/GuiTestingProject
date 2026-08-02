@@ -7,6 +7,7 @@
 // Forward declarations
 class VulkanHandler;
 class Scene; // placeholder for now
+struct InputEvent;
 
 struct CameraTransform { // temporary
 	float positionX{ 0.0f };
@@ -25,6 +26,9 @@ public:
 	void Render(); // NOTE: This is handled by a job manager, not by the owning window
 	VkImageView GetLatestTextureView(); // this should not be written to for the duration it is used
 	// NOTE: if viewport runs its own render thread from a job batch, we need a way to manage outputting the textures
+
+	// Process input
+	void ProcessInput(const InputEvent& event, float localMouseX, float localMouseY);
 
 	// Sizing interface
 	void Resize(uint32_t newWidth, uint32_t newHeight);

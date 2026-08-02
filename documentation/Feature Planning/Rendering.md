@@ -5,7 +5,7 @@ CLASS [Program]
 - WindowManager
 # holds run context of the program
 # VulkanHandler is declared before WindowManager, so WindowManager is destroyed before VulkanHandler
-# Reverse destruction order (VH,WM -> WM,VH)
+# reverse destruction order (VH,WM -> WM,VH)
 # lifecycle of majority of program is tied to this class
 
 CLASS [WindowManager]
@@ -46,6 +46,7 @@ CLASS [GuiLayout]
 - etc
 # holds a gui tree
 # processes tree when modified and renders result to texture for compositing
+# see [[Gui.md]] for more details on gui rendering
 # lifetime managed by LayoutCompositor
 
 CLASS [Viewport]

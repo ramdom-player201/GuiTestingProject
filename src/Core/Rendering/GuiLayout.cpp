@@ -30,7 +30,23 @@ GuiLayout::~GuiLayout() {
 
 void GuiLayout::Render()
 {
-	// TODO: Process UI logic and draw 2D elements to images
+	// TODO: Process UI logic and draw 2D elements to images'
+	if (rootWidget) {
+		rootWidget->Render();
+	}
+}
+
+InputEventResult GuiLayout::ProcessInput(const InputEvent& event)
+{
+	if(rootWidget) {
+		DrawRect windowRect{
+			0.0f,0.0f,
+			static_cast<float>(currentWindowWidth),
+			static_cast<float>(currentWindowHeight)
+		};
+		return rootWidget->ProcessInput(event, windowRect);
+	}
+	return InputEventResult(); // Return empty if no gui loaded
 }
 
 VkImageView GuiLayout::GetBaseTextureView() const
@@ -54,4 +70,8 @@ void GuiLayout::Resize(uint32_t windowWidth, uint32_t windowHeight)
 	// TODO: Recreate stuff to fit new size
 	currentWindowWidth = windowWidth;
 	currentWindowHeight = windowHeight;
+
+	if (rootWidget) {
+		SetFlag(rootWidget->flags, UiWidgetFlags::LayoutDirty, true);
+	}
 }

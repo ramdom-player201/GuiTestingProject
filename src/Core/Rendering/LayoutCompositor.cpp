@@ -197,10 +197,13 @@ VkCommandBuffer LayoutCompositor::RecordCommands(uint32_t imageIndex) {
 			float offsetX, offsetY, scaleWidth, scaleHeight;
 		} pushData;
 
-		pushData.offsetX = (float)layer.screenRect.x / currentExtent.width;
-		pushData.offsetY = (float)layer.screenRect.y / currentExtent.height;
-		pushData.scaleWidth = (float)layer.screenRect.width / currentExtent.width;
-		pushData.scaleHeight = (float)layer.screenRect.height / currentExtent.height;
+		float extentWidth{ static_cast<float>(currentExtent.width) };
+		float extentHeight{ static_cast<float>(currentExtent.height) };
+
+		pushData.offsetX = layer.screenRect.x / currentExtent.width;
+		pushData.offsetY = layer.screenRect.y / currentExtent.height;
+		pushData.scaleWidth = layer.screenRect.width / currentExtent.width;
+		pushData.scaleHeight = layer.screenRect.height / currentExtent.height;
 
 		// Push constants to vertex shader
 		vkCmdPushConstants(cmd, compositePipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstData), &pushData);
@@ -217,8 +220,28 @@ VkCommandBuffer LayoutCompositor::RecordCommands(uint32_t imageIndex) {
 }
 
 void LayoutCompositor::PassInputs(const InputEvent& event) {
-	// TODO: Implement later
-	// guiLayout.PassInputs(event);
+	constexpr std::string_view functionName{ "PassInputs" };
+
+	InputEventResult result = guiLayout.ProcessInput(event);
+
+	if (result.inputConsumed) {
+		return; // Sunk by gui
+	}
+
+	if (result.targetViewportId != UINT32_MAX) {
+		auto it = viewports.find(result.targetViewportId);
+		if (it != viewports.end()) {
+			it->second->ProcessInput(event, result.localX, result.localY);
+		}
+		else {
+			LogService::Log(LogType::ERROR, className, functionName,
+				"Input targeted Viewport ID [" + 
+				std::to_string(result.targetViewportId) +
+				"], but the viewport was not found"
+			);
+		}
+	}
+	// if input not consumed and targetViewportId is default, assume neutral gui element
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -532,7 +555,7 @@ void LayoutCompositor::GatherCompositingLayers() {
 	// 1 - Base GUI layer (Fullscreen)
 	CompositingLayer baseGui;
 	baseGui.textureView = guiLayout.GetBaseTextureView();
-	baseGui.screenRect = { 0, 0, currentExtent.width, currentExtent.height };
+	baseGui.screenRect = { 0.0f, 0.0f,static_cast<float>(currentExtent.width),static_cast<float>(currentExtent.height) };
 	activeLayersThisFrame.push_back(baseGui);
 
 	// 2 - Viewport layers (Subregions)
@@ -547,7 +570,7 @@ void LayoutCompositor::GatherCompositingLayers() {
 			vpLayer.screenRect = rectLookupMap.at(id);
 		}
 		else {
-			vpLayer.screenRect = { 0,0,0,0 }; // Fallback
+			vpLayer.screenRect = { 0.0f,0.0f,0.0f,0.0f }; // Fallback
 		}
 
 		activeLayersThisFrame.push_back(vpLayer);
@@ -558,7 +581,7 @@ void LayoutCompositor::GatherCompositingLayers() {
 	if (overlayView != VK_NULL_HANDLE) {
 		CompositingLayer overlayLayer;
 		overlayLayer.textureView = overlayView;
-		overlayLayer.screenRect = { 0, 0, currentExtent.width, currentExtent.height };
+		overlayLayer.screenRect = { 0.0f, 0.0f, static_cast<float>(currentExtent.width),static_cast<float>(currentExtent.height) };
 		activeLayersThisFrame.push_back(overlayLayer);
 	}
 }
