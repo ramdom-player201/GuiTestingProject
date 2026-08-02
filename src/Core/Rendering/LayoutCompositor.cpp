@@ -4,6 +4,7 @@
 #include "../Services/LogService.h"
 
 #include <fstream>
+#include <cstring> // Required for builing on linux
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SHADERS (You will need to compile these to SPIR-V using glslangValidator or similar)
