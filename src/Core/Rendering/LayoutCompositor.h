@@ -105,7 +105,7 @@ private:
 
 	// Subsystem management
 	void GatherCompositingLayers();
-	void SyncViewports(const std::vector<ViewportLayoutRect>& requestedRects);
+	void SyncViewports(const std::unordered_map<uint32_t, DrawRect>& requestedRects);
 
 	// Vulkan helper
 	void UpdateDescriptorSet(uint32_t imageIndex, VkImageView textureView);

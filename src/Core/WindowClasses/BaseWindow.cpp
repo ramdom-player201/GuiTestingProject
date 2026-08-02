@@ -19,10 +19,6 @@ WindowReturnData BaseWindow::Update() {
 		return WRD;
 	}
 
-	glfwPollEvents();
-
-	// NOTE: Input handling is not the current focus and should be added later, rendering is priority for now
-
 	int width{ 0 };
 	int height = { 0 };
 	glfwGetFramebufferSize(window, &width, &height);
@@ -76,6 +72,7 @@ WindowReturnData BaseWindow::Update() {
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
+	// Note: imageIndex is used because the swapchain holds the semaphore until image is presented
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[imageIndex] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
@@ -146,7 +143,7 @@ BaseWindow::BaseWindow(size_t id, VulkanHandler& vk, int width, int height, std:
 	// 2 - Create vulkan surface
 	CreateWindowSurface();
 
-	// 3 - Initialise global vulkan devices
+	// 3 - Initialise global vulkan devices (has internal checks to prevent reinitialisation; first window to call has priority)
 	vulkanHandler.InitialiseDevices(surface);
 
 	// 4 - Create window-specific rendering objects

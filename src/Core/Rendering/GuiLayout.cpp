@@ -43,10 +43,10 @@ VkImageView GuiLayout::GetOverlayTextureView() const
 	return overlayTextureView;
 }
 
-std::vector<ViewportLayoutRect> GuiLayout::GetViewportLayoutRequests() const
+const std::unordered_map<uint32_t,DrawRect>& GuiLayout::GetViewportLayoutRequests() const
 {
 	// TODO: Return actual layout data based on loaded panels
-	return {};
+	return viewportLayoutRequests;
 }
 
 void GuiLayout::Resize(uint32_t windowWidth, uint32_t windowHeight)

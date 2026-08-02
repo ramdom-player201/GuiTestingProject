@@ -3,8 +3,9 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <cstdint>
+#include <unordered_map>
 
-#include "LayoutTypes.h" // Required for ViewportLayoutRect and PanelType
+#include "LayoutTypes.h" // Required for DrawRect (possibly PanelType, but that is stub right now)
 
 // Forward declarations
 class VulkanHandler;
@@ -22,7 +23,7 @@ public:
 	VkImageView GetOverlayTextureView() const;
 
 	// Layout data output for compositor
-	std::vector<ViewportLayoutRect> GetViewportLayoutRequests() const;
+	const std::unordered_map<uint32_t, DrawRect>& GetViewportLayoutRequests() const;
 
 	// Sizing interface, called by LayoutCompositor when window resizes
 	void Resize(uint32_t windowWidth, uint32_t windowHeight);
@@ -38,6 +39,9 @@ private:
 
 	uint32_t currentWindowWidth{ 0 };
 	uint32_t currentWindowHeight{ 0 };
+
+	// Stored map for viewport layout data
+	std::unordered_map<uint32_t, DrawRect> viewportLayoutRequests;
 
 	// Internal render targets for GUI
 	VkImage baseTextureImage{ VK_NULL_HANDLE };

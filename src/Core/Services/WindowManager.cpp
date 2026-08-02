@@ -4,20 +4,6 @@
 #include "LogService.h"
 #include <vector>
 
-#include "../WindowClasses/TooltipWindow.h"
-#include "../WindowClasses/ContextWindow.h"
-#include "../WindowClasses/TiledWindow.h"
-#include "../WindowClasses/DedicatedWindow.h"
-#include "../WindowClasses/TestWindow.h"
-
-//void WindowManager::initialise() {
-//	// may be removed, not currently used
-//}
-//
-//void WindowManager::shutdown() {
-//	// may be removed, may be replaced with destructor or something? depends on whether IService can support that.
-//}
-
 size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 	constexpr std::string_view functionName{ "CreateWindow" };
 
@@ -33,8 +19,6 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 
 	constexpr int defaultWidth{ 600 };
 	constexpr int defaultHeight{ 400 };
-	constexpr std::string_view defaultTitle{ "Window" };
-
 
 	if (debugMode) {
 		//std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
@@ -48,121 +32,9 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 	}
 
 	// Create window of requested type
-	{
-		switch (type) {
-		case WindowTypes::TooltipWindow: {
-			////////////////////////////////////////////////////
-			// CREATE TOOLTIP // CREATE TOOLTIP //
-			////////////////////////////////////////////////////
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TooltipWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
-			);
-
-			windows[currentId] = std::make_unique<TooltipWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TooltipWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
-			);
-			break;
-
-		}
-		case WindowTypes::ContextWindow: {
-			////////////////////////////////////////////////////
-			// CREATE CONTEXT // CREATE CONTEXT //
-			////////////////////////////////////////////////////
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "ContextWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
-			);
-
-			windows[currentId] = std::make_unique<ContextWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "ContextWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
-			);
-			break;
-
-		}
-		case WindowTypes::TiledWindow: {
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CREATE TILED // CREATE TILED //
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TiledWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
-			);
-
-			windows[currentId] = std::make_unique<TiledWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TiledWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
-			);
-			break;
-
-		}
-		case WindowTypes::DedicatedWindow: {
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CREATE DEDICATED // CREATE DEDICATED //
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "DedicatedWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
-			);
-
-			windows[currentId] = std::make_unique<DedicatedWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "DedicatedWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
-			);
-			break;
-
-		}
-		case WindowTypes::TestWindow: {
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CREATE TEST // CREATE TEST //
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Creating new window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TestWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
-			);
-
-			windows[currentId] = std::make_unique<TestWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
-
-			LogService::Log(LogType::TRACE, className, functionName,
-				"Created window of type <" +
-				ConsoleColours::getColourCode(AnsiColours::YELLOW_BRIGHT) + "TestWindow" +
-				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: End"
-			);
-			break;
-
-		}
-		default: {
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// INVALID WINDOW TYPE // INVALID WINDOW TYPE //
-			////////////////////////////////////////////////////////////////////////////////////////////////////////
-			LogService::Log(LogType::ERROR, className, functionName, "Attempted to create window of invalid type.");
-		}
-		}
-	}
+	LogService::Log(LogType::TRACE, className, functionName, "Creating new window");
+	windows[currentId] = std::make_unique<BaseWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, title); // create new window
+	LogService::Log(LogType::WIP, className, functionName, "WindowType is now legacy, since BaseWindow subclasses are no longer relevant");
 
 	return currentId++;
 }
@@ -234,27 +106,28 @@ void WindowManager::CloseWindow(size_t id)
 bool WindowManager::UpdateWindows()
 {
 	constexpr std::string_view functionName{ "UpdateWindows" };
-
 	bool debugPause = false;
-	// update all windows
+
+	glfwPollEvents();
+
+	// Update all windows
 	std::vector<size_t> toClose;
 	for (auto& windowPair : windows) {
 		WindowReturnData winData = windowPair.second->Update();
-		if (winData.UserCommandBreak) {
-			debugPause = true;
-		}
+
+		if (winData.UserCommandBreak) { debugPause = true; }
 		if (winData.WindowClosed) {
-			// delete window from vector and update id
+			// Delete window from vector and update id
 			LogService::Separator();
 			LogService::Log(LogType::USER, className, functionName,
 				ConsoleColours::getColourCode(AnsiColours::GREEN_BRIGHT) +
 				"WINDOW CLOSE REQUESTED" +
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT)
 			);
-			toClose.push_back(windowPair.first); // cannot close window directly in loop
+			toClose.push_back(windowPair.first); // Cannot close window directly in loop
 		}
 	}
-	for (size_t id : toClose) { // wait until after updating to close
+	for (size_t id : toClose) { // Wait until after updating to close
 		CloseWindow(id);
 	}
 	if (debugPause) {

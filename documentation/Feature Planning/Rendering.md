@@ -12,6 +12,8 @@ CLASS [WindowManager]
 - map<size_t, unique_ptr<BaseWindow>>>
 - VulkanHandler reference
 # manages and stores BaseWindows
+# handles inputs and passes events to whichever BaseWindow is in focus (if any)
+# there shouldn't be any keybinds that work when everything is minimised, in the context of this application
 # lifetime managed by Program
 
 CLASS [BaseWindow]
@@ -20,8 +22,9 @@ CLASS [BaseWindow]
 - GLFWwindow pointer
 - VkSurfaceKHR
 - SwapChainData
-# responsible for rendering program
-# holds rendering objects unique per window
+# responsible for managing swapchain and window-specific resources
+# passes inputs from WindowManager->LayoutCompositor
+# offloads final rendering responsibility to LayoutCompositor
 # lifetime managed by WindowManager
 
 CLASS [VulkanHandler]
@@ -36,9 +39,23 @@ CLASS [VulkanHandler]
 CLASS [LayoutCompositor]
 - VulkanHandler reference
 - GuiLayout
-- vector<Viewport>
-# holds the gui image, multiple viewport images, and overlay image; composites them together and renders them to swapchain
+- map<uint32_t, shared_ptr<Viewport>>
+# requests the gui and viewport output textures; composites them together and renders them to swapchain
 
+CLASS [GuiLayout]
+- etc
+# holds a gui tree
+# processes tree when modified and renders result to texture for compositing
+# lifetime managed by LayoutCompositor
+
+CLASS [Viewport]
+- etc
+# unlike GuiLayout, this class may not be exclusively used by the gui system
+# rendering is processed by a separate JobHandler system, allowing multi-threading and decoupling from UI render thread
+# holds a reference to a 3D scene and renders it to texture
+# for multi-threading reasons, uses triple buffering to allow safe reading of 1 image while rendering in background
+# is triple buffering the right choice here?
+# are there any scenarios where its texture may be requested from multiple places at once?
 
 # //////
 # //////

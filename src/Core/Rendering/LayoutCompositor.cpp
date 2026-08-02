@@ -7,53 +7,6 @@
 #include <cstring> // Required for builing on linux
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SHADERS (You will need to compile these to SPIR-V using glslangValidator or similar)
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Save these as "compositor.vert" and "compositor.frag" and compile to SPIR-V.
-// For now, assume a function CreateShaderModule exists to load them
-
-// Sample code
-/*
---- compositor.vert ---
-#version 450
-
-layout(location = 0) in vec2 inPosition; // 0.0 to 1.0
-layout(location = 1) in vec2 inTexCoord;
-
-layout(push_constant) uniform PushConstants {
-	vec2 offset;  // Normalized X, Y (0.0 to 1.0)
-	vec2 scale;   // Normalized Width, Height (0.0 to 1.0)
-} pc;
-
-layout(location = 0) out vec2 fragTexCoord;
-
-void main() {
-	// Scale the 0-1 quad to the desired size, then shift by offset
-	vec2 pos = (inPosition * pc.scale) + pc.offset;
-
-	// Convert 0-1 space to -1 to 1 NDC space
-	pos = pos * 2.0 - 1.0;
-	pos.y = -pos.y; // Flip Y because Vulkan NDC is bottom-up, but UI coords are top-down
-
-	gl_Position = vec4(pos, 0.0, 1.0);
-	fragTexCoord = inTexCoord;
-}
-----------------------
---- compositor.frag ---
-#version 450
-
-layout(location = 0) in vec2 fragTexCoord;
-layout(binding = 0) uniform sampler2D uiTexture;
-
-layout(location = 0) out vec4 outColor;
-
-void main() {
-	outColor = texture(uiTexture, fragTexCoord);
-}
-----------------------
-*/
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LIFECYCLE
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -180,6 +133,9 @@ void LayoutCompositor::CleanupFramebuffers() {
 		}
 	}
 	framebuffers.clear();
+	if (!commandBuffers.empty()) {
+		vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	}
 	commandBuffers.clear();
 }
 
@@ -580,19 +536,20 @@ void LayoutCompositor::GatherCompositingLayers() {
 	activeLayersThisFrame.push_back(baseGui);
 
 	// 2 - Viewport layers (Subregions)
-	std::vector<ViewportLayoutRect> requestedRects = guiLayout.GetViewportLayoutRequests();
-	SyncViewports(requestedRects);
+	const std::unordered_map<uint32_t, DrawRect>& rectLookupMap = guiLayout.GetViewportLayoutRequests();
+	SyncViewports(rectLookupMap);
 
 	for (const auto& [id, viewport] : viewports) {
 		CompositingLayer vpLayer;
 		vpLayer.textureView = viewport->GetLatestTextureView();
 
-		DrawRect screenRect = { 0,0,0,0 };
-		for (const auto& req : requestedRects) {
-			if (req.panelId == id) { screenRect = req.rect;break; }
+		if (rectLookupMap.contains(id)) {
+			vpLayer.screenRect = rectLookupMap.at(id);
+		}
+		else {
+			vpLayer.screenRect = { 0,0,0,0 }; // Fallback
 		}
 
-		vpLayer.screenRect = screenRect;
 		activeLayersThisFrame.push_back(vpLayer);
 	}
 
@@ -606,7 +563,7 @@ void LayoutCompositor::GatherCompositingLayers() {
 	}
 }
 
-void LayoutCompositor::SyncViewports(const std::vector<ViewportLayoutRect>& requestedRects) {
+void LayoutCompositor::SyncViewports(const std::unordered_map<uint32_t, DrawRect>& requestedRects) {
 	// Implementation for creating/destroying unique_ptr<Viewport> based on requestedRects.panelId
 	// TODO
 }

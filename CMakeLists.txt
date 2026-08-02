@@ -106,11 +106,6 @@ add_executable(
     "src/Core/Services/FileManager.cpp"
     "src/Core/Services/VulkanHandler.cpp"
     "src/Core/WindowClasses/BaseWindow.cpp"
-    "src/Core/WindowClasses/TiledWindow.cpp"
-    "src/Core/WindowClasses/TooltipWindow.cpp"
-    "src/Core/WindowClasses/ContextWindow.cpp"
-    "src/Core/WindowClasses/TestWindow.cpp"
-    "src/Core/WindowClasses/DedicatedWindow.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
     "src/Core/Services.h" # <- no .cpp file

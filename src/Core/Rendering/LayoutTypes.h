@@ -9,7 +9,7 @@ struct DrawRect {
 };
 
 // Used to define regions to render viewport
-struct ViewportLayoutRect {
-	uint32_t panelId;
-	DrawRect rect;
-};
+//struct ViewportLayoutRect {
+//	uint32_t panelId;
+//	DrawRect rect;
+//};
