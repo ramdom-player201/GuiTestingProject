@@ -42,32 +42,24 @@ Program::Program()
 
 	LogService::Log(LogType::TRACE, className, functionName, "Running program initialisations");
 
-	// Initialise GLFW
+	// Initialise GLFW and VulkanHandler
 	if (!glfwInit()) {
-		LogService::Log(
-			LogType::CRITICAL,
-			className,
-			functionName,
-			"GLFW failed to initialise"
-		);
+		LogService::Log(LogType::CRITICAL,className,functionName,"GLFW failed to initialise");
 		std::cerr << "Failed to initialize GLFW" << std::endl;
+		return; // Don't proceed if GLFW fails
 	}
 	else {
-		LogService::Log(
-			LogType::SUCCESS,
-			className,
-			functionName,
-			"GLFW initialised successfully"
-		);
+		LogService::Log(LogType::SUCCESS,className,functionName,"GLFW initialised successfully");
 	}
+	// Get GLFW required extensions
+	uint32_t glfwExtensionCount{ 0 };
+	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	std::vector<const char*> requiredExtensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+	// Pass to VulkanHandler
+	vulkanHandler.CreateVulkanInstance(requiredExtensions);
 
-	// Initialise Vulkan
-
-	//VulkanHandler::Initialise();
-	vulkanHandler.CreateVulkanInstance();
 
 	// Temporary test stuff
-
 	ConsoleColours::PrintTestColours();
 
 	LogService::Log(LogType::TEST, className, functionName, "Testing LogTypes");

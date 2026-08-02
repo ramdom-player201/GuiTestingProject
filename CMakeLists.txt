@@ -117,10 +117,10 @@ add_executable(
     "src/Core/Services/IService.h" # <- no .cpp file
     "src/Core/Services/LocalisedTextService.h"
 
-    #"src/Core/Rendering/GraphicsPipeline.cpp"
     "src/Core/Rendering/LayoutCompositor.cpp"
     "src/Core/Rendering/GuiLayout.cpp"
-    #"src/Core/Rendering/ShaderModule.cpp"
+    "src/Core/Rendering/Viewport.cpp"
+    "src/Core/Rendering/LayoutTypes.h" # <- no .cpp file
 )
 
 add_library(

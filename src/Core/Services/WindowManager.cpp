@@ -31,6 +31,10 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
 	);
 
+	constexpr int defaultWidth{ 600 };
+	constexpr int defaultHeight{ 400 };
+	constexpr std::string_view defaultTitle{ "Window" };
+
 
 	if (debugMode) {
 		//std::cout << ConsoleColours::getColourCode(AnsiColours::BLUE) << "Window Manager > " <<
@@ -57,7 +61,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			windows[currentId] = std::make_unique<TooltipWindow>(currentId, vulkanHandler); // create new window
+			windows[currentId] = std::make_unique<TooltipWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
@@ -78,7 +82,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			windows[currentId] = std::make_unique<ContextWindow>(currentId, vulkanHandler); // create new window
+			windows[currentId] = std::make_unique<ContextWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
@@ -99,7 +103,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			windows[currentId] = std::make_unique<TiledWindow>(currentId, vulkanHandler); // create new window
+			windows[currentId] = std::make_unique<TiledWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
@@ -120,7 +124,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			windows[currentId] = std::make_unique<DedicatedWindow>(currentId, vulkanHandler); // create new window
+			windows[currentId] = std::make_unique<DedicatedWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +
@@ -141,7 +145,7 @@ size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
 				ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "> :: Start"
 			);
 
-			windows[currentId] = std::make_unique<TestWindow>(currentId, vulkanHandler); // create new window
+			windows[currentId] = std::make_unique<TestWindow>(currentId, vulkanHandler, defaultWidth, defaultHeight, defaultTitle); // create new window
 
 			LogService::Log(LogType::TRACE, className, functionName,
 				"Created window of type <" +

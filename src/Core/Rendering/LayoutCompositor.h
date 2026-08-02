@@ -1,14 +1,15 @@
 // LayoutCompositor holds rendering architecture for the gui
 
-// gui is built from a gui compiler into an image
+// gui is built from a gui compiler (GuiLayout) into an image
 // gui is rebuilt any time it changes, otherwise the existing copy is used
-// gui contains 3D viewports as optional subframes
+// gui defines the placement of viewport subframes, but does not manage them
 
 // gui -> offscreen image
 // 3D -> offscreen image, account for size of sub-cut of screen
 // draw gui + 3D viewports + overlays
 
 // LayoutCompositor <- window level generalist and gui handler
+// GuiLayout <- 2D gui renderer (base layer + overlay)
 // Viewport <- 3D sub-renderer
 
 #pragma once
@@ -16,86 +17,101 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <string>
 
 #include "Viewport.h"
 #include "GuiLayout.h"
 
-struct ViewportLayoutRect {
-	uint32_t panelId;
-	int32_t x;
-	int32_t y;
-	uint32_t width;
-	uint32_t height;
-};
+#include "LayoutTypes.h"
 
 // Forward declarations
 class VulkanHandler;
-class BaseWindow;
-class Viewport;
 class InputEvent;
+
+
+// Represents a single texture to be drawn to the screen
+struct CompositingLayer {
+	VkImageView textureView{ VK_NULL_HANDLE };
+	DrawRect screenRect{};
+};
 
 class LayoutCompositor {
 public:
-	LayoutCompositor(BaseWindow& parentWindow, VulkanHandler& vulkanHandler);
+	LayoutCompositor(VulkanHandler& vulkanHandler);
 	~LayoutCompositor();
 
-	// Lifecycle
-	void init();
-	void handleWindowResize();
+	// Lifecycle (managed by BaseWindow)
+	void CreateCompositeResources(VkFormat swapchainFormat);
+	void CreateFramebuffers(const std::vector<VkImageView>& swapchainImageViews, VkExtent2D swapchainExtent);
+
+	void CleanupCompositeResources();
+	void CleanupFramebuffers();
 
 	// Primary
-	void drawFrame();
-	void passInputs(const InputEvent& event);
+	VkCommandBuffer RecordCommands(uint32_t imageIndex);
+	void PassInputs(const InputEvent& event);
 
-	// safety locks
+	// Safety locks
 	LayoutCompositor() = delete;
 	LayoutCompositor(const LayoutCompositor&) = delete;
 	LayoutCompositor& operator=(const LayoutCompositor&) = delete;
 	LayoutCompositor(LayoutCompositor&&) = delete;
 	LayoutCompositor& operator=(LayoutCompositor&&) = delete;
+
+	// ClassName
+	static constexpr std::string_view className{ "LayoutCompositor" };
 private:
 	// References
-	BaseWindow& parentWindow; // access SwapChainData, GLFWWindow, VkSurface through this
 	VulkanHandler& vulkanHandler; // access VkDevice, VkQueues, etc
 
 	// Subsystems
-	GuiLayout guiLayout; // The 2D gui system
+	GuiLayout guiLayout; // The 2D gui system (base layer and overlay)
 	std::map<uint32_t, std::unique_ptr<Viewport>> viewports; // 3D sub-renderers
 
-	// Frame synchronisation
-	std::vector<VkSemaphore> imageAvailableSemaphores;
-	std::vector<VkSemaphore> renderFinishedSemaphores;
-	std::vector<VkFence> inFlightFences;
-	size_t currentFrame{ 0 };
+	// Frame-specific state (cleared and rebuilt every frame during GatherCompositingLayers)
+	std::vector<CompositingLayer> activeLayersThisFrame;
 
-	// Command buffering
+	// Command buffering (owned by compositor but acted on by BaseWindow)
 	VkCommandPool commandPool{ VK_NULL_HANDLE };
 	std::vector<VkCommandBuffer> commandBuffers;
+
+	// Framebuffer targets (regenerated dynamically on swapchain resize)
+	std::vector<VkFramebuffer> framebuffers;
+	VkExtent2D currentExtent{ 0,0 };
+	VkFormat currentSwapchainFormat{ VK_FORMAT_UNDEFINED };
 
 	// Compositing resources
 	VkRenderPass compositeRenderPass{ VK_NULL_HANDLE };
 	VkPipeline compositePipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout compositePipelineLayout{ VK_NULL_HANDLE };
 
+	// Descriptor resources
 	VkDescriptorSetLayout compositeDescriptorSetLayout{ VK_NULL_HANDLE };
 	VkDescriptorPool compositeDescriptorPool{ VK_NULL_HANDLE };
 	std::vector<VkDescriptorSet> compositeDescriptorSets;
 
 	// Single quad vertex buffer to composite and draw textures to the window
 	VkBuffer quadVertexBuffer{ VK_NULL_HANDLE };
+	VkSampler compositeSampler{ VK_NULL_HANDLE };
 	VkDeviceMemory quadVertexBufferMemory{ VK_NULL_HANDLE };
 
 	// Helper functions
-	void createSynchronisationObjects();
-	void createCommandPoolAndBuffers();
-	void createCompositeResources();
-	void cleanupCompositeResources();
+	void CreateCommandPool();
+	void AllocateCommandBuffers(size_t count);
+	void CreateQuadVertexBuffer();
+	void CreateRenderPass();
+	void CreateDescriptorResources();
+	void CreatePipeline();
 
-	// Compare GUI requested viewports against actually instantiated viewports
-	void syncViewports(const std::vector<ViewportLayoutRect>& requestedRects);
+	// Subsystem management
+	void GatherCompositingLayers();
+	void SyncViewports(const std::vector<ViewportLayoutRect>& requestedRects);
 
-	// Records the final draw commands to the swapchain
-	void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex);
+	// Vulkan helper
+	void UpdateDescriptorSet(uint32_t imageIndex, VkImageView textureView);
+
+	// Handle shader files
+	VkShaderModule CreateShaderModule(const std::string& filename);
 };
 
 

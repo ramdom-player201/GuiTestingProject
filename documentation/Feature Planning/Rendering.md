@@ -16,7 +16,7 @@ CLASS [WindowManager]
 
 CLASS [BaseWindow]
 - VulkanHandler reference
-- Renderer
+- LayoutCompositor
 - GLFWwindow pointer
 - VkSurfaceKHR
 - SwapChainData
@@ -34,4 +34,17 @@ CLASS [VulkanHandler]
 # lifetime managed by Program
 
 CLASS [LayoutCompositor]
+- VulkanHandler reference
+- GuiLayout
+- vector<Viewport>
 # holds the gui image, multiple viewport images, and overlay image; composites them together and renders them to swapchain
+
+
+# //////
+# //////
+# //////
+
+# About multi-threading
+# Windows are rendered one at a time via their Compositors
+# Each Viewport and GuiLayout gives the Compositor their latest finished VkImage
+# Viewports may do their actual rendering in separate corountines, but only wheir their target scenes differ
