@@ -56,7 +56,7 @@ endif()
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
-    GIT_TAG 3.4                                     # library version 3.4
+    GIT_TAG 3.5.1                                     # library version 3.5.1
     GIT_SHALLOW ON                                  # exclude version history
 )
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)    # turn off examples
@@ -80,7 +80,7 @@ FetchContent_MakeAvailable(glm)
 # TEMP_DISABLED # FetchContent_Declare(
 # TEMP_DISABLED #     luau
 # TEMP_DISABLED #     GIT_REPOSITORY  https://github.com/luau-lang/luau.git
-# TEMP_DISABLED #     GIT_TAG 0.707  # Use the latest stable version or a specific hash
+# TEMP_DISABLED #     GIT_TAG 0.732  # Use the latest stable version or a specific hash
 # TEMP_DISABLED #     GIT_SHALLOW ON
 # TEMP_DISABLED # )
 # Disable Luau's built-in tests and CLI tools to speed up compilation
@@ -91,6 +91,38 @@ FetchContent_MakeAvailable(glm)
 # // #include "luacode.h"       // <-
 # // #include "lua.h"           // <-
 # // #include "lualib.h"        // <-
+
+# Shader compilation
+find_program(GLSLC_EXECUTABLE glslc)
+
+if(NOT GLSLC_EXECUTABLE)
+    message(WARNING "glslc not found. This should usually be included as part of the Vulkan SDK. Shaders will not compile automatically")
+else()
+    set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/data/shaders")
+    set(SHADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/data/shaders")
+
+    file(GLOB_RECURSE SHADER_SOURCES
+        "${SHADER_SOURCE_DIR}/*.vert"
+        "${SHADER_SOURCE_DIR}/*.frag"
+        "${SHADER_SOURCE_DIR}/*.comp"
+    )
+
+    foreach(SHADER ${SHADER_SOURCES})
+        get_filename_component(SHADER_NAME ${SHADER} NAME)
+        set(SPV_FILE "${SHADER_OUTPUT_DIR}/${SHADER_NAME}.spv")
+
+        add_custom_command(
+            OUTPUT ${SPV_FILE}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUTPUT_DIR}
+            COMMAND ${GLSLC_EXECUTABLE} ${SHADER} -o ${SPV_FILE}
+            DEPENDS ${SHADER}
+            COMMENT "Compiling shader: ${SHADER_NAME}"
+        )
+
+        list(APPEND SPV_FILES ${SPV_FILE})
+    endforeach()
+    add_custom_target(Shaders ALL DEPENDS ${SPV_FILES})
+endif()
 
 add_executable(
     main src/main.cpp
@@ -146,3 +178,7 @@ target_compile_features(
     main PRIVATE
     cxx_std_23
 )
+
+if(TARGET Shaders)
+    add_dependencies(main Shaders)
+endif()

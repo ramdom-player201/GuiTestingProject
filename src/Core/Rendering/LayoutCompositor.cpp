@@ -163,7 +163,7 @@ VkCommandBuffer LayoutCompositor::RecordCommands(uint32_t imageIndex) {
 	renderPassInfo.renderArea.offset = { 0,0 };
 	renderPassInfo.renderArea.extent = currentExtent;
 
-	VkClearValue clearColour = { {{0.1f,0.1f,0.1f,0.1f}} }; // Dark grey background
+	VkClearValue clearColour = { {{0.1f,0.1f,0.1f,1.0f}} }; // Dark grey background
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColour;
 
@@ -416,8 +416,8 @@ void LayoutCompositor::CreatePipeline() {
 	constexpr std::string_view functionName{ "CreatePipeline" };
 
 	// Placeholder logic for shader loader
-	auto vertShaderModule = CreateShaderModule("shaders/compositor.vert.spv");
-	auto fragShaderModule = CreateShaderModule("shaders/compositor.frag.spv");
+	auto vertShaderModule = CreateShaderModule("data/shaders/compositor.vert.spv");
+	auto fragShaderModule = CreateShaderModule("data/shaders/compositor.frag.spv");
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
