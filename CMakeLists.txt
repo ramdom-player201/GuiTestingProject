@@ -146,8 +146,12 @@ add_executable(
 
     "src/Core/Rendering/LayoutCompositor.cpp"
     "src/Core/Rendering/GuiLayout.cpp"
-    "src/Core/Rendering/Viewport.cpp"
+    #"src/Core/Rendering/Viewport.cpp" # <- deprecated
     "src/Core/Rendering/LayoutTypes.h" # <- no .cpp file
+    "src/Core/Rendering/GuiRenderResources.cpp"
+    "src/Core/Rendering/GuiBatchRootRenderer.cpp"
+    "src/Core/Rendering/GuiElements/UiFrame.cpp"
+    "src/Core/Rendering/GuiElements/UiShape.cpp"
 )
 
 add_library(

@@ -2,6 +2,7 @@
 
 #include "../Services/LogService.h"
 #include "../ConsoleColours.h"
+#include "../Rendering/LayoutTypes.h"
 
 #include <algorithm>
 #include <limits>
@@ -25,6 +26,9 @@ WindowReturnData BaseWindow::Update() {
 	if (width == 0 || height == 0) {
 		return WRD; // Skip rendering if 0 sized or minimised
 	}
+
+	InputEvent placeholderInput{};
+	compositor.ProcessGui(placeholderInput);
 
 	// Render loop
 	VkDevice logicalDevice = vulkanHandler.GetLogicalDevice();
@@ -149,8 +153,11 @@ BaseWindow::BaseWindow(size_t id, VulkanHandler& vk, int width, int height, std:
 	// 4 - Create window-specific rendering objects
 	CreateSwapchain();
 	CreateImageViews();
-	compositor.CreateCompositeResources(swapchainData.swapchainImageFormat);
-	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent); // review this functon against LayoutCompositor.h
+
+	compositor.CreateResources(swapchainData.swapchainImageFormat);
+	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent);
+
+	compositor.InitialiseGui(swapchainData.swapchainExtent.width, swapchainData.swapchainExtent.height);
 
 	// 5 - Create synchronisation objects
 	CreateSyncObjects(swapchainData.swapchainImages.size());
@@ -171,8 +178,7 @@ BaseWindow::~BaseWindow() {
 	// Ensure GPU is idle before destroying
 	vkDeviceWaitIdle(vulkanHandler.GetLogicalDevice());
 
-	compositor.CleanupFramebuffers(); // review this functon against LayoutCompositor.h
-	compositor.CleanupCompositeResources(); // review this functon against LayoutCompositor.h
+	compositor.CleanupResources();
 
 	CleanupSyncObjects();
 	CleanupSwapchain();
@@ -325,14 +331,16 @@ void BaseWindow::RecreateSwapchain() {
 	vkDeviceWaitIdle(vulkanHandler.GetLogicalDevice());
 
 	CleanupSwapchain();
-	compositor.CleanupFramebuffers(); // review this functon against LayoutCompositor.h
-	compositor.CleanupCompositeResources(); // review this functon against LayoutCompositor.h
+
+	compositor.CleanupResources();
 	CleanupSyncObjects();
 
 	CreateSwapchain();
 	CreateImageViews();
-	compositor.CreateCompositeResources(swapchainData.swapchainImageFormat);
-	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent); // review this functon against LayoutCompositor.h
+	compositor.CreateResources(swapchainData.swapchainImageFormat);
+	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent);
+	compositor.InitialiseGui(swapchainData.swapchainExtent.width, swapchainData.swapchainExtent.height);
+
 	CreateSyncObjects(swapchainData.swapchainImages.size());
 }
 
