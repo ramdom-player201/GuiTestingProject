@@ -17,11 +17,11 @@ void Program::Run()
 	windowManager.debugMode = true;
 
 	windowManager.CountWindows();
-	windowManager.CreateWindow("Window 1", WindowTypes::TestWindow);
-	windowManager.CreateWindow("Window 2", WindowTypes::TestWindow);
+	windowManager.CreateWindow("Window 1");
+	windowManager.CreateWindow("Window 2");
 	windowManager.CountWindows();
 
-	windowManager.CreateWindow("Window 33", WindowTypes::TestWindow);
+	windowManager.CreateWindow("Window 33");
 
 	windowManager.debugMode = false;
 	while (windowManager.CountWindows() > 0) {

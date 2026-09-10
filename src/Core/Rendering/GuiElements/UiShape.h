@@ -21,7 +21,7 @@ protected:
 
 	// Transparency not stored, but written into colour's RGBA via Getter/Setter
 
-	ShapeVertex cachedVertices[4];
+	ShapeVertex cachedVertices[4]{};
 
 	std::optional<ClipRect> GetClipRect() const override;
 	void DrawElement(UiPassParams& params, bool needsRedraw) override;

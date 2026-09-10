@@ -4,7 +4,7 @@
 #include "LogService.h"
 #include <vector>
 
-size_t WindowManager::CreateWindow(const std::string& title, WindowTypes type) {
+size_t WindowManager::CreateWindow(const std::string& title) {
 	constexpr std::string_view functionName{ "CreateWindow" };
 
 	// creates a new Window and adds it to map

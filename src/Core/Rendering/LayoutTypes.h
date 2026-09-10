@@ -82,6 +82,10 @@ struct ScaleOffset2D {
 	float offsetY{ 0.0f };
 	float scaleX{ 0.0f };
 	float scaleY{ 0.0f };
+
+	ScaleOffset2D(float offX = 0.0f, float offY = 0.0f, float scaX = 0.0f, float scaY = 0.0f)
+		: offsetX(offX), offsetY(offY), scaleX(scaX), scaleY(scaY) {
+	} // constructor
 };
 
 struct ScaleOffset1D {
@@ -113,12 +117,12 @@ struct InputEventResult {
 
 // Layout types
 struct ShapeVertex {
-	float pos[2]; // {X,Y}
-	float centre[2]; // {X,Y}
-	uint32_t packedBaseColour; // A,B,G,R
-	uint32_t packedBorderColour; // A,B,G,R
-	float sizeAndBorder[4]; // {width,height,thickness,empty}
-	float radii[4]; // {TL,TR,BR,BL}
+	float pos[2]{ 0.0f, 0.0f };			// {X,Y}
+	float centre[2]{ 0.0f, 0.0f };		// {X,Y}
+	uint32_t packedBaseColour{ 0 };		// A,B,G,R
+	uint32_t packedBorderColour{ 0 };	// A,B,G,R
+	float sizeAndBorder[4]{ 0,0,0,0 };	// {width,height,thickness,empty}
+	float radii[4]{ 0, 0, 0, 0 };		// {TL,TR,BR,BL}
 };
 static_assert(sizeof(ShapeVertex) == 56, "ShapeVertex size mismatch, check struct layout");
 
@@ -131,9 +135,17 @@ struct TextureVertex {
 };
 
 struct ClipRect {
-	float x, y;					// Centre position
-	float halfW, halfH;			// Half-size
-	float rTL, rTR, rBR, rBL;	// Corner radii
+	// Centre position
+	float x{ 0.0f };
+	float y{ 0.0f };
+	// Half-size
+	float halfW{ 0.0f };
+	float halfH{ 0.0f };
+	// Corner radii
+	float rTL{ 0.0f };
+	float rTR{ 0.0f };
+	float rBR{ 0.0f };
+	float rBL{ 0.0f };
 };
 
 struct ClipStack {

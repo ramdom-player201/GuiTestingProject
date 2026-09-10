@@ -27,7 +27,7 @@ private:
 	uint32_t currentWindowHeight{ 0 };
 
 	// Tree
-	std::unique_ptr<UiFrame> treeRoot;
+	std::unique_ptr<UiFrame> treeRoot{ nullptr };
 
 	// Batches
 	GuiBatches batches;

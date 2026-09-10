@@ -10,13 +10,13 @@
 #include "../WindowClasses/BaseWindow.h"
 
 // Valid Window Types
-enum class WindowTypes : uint8_t {
-	TooltipWindow,
-	ContextWindow,
-	TiledWindow,
-	DedicatedWindow,
-	TestWindow,
-};
+//enum class WindowTypes : uint8_t {
+//	TooltipWindow,
+//	ContextWindow,
+//	TiledWindow,
+//	DedicatedWindow,
+//	TestWindow,
+//};
 
 class WindowManager {
 private:
@@ -32,7 +32,7 @@ public:
 	bool debugMode{ false };
 
 	// service-specific functionality
-	size_t CreateWindow(const std::string& title, WindowTypes type);	// creates a new window and adds it to list
+	size_t CreateWindow(const std::string& title);						// creates a new window and adds it to list
 	size_t CountWindows() const;										// returns number of windows in list
 	BaseWindow* GetWindowById(size_t id) const;							// returns a copy of a pointer to the window, based on its position in the vector
 	void CloseWindow(size_t id);										// closes the referenced window

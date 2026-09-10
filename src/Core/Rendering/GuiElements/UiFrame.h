@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "../LayoutTypes.h"
+#include "../../Services/LogService.h"
 
 class UiFrame; // forward declared for UiPassParams lel
 
@@ -30,12 +31,12 @@ struct UiPassParams {
 class UiFrame {
 protected:
 	// Placement
-	ScaleOffset2D position;
-	ScaleOffset2D size;
-	Vec2 anchorPoint;
+	ScaleOffset2D position{ 0.0f, 0.0f, 0.0f, 0.0f };
+	ScaleOffset2D size{600.0f, 400.0f, 0.0f, 0.0f };
+	Vec2 anchorPoint{ 0.0f, 0.0f };
 
 	// Tree hierarchy
-	UiFrame* parent;
+	UiFrame* parent{ nullptr };
 	std::vector<std::unique_ptr<UiFrame>> children;
 
 	// Calculated during runtime, denotes the resolved bounding rect of the UI element
@@ -57,7 +58,7 @@ protected:
 	virtual bool RecalculateLayout(UiPassParams& params);
 	virtual void DrawElement(UiPassParams& params, bool needsRedraw);
 
-	UiFrame() = default;
+	//UiFrame() = default;
 public:
 	void ProcessElement(UiPassParams& params);
 
