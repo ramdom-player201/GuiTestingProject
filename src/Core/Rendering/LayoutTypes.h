@@ -119,8 +119,8 @@ struct InputEventResult {
 struct ShapeVertex {
 	float pos[2]{ 0.0f, 0.0f };			// {X,Y}
 	float centre[2]{ 0.0f, 0.0f };		// {X,Y}
-	uint32_t packedBaseColour{ 0 };		// A,B,G,R
-	uint32_t packedBorderColour{ 0 };	// A,B,G,R
+	uint32_t packedBaseColour{ 0 };		// R,G,B,A
+	uint32_t packedBorderColour{ 0 };	// R,G,B,A
 	float sizeAndBorder[4]{ 0,0,0,0 };	// {width,height,thickness,empty}
 	float radii[4]{ 0, 0, 0, 0 };		// {TL,TR,BR,BL}
 };

@@ -6,6 +6,7 @@ layout(location = 1) in vec4 fragBaseColour;
 layout(location = 2) in vec4 fragBorderColour;
 layout(location = 3) in vec4 fragSizeBorder;
 layout(location = 4) in vec4 fragRadii;
+layout(location = 5) in vec2 fragCentre;
 
 // Push constants: clip stack
 struct ClipRect {
@@ -66,9 +67,11 @@ void main() {
     float edgeSoftness = fwidth(outlineDist) * 1.5;
     float alpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, outlineDist);
 
+    vec2 screenPos = fragLocalPos + fragCentre;
+
     // Clip test
     for (int i = 0; i < clipCount; i++) {
-        if (clipSDF(fragLocalPos, clips[i]) > 0.0) {
+        if (clipSDF(screenPos, clips[i]) > 0.0) {
             discard;
         }
     }

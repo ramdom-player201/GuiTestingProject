@@ -30,9 +30,7 @@ private:
 	VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };
 	std::vector<VkDescriptorSet> descriptorSets;
 
-	// Vertex buffer for fullscreen quad
-	VkBuffer quadVertexBuffer{ VK_NULL_HANDLE };
-	VkDeviceMemory quadVertexBufferMemory{ VK_NULL_HANDLE };
+	// ...
 	VkSampler textureSampler{ VK_NULL_HANDLE };
 
 	// Command buffers
@@ -42,7 +40,6 @@ private:
 	// Helper initialisations
 	void CreateCommandPool();
 	void AllocateCommandBuffers(size_t count);
-	void CreateQuadVertexBuffer();
 	void CreateRenderPass(); 
 	void CreateDescriptorResources();
 	void CreatePipeline();

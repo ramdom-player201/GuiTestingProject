@@ -66,7 +66,13 @@ void UiShape::DrawElement(UiPassParams& params, bool needsRedraw) {
 
 	// always draw
 	auto& bucket = params.batches->zBuckets[params.currentZBucket];
-	for (int i{ 0 }; i < 4; i++) {
-		bucket.shapes.push_back(cachedVertices[i]);
-	}
+	bucket.clipStack = params.clipStack;
+	
+	bucket.shapes.push_back(cachedVertices[0]); // TL
+	bucket.shapes.push_back(cachedVertices[1]); // TR
+	bucket.shapes.push_back(cachedVertices[3]); // BL (Order for CCW)
+
+	bucket.shapes.push_back(cachedVertices[1]); // TR
+	bucket.shapes.push_back(cachedVertices[2]); // BR
+	bucket.shapes.push_back(cachedVertices[3]); // BL
 }

@@ -2,10 +2,10 @@
 
 // Input: ShapeVertex
 layout(location = 0) in vec2 inPos;
-layout(location = 1) in vec2 inCenter;
+layout(location = 1) in vec2 inCentre;
 layout(location = 2) in vec4 inBaseColour;      // UNORM unpacked by Vulkan
 layout(location = 3) in vec4 inBorderColour;
-layout(location = 4) in vec4 inSizeBorder;       // width, height, thickness, unused
+layout(location = 4) in vec4 inSizeBorder;      // width, height, thickness, unused
 layout(location = 5) in vec4 inRadii;           // TL, TR, BR, BL
 
 // Push constants: viewport transform
@@ -22,10 +22,11 @@ layout(location = 1) out vec4 fragBaseColour;
 layout(location = 2) out vec4 fragBorderColour;
 layout(location = 3) out vec4 fragSizeBorder;
 layout(location = 4) out vec4 fragRadii;
+layout(location = 5) out vec2 fragCentre;
 
 void main() {
-    // Local position relative to center (for SDF)
-    fragLocalPos = inPos - inCenter;
+    // Local position relative to centre (for SDF)
+    fragLocalPos = inPos - inCentre;
 
     // Convert screen position to NDC
     vec2 screenPos = inPos - vec2(viewport.offsetX, viewport.offsetY);
@@ -39,4 +40,5 @@ void main() {
     fragBorderColour = inBorderColour;
     fragSizeBorder = inSizeBorder;
     fragRadii = inRadii;
+    fragCentre = inCentre;
 }

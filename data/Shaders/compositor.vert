@@ -1,8 +1,5 @@
 #version 450
 
-layout(location = 0) in vec2 inPosition; // 0.0 to 1.0
-layout(location = 1) in vec2 inTexCoord;
-
 layout(push_constant) uniform PushConstants {
 	vec2 offset;  // Normalized X, Y (0.0 to 1.0)
 	vec2 scale;   // Normalized Width, Height (0.0 to 1.0)
@@ -11,13 +8,23 @@ layout(push_constant) uniform PushConstants {
 layout(location = 0) out vec2 fragTexCoord;
 
 void main() {
-	// Scale the 0-1 quad to the desired size, then shift by offset
-	vec2 pos = (inPosition * pc.scale) + pc.offset;
+	// Fullscreen triangle strip
+	vec2 positions[6] = vec2[](
+		vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0),
+        vec2(0.0, 0.0), vec2(1.0, 1.0), vec2(0.0, 1.0)
+	);
 
-	// Convert 0-1 space to -1 to 1 NDC space
+	vec2 texCoords[6] = vec2[](
+		vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0),
+        vec2(0.0, 0.0), vec2(1.0, 1.0), vec2(0.0, 1.0)
+	);
+
+	vec2 pos = positions[gl_VertexIndex];
+
+	pos = (pos * pc.scale) + pc.offset;
 	pos = pos * 2.0 - 1.0;
-	pos.y = -pos.y; // Flip Y because Vulkan NDC is bottom-up, but UI coords are top-down
+	pos.y = -pos.y;
 
 	gl_Position = vec4(pos, 0.0, 1.0);
-	fragTexCoord = inTexCoord;
+	fragTexCoord = texCoords[gl_VertexIndex];
 }
