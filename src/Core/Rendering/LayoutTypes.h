@@ -192,3 +192,15 @@ struct RenderTarget {
 	uint32_t width{ 0 };
 	uint32_t height{ 0 };
 };
+
+struct SwapchainData {
+	VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
+	std::vector<VkImage> swapchainImages{};
+	VkFormat swapchainImageFormat{ VK_FORMAT_UNDEFINED };
+	VkExtent2D swapchainExtent{ 0,0 };
+	std::vector<VkImageView> swapchainImageViews{};
+};
+
+namespace GuiConstants {
+	constexpr VkFormat RGBA_8_FORMAT{ VK_FORMAT_R8G8B8A8_SRGB };
+}

@@ -144,7 +144,8 @@ add_executable(
     "src/Core/Services/IService.h" # <- no .cpp file
     "src/Core/Services/LocalisedTextService.h"
 
-    "src/Core/Rendering/LayoutCompositor.cpp"
+    #"src/Core/Rendering/LayoutCompositor.cpp" # <- due to be deprecated
+    "src/Core/Rendering/WindowPresenter.cpp"
     "src/Core/Rendering/GuiLayout.cpp"
     #"src/Core/Rendering/Viewport.cpp" # <- deprecated
     "src/Core/Rendering/LayoutTypes.h" # <- no .cpp file

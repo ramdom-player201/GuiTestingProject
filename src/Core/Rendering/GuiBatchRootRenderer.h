@@ -37,7 +37,7 @@ public:
 	GuiBatchRootRenderer(VulkanHandler& vk, const GuiRenderResources& resources);
 	~GuiBatchRootRenderer();
 
-	void CreateResources(uint32_t maxVertices = 8192);
+	void CreateResources(uint32_t maxVertices = 8192); 	// This should be called only once, requires vk to be initialised
 
 	// Safety locks
 	GuiBatchRootRenderer() = delete;

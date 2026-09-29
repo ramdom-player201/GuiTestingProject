@@ -3,6 +3,8 @@
 #include "../Services/VulkanHandler.h"
 #include "../Services/LogService.h"
 
+#include "GuiElements/UiShape.h"
+
 #include <cstring>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,6 +16,18 @@ GuiLayout::GuiLayout(VulkanHandler& vulkanHandler)
 	renderResources(vulkanHandler),
 	renderer(vulkanHandler, renderResources)
 {
+	constexpr std::string_view functionName{ "Constructor" };
+
+	auto testRoot{ std::make_unique<UiFrame>() };
+	auto testShape{ std::make_unique<UiShape>() };
+
+	auto testShape2{ std::make_unique<UiShape>() };
+	auto testShape3{ std::make_unique<UiShape>() };
+
+	testRoot->AddChild(std::move(testShape));
+	//testRoot->AddChild(std::move(testShape2));
+	//testRoot->AddChild(std::move(testShape3));
+	treeRoot = std::move(testRoot);
 }
 
 GuiLayout::~GuiLayout() {
@@ -21,7 +35,7 @@ GuiLayout::~GuiLayout() {
 	CleanupLayerTexture();
 }
 
-void GuiLayout::CreateRenderResources() {
+void GuiLayout::InitialiseRenderResources() {
 	renderResources.CreateResources();
 	renderer.CreateResources(8192);
 }
@@ -44,7 +58,7 @@ void GuiLayout::CreateLayerTexture() {
 	imageInfo.extent.depth = 1;
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
-	imageInfo.format = FORMAT;
+	imageInfo.format = GuiConstants::RGBA_8_FORMAT; // from LayoutTypes.h
 	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -82,7 +96,7 @@ void GuiLayout::CreateLayerTexture() {
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = layerTexture.image;
 	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = FORMAT;
+	viewInfo.format = GuiConstants::RGBA_8_FORMAT;
 	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	viewInfo.subresourceRange.baseMipLevel = 0;
 	viewInfo.subresourceRange.levelCount = 1;
@@ -143,7 +157,7 @@ void GuiLayout::CleanupLayerTexture() {
 // PUBLIC INTERFACE
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GuiLayout::Resize(uint32_t width, uint32_t height) {
+void GuiLayout::Refresh(uint32_t width, uint32_t height) {
 	constexpr std::string_view functionName{ "Resize" };
 
 	if (width == 0 || height == 0) {
@@ -171,12 +185,62 @@ void GuiLayout::Resize(uint32_t width, uint32_t height) {
 	CreateLayerTexture();
 }
 
-InputEventResult GuiLayout::ProcessGui(const InputEvent& event) {
-	constexpr std::string_view functionName{ "ProcessGui" };
+//bool GuiLayout::ProcessGui(const InputEvent& event) {
+//	constexpr std::string_view functionName{ "ProcessGui" };
+//
+//	if (layerTexture.view == VK_NULL_HANDLE) {
+//		LogService::Log(LogType::ERROR, className, functionName, "Cannot process GUI without initialised texture");
+//		return false; // do not attempt to draw
+//	}
+//
+//	batches.Clear(); // Clear batches from previous frame
+//
+//	// Setup params for tree traversal
+//	UiPassParams params;
+//	params.event = event;
+//	params.activeTarget = nullptr; // TODO: must persist from last frame
+//	params.parentContentRect = { 0.0f,0.0f,static_cast<float>(currentWindowWidth),static_cast<float>(currentWindowHeight) };
+//	params.guiScaleFactor = 1.0f; // TODO: load from settings
+//	params.batches = &batches;
+//	params.layoutChanged = false;
+//
+//	//LogService::Log(LogType::WIP, className, functionName, "Some UiPassParams values still need TODO work, see comments");
+//
+//	if (treeRoot) {
+//		treeRoot->ProcessElement(params);
+//	}
+//
+//	//LogService::Log(LogType::WIP, className, functionName, "InputEventResult might need to be deprecated");
+//	// ^ We no longer store Viewports externally, so its original function is null unless we need it for something else
+//
+//	return params.layoutChanged;
+//}
+
+//void GuiLayout::RenderFinal(VkCommandBuffer cmd) {
+//	constexpr std::string_view functionName{ "Render" };
+//
+//	if (layerTexture.view == VK_NULL_HANDLE) {
+//		LogService::Log(LogType::ERROR, className, functionName, "Cannot render without initialised texture");
+//		return;
+//	}
+//
+//	// Build render target from layer texture
+//	RenderTarget target;
+//	target.imageView = layerTexture.view;
+//	target.framebuffer = layerTexture.framebuffer;
+//	target.width = currentWindowWidth;
+//	target.height = currentWindowHeight;
+//
+//	renderer.Render(cmd, batches, target);
+//}
+
+bool GuiLayout::UpdateAndRender(InputEvent& event, VkCommandBuffer cmd)
+{
+	constexpr std::string_view functionName{ "UpdateAndRender" };
 
 	if (layerTexture.view == VK_NULL_HANDLE) {
 		LogService::Log(LogType::ERROR, className, functionName, "Cannot process GUI without initialised texture");
-		return InputEventResult();
+		return false; // do not attempt to draw
 	}
 
 	batches.Clear(); // Clear batches from previous frame
@@ -184,7 +248,7 @@ InputEventResult GuiLayout::ProcessGui(const InputEvent& event) {
 	// Setup params for tree traversal
 	UiPassParams params;
 	params.event = event;
-	params.activeTarget = nullptr; // TODO: must persist from last frame
+	params.activeTarget = nullptr; // TODO: must persist from last frame :: consider moving into event
 	params.parentContentRect = { 0.0f,0.0f,static_cast<float>(currentWindowWidth),static_cast<float>(currentWindowHeight) };
 	params.guiScaleFactor = 1.0f; // TODO: load from settings
 	params.batches = &batches;
@@ -192,22 +256,9 @@ InputEventResult GuiLayout::ProcessGui(const InputEvent& event) {
 
 	//LogService::Log(LogType::WIP, className, functionName, "Some UiPassParams values still need TODO work, see comments");
 
+	// Update tree
 	if (treeRoot) {
 		treeRoot->ProcessElement(params);
-	}
-
-	//LogService::Log(LogType::WIP, className, functionName, "InputEventResult might need to be deprecated");
-	// ^ We no longer store Viewports externally, so its original function is null unless we need it for something else
-
-	return params.result;
-}
-
-void GuiLayout::Render(VkCommandBuffer cmd) {
-	constexpr std::string_view functionName{ "Render" };
-
-	if (layerTexture.view == VK_NULL_HANDLE) {
-		LogService::Log(LogType::ERROR, className, functionName, "Cannot render without initialised texture");
-		return;
 	}
 
 	// Build render target from layer texture
@@ -218,6 +269,8 @@ void GuiLayout::Render(VkCommandBuffer cmd) {
 	target.height = currentWindowHeight;
 
 	renderer.Render(cmd, batches, target);
+
+	return params.layoutChanged;
 }
 
 void GuiLayout::LoadPage(PageMode mode, const std::string& layoutFilePath) {

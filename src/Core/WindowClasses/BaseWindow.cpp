@@ -15,32 +15,32 @@ WindowReturnData BaseWindow::Update() {
 	constexpr std::string_view functionName{ "Update" };
 	WindowReturnData WRD;
 
+	//LogService::Log(LogType::HIGH, className, functionName, "UPDATE");
+
+	// Check for window close requests
 	if (glfwWindowShouldClose(window)) {
 		WRD.WindowClosed = true;
 		return WRD;
 	}
 
 	int width{ 0 };
-	int height = { 0 };
+	int height{ 0 };
 	glfwGetFramebufferSize(window, &width, &height);
 	if (width == 0 || height == 0) {
-		return WRD; // Skip rendering if 0 sized or minimised
+		return WRD; // Skip rendering if minimised
 	}
 
-	InputEvent placeholderInput{};
-	compositor.ProcessGui(placeholderInput);
-
 	// Render loop
-	VkDevice logicalDevice = vulkanHandler.GetLogicalDevice();
+	VkDevice logicalDevice{ vulkanHandler.GetLogicalDevice() };
 
-	// 1 - Wait for previous frame to finish
+	// Wait for previous frame to finish
 	vkWaitForFences(logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
-	// 2 - Reset the fence for this frame before aquiring the swapchain image
+	// Reset fence for frame before aquiring the swapchain image
 	vkResetFences(logicalDevice, 1, &inFlightFences[currentFrame]);
 
-	// 3 - Acquire the next swapchain image
-	uint32_t imageIndex;
+	// Aquire an index for a swapchain image that is free to write to
+	uint32_t imageIndex{ 0 };
 	VkResult result = vkAcquireNextImageKHR(
 		logicalDevice,
 		swapchainData.swapchain,
@@ -50,33 +50,32 @@ WindowReturnData BaseWindow::Update() {
 		&imageIndex
 	);
 
-	// Handle window resize
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || framebufferResized) {
-		framebufferResized = false;
-		RecreateSwapchain();
-		return WRD; // Skip frame to draw on next iteration
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		Swapchain_Refresh();
+		return WRD;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to acquire swap chain image");
-		throw std::runtime_error("Failed to acquire swap chain image!");
+		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to acquire swapchain image");
+		throw std::runtime_error("Failed to acquire swapchain image!");
 	}
 
-	VkCommandBuffer commandBuffer = compositor.RecordCommands(imageIndex); // review this functon against LayoutCompositor.h
+	// Update and Present - handles inputs and returns populated command buffer
+	InputEvent placeholderInput{};
+	VkCommandBuffer commandBuffer = presenter.UpdateAndPresent(placeholderInput, imageIndex);
 
-	// 4 - Submit command buffer
+	// Submit command buffer
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
+	// Wait semaphores
 	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
-
+	// Command buffer
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
-
-	// Note: imageIndex is used because the swapchain holds the semaphore until image is presented
+	// Signal semaphores
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[imageIndex] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
@@ -86,12 +85,12 @@ WindowReturnData BaseWindow::Update() {
 		throw std::runtime_error("Failed to submit draw command buffer!");
 	}
 
-	// 5 - Present image to window
+	// Present image to window
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
-
+	// Swapchains
 	VkSwapchainKHR swapchains[] = { swapchainData.swapchain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapchains;
@@ -99,17 +98,16 @@ WindowReturnData BaseWindow::Update() {
 
 	result = vkQueuePresentKHR(vulkanHandler.GetPresentQueue(), &presentInfo);
 
-	// Handle window resize triggered by presentation (such as dragging window edge)
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-		framebufferResized = false;
-		RecreateSwapchain();
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+		// Swapchain became invalid during presentation
+		//Swapchain_Refresh(); // <- causes a rendering bug on resize, just wait for next frame
 	}
 	else if (result != VK_SUCCESS) {
-		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to present swap chain image");
-		throw std::runtime_error("Failed to present swap chain image!");
+		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to present swapchain image");
+		throw std::runtime_error("Failed to present swapchain image!");
 	}
 
-	// 6 - Advance the frame counter
+	// Advance to next frame
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return WRD;
@@ -117,7 +115,7 @@ WindowReturnData BaseWindow::Update() {
 
 BaseWindow::BaseWindow(size_t id, VulkanHandler& vk, int width, int height, std::string_view title) :
 	vulkanHandler(vk),
-	compositor(vk),
+	presenter(vk),
 	windowId(id)
 {
 	constexpr std::string_view functionName{ "Constructor" };
@@ -129,9 +127,9 @@ BaseWindow::BaseWindow(size_t id, VulkanHandler& vk, int width, int height, std:
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "]"
 	);
 
-	// 1 - Create GLFW Window
+	// Create GLFW window
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Enable resizing
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 	window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
 	if (!window) {
@@ -139,30 +137,28 @@ BaseWindow::BaseWindow(size_t id, VulkanHandler& vk, int width, int height, std:
 		throw std::runtime_error("Failed to create GLFW window!");
 	}
 
-	// Set resize callback
 	glfwSetWindowUserPointer(window, this);
-	glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 	LogService::Log(LogType::SUCCESS, className, functionName, "GLFW window created");
 
-	// 2 - Create vulkan surface
-	CreateWindowSurface();
+	// Create vulkan surface
+	if (glfwCreateWindowSurface(vulkanHandler.GetInstance(), window, nullptr, &surface) != VK_SUCCESS) {
+		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create window surface");
+		throw std::runtime_error("Failed to create window surface!");
+	}
 
-	// 3 - Initialise global vulkan devices (has internal checks to prevent reinitialisation; first window to call has priority)
+	// Ensure global vulkan devices are initialised
 	vulkanHandler.InitialiseDevices(surface);
 
-	// 4 - Create window-specific rendering objects
-	CreateSwapchain();
-	CreateImageViews();
+	// Create persistent synchronisation objects
+	Sync_Create();
 
-	compositor.CreateResources(swapchainData.swapchainImageFormat);
-	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent);
+	// Initialise swapchain for the first time
+	Swapchain_Refresh();
 
-	compositor.InitialiseGui(swapchainData.swapchainExtent.width, swapchainData.swapchainExtent.height);
+	// Initialise window presenter
+	presenter.Refresh(swapchainData);
 
-	// 5 - Create synchronisation objects
-	CreateSyncObjects(swapchainData.swapchainImages.size());
-
-	LogService::Log(LogType::SUCCESS, className, functionName, "Window fully initialised");
+	LogService::Log(LogType::SUCCESS, className, functionName, "Window initialised");
 }
 
 BaseWindow::~BaseWindow() {
@@ -175,13 +171,10 @@ BaseWindow::~BaseWindow() {
 		ConsoleColours::getColourCode(AnsiColours::GREY_MEDIUM_BRIGHT) + "] "
 	);
 
-	// Ensure GPU is idle before destroying
 	vkDeviceWaitIdle(vulkanHandler.GetLogicalDevice());
 
-	compositor.CleanupResources();
-
-	CleanupSyncObjects();
-	CleanupSwapchain();
+	Sync_Cleanup();
+	Swapchain_FinalCleanup();
 
 	if (surface != VK_NULL_HANDLE) {
 		vkDestroySurfaceKHR(vulkanHandler.GetInstance(), surface, nullptr);
@@ -193,32 +186,127 @@ BaseWindow::~BaseWindow() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// VULKAN SURFACE & SWAPCHAIN SETUP
+// PERSISTENT HELPERS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BaseWindow::CreateWindowSurface() {
-	constexpr std::string_view functionName{ "CreateWindowSurface" };
+void BaseWindow::Sync_Create() {
+	constexpr std::string_view functionName{ "Sync_Create" };
 
-	if (glfwCreateWindowSurface(vulkanHandler.GetInstance(), window, nullptr, &surface) != VK_SUCCESS) {
-		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create window surface");
-		throw std::runtime_error("Failed to create window surface!");
+	VkDevice device{ vulkanHandler.GetLogicalDevice() };
+
+	VkSemaphoreCreateInfo semaphoreInfo{};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	for (size_t i{ 0 }; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		// Create imageAvailable semaphores
+		if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS) {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create imageAvailable semaphore");
+			throw std::runtime_error("Failed to create image available semaphore!");
+		}
+
+		// RenderFinished semaphores are transient and dealt with in refresh
+
+		// In-flight fences
+		if (vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create fences");
+			throw std::runtime_error("Failed to create fences!");
+		}
 	}
 }
 
-void BaseWindow::CreateSwapchain() {
-	constexpr std::string_view functionName{ "CreateSwapchain" };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TRANSIENT HELPERS (REFRESH)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	SwapchainSupportDetails swapchainSupport = QuerySwapchainSupport();
+void BaseWindow::Swapchain_Refresh() {
+	constexpr std::string_view functionName{ "Swapchain_Refresh" };
 
-	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapchainSupport.formats);
-	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapchainSupport.presentModes);
-	VkExtent2D extent = ChooseSwapExtent(swapchainSupport.capabilities);
+	VkDevice device{ vulkanHandler.GetLogicalDevice() };
+	LogService::Log(LogType::TRACE, className, functionName, "Refreshing swapchain");
+
+	// Wait for GPU to finish using current resources
+	vkDeviceWaitIdle(device);
+
+	// Cleanup old imageViews
+	for (auto imageView : swapchainData.swapchainImageViews) {
+		if (imageView != VK_NULL_HANDLE) { vkDestroyImageView(device, imageView, nullptr); }
+	}
+	swapchainData.swapchainImageViews.clear();
+
+	// Cleanup old renderFinished semaphores
+	for (auto sem : renderFinishedSemaphores) {
+		if (sem != VK_NULL_HANDLE) { vkDestroySemaphore(device, sem, nullptr); }
+	}
+	renderFinishedSemaphores.clear();
+
+	// Create new swapchain from old handle
+	VkSwapchainKHR oldSwapchain{ swapchainData.swapchain };
+	Swapchain_Create(oldSwapchain);
+
+	// Destroy old swapchain
+	if (oldSwapchain != VK_NULL_HANDLE) {
+		vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
+	}
+
+	// Create new renderFinished semaphores
+	VkSemaphoreCreateInfo semaphoreInfo{};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	renderFinishedSemaphores.resize(swapchainData.swapchainImages.size());
+
+	for (size_t i = 0; i < swapchainData.swapchainImages.size(); i++) {
+		if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS) {
+			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create renderFinished semaphore for swapchain");
+			throw std::runtime_error("Failed to create render finished semaphore!");
+		}
+	}
+
+	// Propogate refresh up to presenter
+	presenter.Refresh(swapchainData);
+}
+
+void BaseWindow::Swapchain_FinalCleanup() {
+	VkDevice device{ vulkanHandler.GetLogicalDevice() };
+
+	// Destroy transient renderFinished semaphores
+	for (auto sem : renderFinishedSemaphores) {
+		if (sem != VK_NULL_HANDLE) { vkDestroySemaphore(device, sem, nullptr); }
+	}
+	renderFinishedSemaphores.clear();
+
+	// Destroy imageViews first as they are a dependency of swapchain
+	for (auto imageView : swapchainData.swapchainImageViews) {
+		if (imageView != VK_NULL_HANDLE) {
+			vkDestroyImageView(device, imageView, nullptr);
+		}
+	}
+	swapchainData.swapchainImageViews.clear();
+
+	// Destroy Swapchain
+	if (swapchainData.swapchain != VK_NULL_HANDLE) {
+		vkDestroySwapchainKHR(device, swapchainData.swapchain, nullptr);
+		swapchainData.swapchain = VK_NULL_HANDLE;
+	}
+}
+
+void BaseWindow::Swapchain_Create(VkSwapchainKHR oldSwapchain) {
+	constexpr std::string_view functionName{ "Swapchain_Create" };
+
+	// Query capabilites
+	SwapchainSupportDetails swapchainSupport = Swapchain_QuerySupport();
+	VkSurfaceFormatKHR surfaceFormat = Swapchain_ChooseSurfaceFormat(swapchainSupport.formats);
+	VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR; // hard-coded support only for FIFO (MAILBOX is ignored)
+	VkExtent2D extent = Swapchain_ChooseExtent(swapchainSupport.capabilities);
 
 	uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
 	if (swapchainSupport.capabilities.maxImageCount > 0 && imageCount > swapchainSupport.capabilities.maxImageCount) {
 		imageCount = swapchainSupport.capabilities.maxImageCount;
 	}
 
+	// Create swapchain
 	VkSwapchainCreateInfoKHR createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	createInfo.surface = surface;
@@ -228,35 +316,31 @@ void BaseWindow::CreateSwapchain() {
 	createInfo.imageExtent = extent;
 	createInfo.imageArrayLayers = 1;
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
 	createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	createInfo.queueFamilyIndexCount = 0;
 	createInfo.pQueueFamilyIndices = nullptr;
-
 	createInfo.preTransform = swapchainSupport.capabilities.currentTransform;
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	createInfo.oldSwapchain = oldSwapchain;
 
 	if (vkCreateSwapchainKHR(vulkanHandler.GetLogicalDevice(), &createInfo, nullptr, &swapchainData.swapchain) != VK_SUCCESS) {
-		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create swap chain");
-		throw std::runtime_error("Failed to create swap chain!");
+		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create swapchain");
+		throw std::runtime_error("Failed to create swapchain!");
 	}
 
+	// Retrieve images
 	vkGetSwapchainImagesKHR(vulkanHandler.GetLogicalDevice(), swapchainData.swapchain, &imageCount, nullptr);
 	swapchainData.swapchainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(vulkanHandler.GetLogicalDevice(), swapchainData.swapchain, &imageCount, swapchainData.swapchainImages.data());
 
 	swapchainData.swapchainImageFormat = surfaceFormat.format;
 	swapchainData.swapchainExtent = extent;
-}
 
-void BaseWindow::CreateImageViews() {
-	constexpr std::string_view functionName{ "CreateImageViews" };
-
+	// Create image views
 	swapchainData.swapchainImageViews.resize(swapchainData.swapchainImages.size());
 
-	for (size_t i{ 0 }; i < swapchainData.swapchainImages.size();i++) {
+	for (size_t i{ 0 }; i < swapchainData.swapchainImages.size(); i++) {
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		createInfo.image = swapchainData.swapchainImages[i];
@@ -280,80 +364,10 @@ void BaseWindow::CreateImageViews() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SYNCHRONISATION & RESIZE HANDLING
+// SWAPCHAIN QUERIES
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-void BaseWindow::CreateSyncObjects(uint32_t imageCount) {
-	constexpr std::string_view functionName{ "CreateSyncObjects" };
-
-	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-	renderFinishedSemaphores.resize(imageCount);
-	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-
-	VkSemaphoreCreateInfo semaphoreInfo{};
-	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-	VkFenceCreateInfo fenceInfo{};
-	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-	// 1 - Create aquire semaphores (sized to MAX_FRAMES_IN_FLIGHT)
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		if (vkCreateSemaphore(vulkanHandler.GetLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS) {
-			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create acquire semaphores");
-			throw std::runtime_error("Failed to create acquire semaphores!");
-		}
-	}
-
-	// 2 - Create render semaphores (sized to imageCount)
-	for (size_t i = 0; i < imageCount; i++) {
-		if (vkCreateSemaphore(vulkanHandler.GetLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS) {
-			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create render semaphores");
-			throw std::runtime_error("Failed to create render semaphores!");
-		}
-	}
-
-	// 3 - create fences (sized to MAX_FRAMES_IN_FLIGHT)
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		if (vkCreateFence(vulkanHandler.GetLogicalDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-			LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create fences");
-			throw std::runtime_error("Failed to create fences!");
-		}
-	}
-}
-
-void BaseWindow::RecreateSwapchain() {
-	constexpr std::string_view functionName{ "RecreateSwapchain" };
-
-	LogService::Log(LogType::TRACE, className, functionName, "Recreating swapchain due to window resize");
-
-	vkDeviceWaitIdle(vulkanHandler.GetLogicalDevice());
-
-	CleanupSwapchain();
-
-	compositor.CleanupResources();
-	CleanupSyncObjects();
-
-	CreateSwapchain();
-	CreateImageViews();
-	compositor.CreateResources(swapchainData.swapchainImageFormat);
-	compositor.CreateFramebuffers(swapchainData.swapchainImageViews, swapchainData.swapchainExtent);
-	compositor.InitialiseGui(swapchainData.swapchainExtent.width, swapchainData.swapchainExtent.height);
-
-	CreateSyncObjects(swapchainData.swapchainImages.size());
-}
-
-void BaseWindow::FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
-	auto baseWindow = reinterpret_cast<BaseWindow*>(glfwGetWindowUserPointer(window));
-	baseWindow->framebufferResized = true;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SWAPCHAIN HELPERS
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-BaseWindow::SwapchainSupportDetails BaseWindow::QuerySwapchainSupport() const {
+BaseWindow::SwapchainSupportDetails BaseWindow::Swapchain_QuerySupport() const {
 	SwapchainSupportDetails details;
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkanHandler.GetPhysicalDevice(), surface, &details.capabilities);
 
@@ -364,17 +378,10 @@ BaseWindow::SwapchainSupportDetails BaseWindow::QuerySwapchainSupport() const {
 		vkGetPhysicalDeviceSurfaceFormatsKHR(vulkanHandler.GetPhysicalDevice(), surface, &formatCount, details.formats.data());
 	}
 
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(vulkanHandler.GetPhysicalDevice(), surface, &presentModeCount, nullptr);
-	if (presentModeCount != 0) {
-		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(vulkanHandler.GetPhysicalDevice(), surface, &presentModeCount, details.presentModes.data());
-	}
-
 	return details;
 }
 
-VkSurfaceFormatKHR BaseWindow::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const {
+VkSurfaceFormatKHR BaseWindow::Swapchain_ChooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const {
 	for (const auto& availableFormat : availableFormats) {
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 			return availableFormat;
@@ -383,21 +390,13 @@ VkSurfaceFormatKHR BaseWindow::ChooseSwapSurfaceFormat(const std::vector<VkSurfa
 	return availableFormats[0];
 }
 
-VkPresentModeKHR BaseWindow::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const {
-	for (const auto& availablePresentMode : availablePresentModes) {
-		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			return availablePresentMode;
-		}
-	}
-	return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D BaseWindow::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const {
+VkExtent2D BaseWindow::Swapchain_ChooseExtent(const VkSurfaceCapabilitiesKHR& capabilities) const {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		return capabilities.currentExtent;
+		return capabilities.currentExtent; 	// If not max, the window is not resizable (shouldn't ever happen here)
 	}
 	else {
-		int width, height;
+		int width{ 0 };
+		int height{ 0 };
 		glfwGetFramebufferSize(window, &width, &height);
 
 		VkExtent2D actualExtent = {
@@ -410,47 +409,24 @@ VkExtent2D BaseWindow::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabili
 
 		return actualExtent;
 	}
-}
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLEANUP HELPERS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BaseWindow::CleanupSwapchain() {
-	VkDevice device = vulkanHandler.GetLogicalDevice();
+void BaseWindow::Sync_Cleanup() {
+	VkDevice device{ vulkanHandler.GetLogicalDevice() };
 
-	for (auto imageView : swapchainData.swapchainImageViews) {
-		if (imageView != VK_NULL_HANDLE) {
-			vkDestroyImageView(device, imageView, nullptr);
-		}
-	}
-	swapchainData.swapchainImageViews.clear();
-
-	if (swapchainData.swapchain != VK_NULL_HANDLE) {
-		vkDestroySwapchainKHR(device, swapchainData.swapchain, nullptr);
-		swapchainData.swapchain = VK_NULL_HANDLE;
-	}
-}
-
-void BaseWindow::CleanupSyncObjects() {
-	VkDevice device = vulkanHandler.GetLogicalDevice();
-
-	for (size_t i{ 0 }; i < imageAvailableSemaphores.size();i++) {
+	for (size_t i{ 0 }; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		// Cleanup imageAvailable semaphore
 		if (imageAvailableSemaphores[i] != VK_NULL_HANDLE) {
 			vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
 		}
-	}
-	imageAvailableSemaphores.clear();
-	for (size_t i{ 0 }; i < renderFinishedSemaphores.size();i++) {
-		if (renderFinishedSemaphores[i] != VK_NULL_HANDLE) {
-			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
-		}
-	}
-	renderFinishedSemaphores.clear();
-	for (size_t i = 0; i < inFlightFences.size(); i++) {
+
+		// Cleanup fences
 		if (inFlightFences[i] != VK_NULL_HANDLE) {
 			vkDestroyFence(device, inFlightFences[i], nullptr);
 		}
 	}
-	inFlightFences.clear();
 }

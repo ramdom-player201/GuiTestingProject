@@ -32,10 +32,8 @@ private:
 	// Batches
 	GuiBatches batches;
 
-	// Render resources
+	// Render resources and root renderer
 	GuiRenderResources renderResources;
-
-	// Renderer
 	GuiBatchRootRenderer renderer;
 
 	// Render target (output texture)
@@ -45,13 +43,7 @@ private:
 		VkImageView view{ VK_NULL_HANDLE };
 		VkFramebuffer framebuffer{ VK_NULL_HANDLE };
 	};
-	LayerTexture layerTexture;
-
-	// Cached map for viewport layout data (populated during CalculateLayout by finding ViewportWidgets)
-	//std::unordered_map<uint32_t, DrawRect> viewportLayoutRequests;
-	// ^ Deprecated as Viewports are no longer external
-
-	const VkFormat FORMAT{ VK_FORMAT_R8G8B8A8_SRGB };
+	LayerTexture layerTexture; // <- do we want to keep this a struct as opposed to just raw params?
 
 	// Texture management, as window may be resized
 	void CreateLayerTexture();
@@ -61,7 +53,7 @@ public:
 	explicit GuiLayout(VulkanHandler& vulkanHandler);
 	~GuiLayout();
 
-	void CreateRenderResources();
+	void InitialiseRenderResources(); // Called once only, requires vk to be initialised, initialises GuiRenderResources
 
 	// Safety locks
 	GuiLayout() = delete;
@@ -70,18 +62,21 @@ public:
 	GuiLayout(GuiLayout&&) = delete;
 	GuiLayout& operator=(GuiLayout&&) = delete;
 
-	// Traverse UI tree to populate batches, etc
-	InputEventResult ProcessGui(const InputEvent& event);
-
-	// Records draw commands into provided command buffer
-	void Render(VkCommandBuffer cmd);
+	// Traverse tree, populate batches and record draw commands
+	bool UpdateAndRender(InputEvent& event, VkCommandBuffer cmd);
+	// The tree is traversed depth-first.
+	// A batch ref travels down the tree.
+	// UI subelements (UiScrollingFrame, etc) can overload batches with their own.
+	// These elements record their render commands during traversal, when exiting their nodes upwards.
+	// The top-level batches owned by GuiLayout are handled after tree traversal.
 
 	// Output
 	VkImageView GetTextureView() const { return layerTexture.view; }
+	VkImage GetTextureImage() const { return layerTexture.image; }
 	const GuiRenderResources& GetRenderResources() const { return renderResources; }
 
 	// Sizing
-	void Resize(uint32_t width, uint32_t height);
+	void Refresh(uint32_t width, uint32_t height);
 
 	// Load gui tree based on app state
 	void LoadPage(PageMode mode, const std::string& layoutFilePath); // WIP stub

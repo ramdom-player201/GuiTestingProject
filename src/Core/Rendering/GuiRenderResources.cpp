@@ -89,7 +89,7 @@ void GuiRenderResources::CreateRenderPass() {
 	VkDevice device{ vulkanHandler.GetLogicalDevice() };
 
 	VkAttachmentDescription colourAttachment{};
-	colourAttachment.format = VK_FORMAT_R8G8B8A8_SRGB; // Is the format the same everywhere? Should we move this to a shared header.
+	colourAttachment.format = GuiConstants::RGBA_8_FORMAT;
 	colourAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	colourAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	colourAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
