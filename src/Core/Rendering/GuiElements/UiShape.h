@@ -15,7 +15,7 @@ inline uint32_t PackColour(ColourRGBA_8 c) {
 class UiShape : public UiFrame {
 protected:
 	Vec4 cornerRadii{ 0.0f,0.0f,0.0f,0.0f }; // TL, TR, BR, BL
-	float borderThickness{ 0.0f };
+	float borderThickness{ 5.0f };
 	ColourRGBA_8 baseColour{ 255,255,255,255 }; // White, opaque
 	ColourRGBA_8 borderColour{ 0,0,0,255 }; // Black, opaque
 
@@ -27,6 +27,17 @@ protected:
 	void DrawElement(UiPassParams& params, bool needsRedraw) override;
 public:
 	UiShape();
+
+	// Additional setters and getters
+	void SetCornerRadii(Vec4 radii) { cornerRadii = radii; }
+	void SetBorderThickness(float thickness) { borderThickness = thickness; }
+	void SetBaseColour(ColourRGBA_8 colour) { baseColour = colour; }
+	void SetBorderColour(ColourRGBA_8 colour) { borderColour = colour; }
+
+	Vec4 GetCornerRadii() { return cornerRadii; }
+	float GetBorderThickness() { return borderThickness; }
+	ColourRGBA_8 GetBaseColour() { return baseColour; }
+	ColourRGBA_8 GetBorderColour() { return borderColour; }
 };
 
 

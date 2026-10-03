@@ -27,13 +27,16 @@ layout(location = 0) out vec4 outColor;
 
 // SDF for rounded rectangle
 float sdRoundedBox(vec2 p, vec2 halfSize, vec4 radii) {
-    vec2 d = abs(p) - halfSize;
 
+    // Select radius for quadrant (Screen space Y>0 is down)
     float r;
-    if (p.x < 0.0 && p.y > 0.0)      r = radii.x; // Top-Left
-    else if (p.x > 0.0 && p.y > 0.0) r = radii.y; // Top-Right
-    else if (p.x > 0.0 && p.y < 0.0) r = radii.z; // Bottom-Right
-    else                               r = radii.w; // Bottom-Left
+    if (p.x < 0.0 && p.y < 0.0)      r = radii.x; // Top-Left
+    else if (p.x > 0.0 && p.y < 0.0) r = radii.y; // Top-Right
+    else if (p.x > 0.0 && p.y > 0.0) r = radii.z; // Bottom-Right
+    else                             r = radii.w; // Bottom-Left
+
+    // Fit corners to halfSize boundary
+    vec2 d = abs(p) - halfSize + r;
 
     return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
 }
@@ -47,34 +50,37 @@ void main() {
     vec2 halfSize = fragSizeBorder.xy * 0.5;
     float borderThickness = fragSizeBorder.z;
 
-    // Fill SDF
-    float fillDist = sdRoundedBox(fragLocalPos, halfSize - borderThickness, fragRadii - borderThickness);
+    // Calculate single outer shape SDF
+    float shapeDist = sdRoundedBox(fragLocalPos, halfSize, fragRadii);
 
-    // Outline SDF
-    float outlineDist = sdRoundedBox(fragLocalPos, halfSize, fragRadii);
+    // Calculate anti-aliasing smoothness based on pixel density
+    float outerSoftness = fwidth(shapeDist) * 1.5;
+    float innerSoftness = fwidth(shapeDist + borderThickness) * 1.5;
 
-    // Determine colour
-    vec4 colour;
-    if (fillDist <= 0.0) {
-        colour = fragBaseColour;
-    } else if (outlineDist <= 0.0) {
-        colour = fragBorderColour;
-    } else {
-        discard;
-    }
+    // Calculate masks based on distance
+    // > Outer mask (fade along edge)
+    float outerMask = 1.0 - smoothstep(-outerSoftness, outerSoftness, shapeDist);
 
-    // Anti-aliasing
-    float edgeSoftness = fwidth(outlineDist) * 1.5;
-    float alpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, outlineDist);
+    // > Inner mask (fade along border inner edge)
+    float innerMask = 1.0 - smoothstep(-innerSoftness, innerSoftness, shapeDist + borderThickness);
 
+    // Calculate coverage
+    float fillCoverage = innerMask;
+    float borderCoverage = outerMask - innerMask;
+
+    // Combine colours with pre-multiplied alpha
+    vec3 finalColour = (fragBaseColour.rgb * fragBaseColour.a * fillCoverage) +
+                       (fragBorderColour.rgb * fragBorderColour.a * borderCoverage);
+
+    float finalAlpha = (fragBaseColour.a * fillCoverage) + (fragBorderColour.a * borderCoverage);
+
+    // Clip test (reconstruct absolute screen position)
     vec2 screenPos = fragLocalPos + fragCentre;
-
-    // Clip test
     for (int i = 0; i < clipCount; i++) {
         if (clipSDF(screenPos, clips[i]) > 0.0) {
             discard;
         }
     }
 
-    outColor = vec4(colour.rgb, colour.a * alpha);
+    outColor = vec4(finalColour, finalAlpha);
 }

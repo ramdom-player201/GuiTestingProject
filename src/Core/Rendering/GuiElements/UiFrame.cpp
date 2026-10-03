@@ -12,6 +12,7 @@ bool UiFrame::HandleBindings(UiPassParams& params) {
 
 bool UiFrame::RecalculateLayout(UiPassParams& params) {
 	// Recalculate layout and return true for redraw if updated
+
 	float resolvedX = params.parentContentRect.x
 		+ (params.parentContentRect.width * position.scaleX)
 		+ (position.offsetX * params.guiScaleFactor);
@@ -29,12 +30,6 @@ bool UiFrame::RecalculateLayout(UiPassParams& params) {
 	DrawRect newElementRect{ resolvedX,resolvedY,resolvedW,resolvedH };
 	bool layoutChanged{ newElementRect != absoluteElementRect };
 	absoluteElementRect = newElementRect;
-
-	//LogService::Log(LogType::CATCH, className, "RecalculateLayout",
-	//	"Draw rect is width<" + std::to_string(absoluteElementRect.width) + "> " +
-	//	"height<" + std::to_string(absoluteElementRect.height) + "> " +
-	//	"xPos<" + std::to_string(absoluteElementRect.x) + "> " +
-	//	"yPos<" + std::to_string(absoluteElementRect.y) + "> ");
 
 	return layoutChanged;
 }

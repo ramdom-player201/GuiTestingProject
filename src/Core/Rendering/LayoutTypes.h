@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 #include <vulkan/vulkan.h>
 
 // 2D rectangle for drawing images to screen, must cast to int32_t and uint32_t when passed to VkRect2D
@@ -44,6 +45,15 @@ struct Vec4 {
 		float inW = 0.0f
 	) :x(inX), y(inY), z(inZ), w(inW) {
 	} // constructor
+
+	Vec4 Clamp(float minVal, float maxVal) const {
+		return Vec4{
+			std::clamp(x,minVal,maxVal),
+			std::clamp(y,minVal,maxVal),
+			std::clamp(z, minVal, maxVal),
+			std::clamp(w, minVal, maxVal)
+		};
+	} // Clamping utility
 };
 
 //// A single axis value unioning a ratio and absolute value

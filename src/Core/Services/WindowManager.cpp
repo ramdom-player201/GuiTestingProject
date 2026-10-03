@@ -46,7 +46,7 @@ size_t WindowManager::CountWindows() const
 	constexpr std::string_view functionName{ "CountWindows" };
 
 	//if (debugMode) {
-	LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
+	//LogService::Log(LogType::SPAM, className, functionName, "Current window count: [" + std::to_string(windows.size()) + "]");
 	//}
 
 		//temp++;

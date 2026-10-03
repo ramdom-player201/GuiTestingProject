@@ -51,6 +51,7 @@ WindowReturnData BaseWindow::Update() {
 	);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		LogService::Log(LogType::TRACE, className, functionName, "Outdated KHR");
 		Swapchain_Refresh();
 		return WRD;
 	}
@@ -100,7 +101,8 @@ WindowReturnData BaseWindow::Update() {
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
 		// Swapchain became invalid during presentation
-		//Swapchain_Refresh(); // <- causes a rendering bug on resize, just wait for next frame
+		Swapchain_Refresh(); // <- causes a rendering bug on resize, just wait for next frame
+		LogService::Log(LogType::TRACE, className, functionName, "Outdated OR suboptimal KHR");
 	}
 	else if (result != VK_SUCCESS) {
 		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to present swapchain image");

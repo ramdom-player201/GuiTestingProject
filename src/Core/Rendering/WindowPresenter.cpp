@@ -41,6 +41,8 @@ void WindowPresenter::Refresh(const SwapchainData& data) {
 	bool sizeChanged = (data.swapchainExtent.width != currentExtent.width || // For Framebuffer refresh and GUI resize
 		data.swapchainExtent.height != currentExtent.height);
 
+	LogService::Log(LogType::TRACE, className, functionName, "Attempt refresh :: format<"+std::to_string(formatChanged) + "> & size<" + std::to_string(sizeChanged)+">");
+
 	// F|S -> P|F
 	// _|_ -> _|_ <- no change
 	// *|_ -> *|* <- format refresh all

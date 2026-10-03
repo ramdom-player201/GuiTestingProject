@@ -32,7 +32,7 @@ class UiFrame {
 protected:
 	// Placement
 	ScaleOffset2D position{ 0.0f, 0.0f, 0.0f, 0.0f };
-	ScaleOffset2D size{600.0f, 400.0f, 0.0f, 0.0f };
+	ScaleOffset2D size{0.0f, 0.0f, 0.5f, 0.5f };
 	Vec2 anchorPoint{ 0.0f, 0.0f };
 
 	// Tree hierarchy
@@ -70,6 +70,16 @@ public:
 	void AddChild(std::unique_ptr<UiFrame> child);
 	void RemoveChild(UiFrame* child);
 	void ClearChildren();
+
+	// Setters
+	void SetPosition(ScaleOffset2D newPos) { position = newPos; }
+	void SetSize(ScaleOffset2D newSize) { size = newSize; }
+	void SetAnchorPoint(Vec2 newAnchor) { anchorPoint = newAnchor; }
+
+	// Getters
+	ScaleOffset2D GetPosition() { return position; }
+	ScaleOffset2D GetSize() { return size; }
+	Vec2 GetAnchorPoint() { return anchorPoint; }
 
 	virtual ~UiFrame() = default;
 
