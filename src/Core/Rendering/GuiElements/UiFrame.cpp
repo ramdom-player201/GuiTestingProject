@@ -45,14 +45,19 @@ void UiFrame::ProcessElement(UiPassParams& params) {
 
 	// Layout
 	bool layoutChangedThisFrame{ RecalculateLayout(params) };
-	params.layoutChanged |= layoutChangedThisFrame;
+	params.layoutChanged |= layoutChangedThisFrame; // This inherits layoutChanged from parent, is that necassary?
+
+	// TODO: Does this persist from parent, are there cases where a parent redrawing means a child must too?
+	// Layout changes in resize can already be derived from RecalculateLayout, so do we need to persist from parent?
+	// Also, do layout changes in a child propogate up into a parent before DrawElement is called?
+	// Some elements overload rendering, so may need to know whether they can keep their old texture or submit the batches to redraw it first.
 
 	// Push clip if element clips
 	bool isClipping{ false };
 	if (clipChildren) { // Element has clipping enabled
 		auto clip = GetClipRect();
 		if (clip) { // Element has clipable bounds
-			params.clipStack.rects.push_back(*clip);
+			params.batches->localClipStack.push_back(*clip);
 			isClipping = true;
 		}
 	}
@@ -61,16 +66,13 @@ void UiFrame::ProcessElement(UiPassParams& params) {
 	UiPassParams childParams = params;
 	childParams.parentContentRect = GetContentRect();
 
-	uint32_t currentDepth = params.clipStack.Count();
-	childParams.currentZBucket = currentDepth;
-
 	for (auto& child : children) {
 		child->ProcessElement(childParams);
 	}
 
 	// Pop clip from stack
 	if (isClipping) {
-		params.clipStack.rects.pop_back();
+		params.batches->localClipStack.pop_back();
 	}
 
 	// Input (process inputs from leaf nodes back up the tree)
@@ -79,13 +81,22 @@ void UiFrame::ProcessElement(UiPassParams& params) {
 	// Bindings
 	params.layoutChanged |= HandleBindings(params);
 
+	// DrawElement converts current CPU clip stack into flat GPU SSBO buffer
+
 	// Draw
-	DrawElement(params, params.layoutChanged);
+	DrawElement(params, childParams.layoutChanged); // Second parameter defines whether the descendants updated
 
 	// Propagate results
-	params.result = childParams.result; // May or may not be deprecated
 	params.activeTarget = childParams.activeTarget; // Persists the full update loop across all BaseWindows
 	params.layoutChanged |= childParams.layoutChanged; // Determines whether to redraw the gui root
+
+	// We're propogating the layout change *after* drawing, but do we not need it before?
+	// Let's say a UiCanvas overloads rendering. If *any* of its descendants redraw, it needs to redraw its own texture.
+	// If no descendants redraw, it can reuse its existing texture.
+	// UiCanvas does not exist yet, so it's not too important, but we may need to update this when it gets implementation.
+
+	// Also consider that elements like UiTexture and UiText may need to store cached resources that do not care about the redraw status of descendants.
+	// We *do* need to rely on layoutChanged for descendant changes, but may need to differentiate it from changes of self
 }
 
 // ==================================================

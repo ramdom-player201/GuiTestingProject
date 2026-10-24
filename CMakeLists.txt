@@ -129,7 +129,6 @@ add_executable(
     "src/Core/Program.cpp"
     "src/Core/Services/WindowManager.cpp"
     "src/Core/Services/CommandConsole.cpp"
-   #"src/Core/Window.cpp"
     "src/Core/Services/ObjectManager.cpp"
     "src/Core/Objects/IBaseObject.cpp"
     "src/Core/Pages/WinTile.cpp"
@@ -144,15 +143,14 @@ add_executable(
     "src/Core/Services/IService.h" # <- no .cpp file
     "src/Core/Services/LocalisedTextService.h"
 
-    #"src/Core/Rendering/LayoutCompositor.cpp" # <- due to be deprecated
     "src/Core/Rendering/WindowPresenter.cpp"
     "src/Core/Rendering/GuiLayout.cpp"
-    #"src/Core/Rendering/Viewport.cpp" # <- deprecated
     "src/Core/Rendering/LayoutTypes.h" # <- no .cpp file
     "src/Core/Rendering/GuiRenderResources.cpp"
     "src/Core/Rendering/GuiBatchRootRenderer.cpp"
     "src/Core/Rendering/GuiElements/UiFrame.cpp"
     "src/Core/Rendering/GuiElements/UiShape.cpp"
+    "src/Core/Rendering/GuiClipSsbo.cpp"
 )
 
 add_library(

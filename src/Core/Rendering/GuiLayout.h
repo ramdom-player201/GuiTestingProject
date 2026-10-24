@@ -5,15 +5,16 @@
 #include <unordered_map>
 #include <memory>
 
-#include "LayoutTypes.h" // Required for DrawRect (possibly PanelType, but that is stub right now)
-#include "GuiRenderResources.h"
+#include "LayoutTypes.h"
 #include "GuiBatchRootRenderer.h"
 #include "GuiElements/UiFrame.h"
+#include "GuiClipSsbo.h"
 
 // Forward declarations
 class VulkanHandler;
+class GuiRenderResources; 
 
-enum class PageMode :uint8_t {
+enum class PageMode :uint8_t { // probably going to deprecate this
 	DockableEditor,
 	DedicatedViewer,
 	SplashScreen
@@ -32,9 +33,13 @@ private:
 	// Batches
 	GuiBatches batches;
 
-	// Render resources and root renderer
-	GuiRenderResources renderResources;
+	//GuiRenderResources renderResources; <- now owned by VulkanHandler
+	
+	// Batch renderer
 	GuiBatchRootRenderer renderer;
+
+	// Clip SSBO (to push clipChain data on the GPU)
+	GuiClipSsbo clipSsbo;
 
 	// Render target (output texture)
 	struct LayerTexture {
@@ -44,6 +49,9 @@ private:
 		VkFramebuffer framebuffer{ VK_NULL_HANDLE };
 	};
 	LayerTexture layerTexture; // <- do we want to keep this a struct as opposed to just raw params?
+	// We definitely do need to rename the struct at minimum, since the concept of texture layers is deprecated
+	// All UI elements exist in one tree and render to one target, which differs from how an older version of this architecture worked
+	// The struct has only one usage, and that is here; so is it just bloat to keep it?
 
 	// Texture management, as window may be resized
 	void CreateLayerTexture();
@@ -73,7 +81,7 @@ public:
 	// Output
 	VkImageView GetTextureView() const { return layerTexture.view; }
 	VkImage GetTextureImage() const { return layerTexture.image; }
-	const GuiRenderResources& GetRenderResources() const { return renderResources; }
+	//const GuiRenderResources& GetRenderResources() const { return renderResources; } <- deprecated
 
 	// Sizing
 	void Refresh(uint32_t width, uint32_t height);

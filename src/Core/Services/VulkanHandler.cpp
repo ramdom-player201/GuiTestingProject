@@ -272,6 +272,8 @@ void VulkanHandler::InitialiseDevices(const VkSurfaceKHR& surface)
 {
 	PickPhysicalDevice(surface);
 	CreateLogicalDevice(surface);
+
+	guiRenderResources.Initialise(vulkanInstance, physicalDevice, logicalDevice);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -442,6 +444,11 @@ uint32_t VulkanHandler::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlag
 
 VulkanHandler::~VulkanHandler() {
 	constexpr std::string_view functionName{ "Destructor" };
+
+	if (guiRenderResources.IsInitialised()) {
+		guiRenderResources.Cleanup();
+		LogService::Log(LogType::TRACE, className, functionName, "Cleaned Render Resources");
+	}
 
 	if (logicalDevice != VK_NULL_HANDLE) {
 		vkDestroyDevice(logicalDevice, nullptr);

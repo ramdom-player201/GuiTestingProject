@@ -56,37 +56,6 @@ struct Vec4 {
 	} // Clamping utility
 };
 
-//// A single axis value unioning a ratio and absolute value
-//struct UDim {
-//	float scale{ 0.0f }; // 0.0 to 1.0 (ratio of parent size
-//	float offset{ 0.0f }; // Absolute pixels, but multiplied by scale
-//
-//	UDim(float inScale = 0.0f, float inOffset = 0.0f) :scale(inScale), offset(inOffset) {} // Constructor
-//
-//	// Comparison operators
-//	//bool operator==(const UDim& other) const {
-//	//	return scale == other.scale && offset == other.offset;
-//	//}
-//	//bool operator!=(const UDim& other) const { return !(*this == other); }
-//};
-//
-//// 2D coordinate or size
-//struct UDim2 {
-//	UDim x;
-//	UDim y;
-//
-//	UDim2(float scaleX = 0.0f, float offsetX = 0.0f, float scaleY = 0.0f, float offsetY = 0.0f) :
-//		x(scaleX, offsetX), y(scaleY, offsetY) {
-//	} // Constructor from raw values
-//	UDim2(UDim inX, UDim inY) :x(inX), y(inY) {} // Constructor from UDim pair
-//
-//	// Comparison operators
-//	//bool operator==(const UDim2& other) const {
-//	//	return x == other.x && y == other.y;
-//	//}
-//	//bool operator!=(const UDim2& other) const { return !(*this == other); }
-//};
-
 struct ScaleOffset2D {
 	float offsetX{ 0.0f };
 	float offsetY{ 0.0f };
@@ -114,33 +83,30 @@ struct ColourRGBA_8 {
 
 // Input structs
 struct InputEvent {
-
-};
-
-struct InputEventResult {
-	bool inputConsumed{ false }; // Is the input consumed by the gui, or does it need to be passed to a viewport?
-	uint32_t targetViewportId{ UINT32_MAX }; // Max acts as null value (no viewport)
-	// Mouse coordinates relative to the viewport instead of screen (only valid if viewport)
-	float localX{ 0.0f };
-	float localY{ 0.0f };
+	// store mouse input data
+	// store keyboard input data
+	// store pointer to uiTarget
+	// store whether the UI was used (fallback to reset target)
+	// store result (what exactly is needed for this?)
 };
 
 // Layout types
-struct ShapeVertex {
-	float pos[2]{ 0.0f, 0.0f };			// {X,Y}
+struct ShapeInstance {
 	float centre[2]{ 0.0f, 0.0f };		// {X,Y}
 	uint32_t packedBaseColour{ 0 };		// R,G,B,A
 	uint32_t packedBorderColour{ 0 };	// R,G,B,A
 	float sizeAndBorder[4]{ 0,0,0,0 };	// {width,height,thickness,empty}
 	float radii[4]{ 0, 0, 0, 0 };		// {TL,TR,BR,BL}
+	uint32_t clipStackOffset{ 0 };		// Index into SSBO for element clip start
+	uint32_t clipCount{ 0 };			// Number of clips to read from SSBO
 };
-static_assert(sizeof(ShapeVertex) == 56, "ShapeVertex size mismatch, check struct layout");
+static_assert(sizeof(ShapeInstance) == 56, "ShapeInstance size mismatch, check struct layout");
 
-struct TextVertex {
+struct TextInstance {
 	// stub
 };
 
-struct TextureVertex {
+struct TextureInstance {
 	// stub
 };
 
@@ -158,42 +124,41 @@ struct ClipRect {
 	float rBL{ 0.0f };
 };
 
-struct ClipStack {
-	std::vector<ClipRect> rects;
-
-	uint32_t Count() const { return static_cast<uint32_t>(rects.size()); }
-	size_t DataSize() const { return rects.size() * sizeof(ClipRect); }
-	const void* DataPtr() const { return rects.empty() ? nullptr : rects.data(); }
+enum class DrawRequestType :uint8_t {
+	Undefined,
+	Shape,
+	Text,
+	Texture
 };
 
-struct ZBucket {
-	ClipStack clipStack;
-	std::vector<ShapeVertex> shapes;
-	std::vector<TextVertex> text;
-	std::vector<TextureVertex> textures;
+struct DrawRequest {
+	DrawRequestType type{ DrawRequestType::Undefined }; // Which batch to draw from
+	uint32_t instanceIndex{ 0 }; // Where in the buffer to get this draw's data
 };
 
 struct GuiBatches {
-	std::map<uint32_t, ZBucket> zBuckets; // child depth component of Z ordering (integer)
+	// Render list
+	std::vector<DrawRequest> renderList;
+
+	// Clip rect buffer
+	std::vector<ClipRect> finalClipChain; // This gets submitted to the GPU's SSBO at the rendering stage
+	std::vector<ClipRect> localClipStack; // Local cache of current clipstack sample, appended to SSBO stack for each element after mutation
+
+	// Instancing buffers store continuous data, and are appended to during tree traversal
+	std::vector<ShapeInstance> shapes;
+	std::vector<TextInstance> text;
+	std::vector<TextureInstance> textures;
 
 	void Clear() {
-		for (auto& [z, bucket] : zBuckets) {
-			bucket.clipStack.rects.clear();
-			bucket.shapes.clear();
-			bucket.text.clear();
-			bucket.textures.clear();
-		}
-		zBuckets.clear();
+		renderList.clear();
+		finalClipChain.clear();
+		localClipStack.clear();
+		shapes.clear();
+		text.clear();
+		textures.clear();
 	}
 
-	bool IsEmpty() const {
-		for (const auto& [z, bucket] : zBuckets) {
-			if (!bucket.shapes.empty() || !bucket.text.empty() || !bucket.textures.empty()) {
-				return false;
-			}
-		}
-		return true;
-	}
+	bool IsRenderListEmpty() const { return renderList.empty(); }
 };
 
 struct RenderTarget {

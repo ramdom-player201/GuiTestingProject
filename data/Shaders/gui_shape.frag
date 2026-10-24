@@ -7,21 +7,19 @@ layout(location = 2) in vec4 fragBorderColour;
 layout(location = 3) in vec4 fragSizeBorder;
 layout(location = 4) in vec4 fragRadii;
 layout(location = 5) in vec2 fragCentre;
+layout(location = 6) flat in uint fragClipStackOffset;
+layout(location = 7) flat in uint fragClipCount;
 
-// Push constants: clip stack
-struct ClipRect {
+// SSBO: Clip rect buffer
+struct ClipRect{
     vec2 pos;
     vec2 halfSize;
     vec4 radii;
 };
 
-layout(push_constant, std430) uniform FragPush {
-    layout(offset = 16) ClipRect clips[3];
-    int clipCount;
-    int _pad0;
-    int _pad1;
-    int _pad2;
-};
+layout(std430, set = 0, binding = 0) readonly buffer ClipData{
+    ClipRect clips[];
+} clipData;
 
 layout(location = 0) out vec4 outColor;
 
@@ -47,6 +45,14 @@ float clipSDF(vec2 pos, ClipRect clip) {
 }
 
 void main() {
+    // Clip test (reconstruct absolute screen position)
+    vec2 screenPos = fragLocalPos + fragCentre;
+    for (uint i = 0; i < fragClipCount; i++) {
+        if (clipSDF(screenPos, clipData.clips[fragClipStackOffset + i]) > 0.0) {
+            discard; // early exit so redundant calculations can be skipped
+        }
+    }
+
     vec2 halfSize = fragSizeBorder.xy * 0.5;
     float borderThickness = fragSizeBorder.z;
 
@@ -73,14 +79,6 @@ void main() {
                        (fragBorderColour.rgb * fragBorderColour.a * borderCoverage);
 
     float finalAlpha = (fragBaseColour.a * fillCoverage) + (fragBorderColour.a * borderCoverage);
-
-    // Clip test (reconstruct absolute screen position)
-    vec2 screenPos = fragLocalPos + fragCentre;
-    for (int i = 0; i < clipCount; i++) {
-        if (clipSDF(screenPos, clips[i]) > 0.0) {
-            discard;
-        }
-    }
 
     outColor = vec4(finalColour, finalAlpha);
 }

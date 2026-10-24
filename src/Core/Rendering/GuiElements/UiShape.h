@@ -21,7 +21,7 @@ protected:
 
 	// Transparency not stored, but written into colour's RGBA via Getter/Setter
 
-	ShapeVertex cachedVertices[4]{};
+	ShapeInstance cachedInstance{};
 
 	std::optional<ClipRect> GetClipRect() const override;
 	void DrawElement(UiPassParams& params, bool needsRedraw) override;
@@ -34,10 +34,10 @@ public:
 	void SetBaseColour(ColourRGBA_8 colour) { baseColour = colour; }
 	void SetBorderColour(ColourRGBA_8 colour) { borderColour = colour; }
 
-	Vec4 GetCornerRadii() { return cornerRadii; }
-	float GetBorderThickness() { return borderThickness; }
-	ColourRGBA_8 GetBaseColour() { return baseColour; }
-	ColourRGBA_8 GetBorderColour() { return borderColour; }
+	Vec4 GetCornerRadii() const { return cornerRadii; }
+	float GetBorderThickness() const { return borderThickness; }
+	ColourRGBA_8 GetBaseColour() const { return baseColour; }
+	ColourRGBA_8 GetBorderColour() const { return borderColour; }
 };
 
 

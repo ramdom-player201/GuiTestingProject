@@ -2,6 +2,8 @@
 
 #include "LogService.h"
 
+#include "../Rendering/GuiRenderResources.h"
+
 #include <vulkan/vulkan.h>
 #include <optional>
 #include <string>
@@ -34,6 +36,9 @@ private:
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice deviceToCheck, const VkSurfaceKHR& surface) const;
 	void PickPhysicalDevice(const VkSurfaceKHR& surface); // Requires a surface to check present support
 	void CreateLogicalDevice(const VkSurfaceKHR& surface); // Pass surface to ensure queue families are correct
+
+	// 2D gui global rendering resources
+	GuiRenderResources guiRenderResources;
 public:
 	// Safety locks to prevent copy/move/reassignment
 	VulkanHandler() = default;
@@ -106,6 +111,18 @@ public:
 			);
 		}
 		return presentQueue;
+	}
+
+	const GuiRenderResources& GetGuiRenderResources() const {
+		if (!guiRenderResources.IsInitialised()) {
+			LogService::Log(
+				LogType::CRITICAL,
+				className,
+				"GetGuiRenderResources",
+				"GuiRenderResources not initialised"
+			);
+		}
+		return guiRenderResources;
 	}
 
 	// Hardware queries

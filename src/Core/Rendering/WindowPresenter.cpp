@@ -147,7 +147,7 @@ VkCommandBuffer WindowPresenter::UpdateAndPresent(InputEvent& input, uint32_t im
 		rpInfo.renderArea.extent = currentExtent;
 
 		// Start by clearing the existing image
-		VkClearValue clearValue = { {{0.1f, 0.1f, 0.1f, 1.0f}} }; // Dark grey background
+		VkClearValue clearValue = { {{0.1f, 0.1f, 0.0f, 1.0f}} }; // Dark yellow background
 		rpInfo.clearValueCount = 1;
 		rpInfo.pClearValues = &clearValue;
 

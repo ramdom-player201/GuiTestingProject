@@ -1,0 +1,1 @@
+DeprecationCache folder is a place to put old files when doing large refactors, in order to quickly revert failed refactors or to reference during a refactor

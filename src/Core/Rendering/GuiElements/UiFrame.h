@@ -18,12 +18,8 @@ struct UiPassParams {
 	DrawRect parentContentRect;			// The screen rect to which child elements are relative to
 	float guiScaleFactor{ 1.0f };		// Scale factor for gui elements, defaults to global, but individual elements can override downstream
 	// Output
-	InputEventResult result;			// The result of the current action, generally used to pass inputs to Viewports
 	GuiBatches* batches{ nullptr };		// For batch rendering of UI elements
 	bool layoutChanged{ false };		// Do not redraw gui texture unless something changes
-	// Clipping
-	ClipStack clipStack;
-	uint32_t currentZBucket{ 0 };		// Integer component of Z bucket index
 };
 
 // UiFrame is an empty container and base class for gui elements
@@ -44,10 +40,10 @@ protected:
 
 	// State
 	bool visible{ true }; // Skip processing if hidden
-	bool visualsChanged{ false }; // Force redraw if the visuals change
+	//bool visualsChanged{ false }; // Force redraw if the visuals change <- not used?
 	bool clipChildren{ false }; // Defaults to off
 
-	uint32_t zOrder{ 0 };
+	//uint32_t zOrder{ 0 }; <- not used?
 
 	virtual std::optional<ClipRect> GetClipRect() const { return std::nullopt; }
 	virtual DrawRect GetContentRect() const { return absoluteElementRect; }
@@ -56,7 +52,12 @@ protected:
 	virtual bool ProcessInput(UiPassParams& params);
 	virtual bool HandleBindings(UiPassParams& params);
 	virtual bool RecalculateLayout(UiPassParams& params);
-	virtual void DrawElement(UiPassParams& params, bool needsRedraw);
+	virtual void DrawElement(UiPassParams& params, bool descendantsUpdated);
+
+	// Draw info
+	// UiShape - recalculates all, caches nothing, ignores layoutChanged
+	// UiText - recalculate only if necessary, checks params.layoutChanged
+	// UiCanvas - recalculates if either itself or its descendants updated, else blits last cycle's result
 
 	//UiFrame() = default;
 public:

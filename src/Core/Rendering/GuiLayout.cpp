@@ -13,8 +13,8 @@
 
 GuiLayout::GuiLayout(VulkanHandler& vulkanHandler)
 	: vulkanHandler(vulkanHandler),
-	renderResources(vulkanHandler),
-	renderer(vulkanHandler, renderResources)
+	renderer(vulkanHandler),
+	clipSsbo(vulkanHandler)
 {
 	constexpr std::string_view functionName{ "Constructor" };
 
@@ -23,37 +23,58 @@ GuiLayout::GuiLayout(VulkanHandler& vulkanHandler)
 	auto testShape1{ std::make_unique<UiShape>() };
 	auto testShape2{ std::make_unique<UiShape>() };
 	auto testShape3{ std::make_unique<UiShape>() };
+	auto testShape4{ std::make_unique<UiShape>() };
+	auto testShape5{ std::make_unique<UiShape>() };
 
 	// root frame covers full space
 	testRoot->SetSize({ 0.0f, 0.0f, 1.0f, 1.0f });
 
 	// shape 1 top left corner
 	testShape1->SetSize({ 0.0f, 0.0f, 0.5f, 0.5f });
-	testShape1->SetBaseColour({ 255,0,0,150 });
-	testShape1->SetBorderColour({ 0,0,0,255 });
+	// default position
+	testShape1->SetBaseColour({ 255,0,0,150 }); // Red, partial transparency
+	testShape1->SetBorderColour({ 0,0,0,255 }); // Black, opaque
 	testShape1->SetBorderThickness(5);
 	testShape1->SetCornerRadii({ 50.0f,0.0f,0.0f,0.0f });
 
 	// shape 2 bottom left corner
 	testShape2->SetSize({ 0.0f, 0.0f, 0.5f, 0.5f });
 	testShape2->SetPosition({ 0.0f,0.0f,0.0f,0.5f });
-	testShape2->SetBaseColour({ 0,255,0,150 });
-	testShape2->SetBorderColour({ 255,0,255,255 });
+	testShape2->SetBaseColour({ 0,255,0,150 }); // Green, partial transparency
+	testShape2->SetBorderColour({ 255,0,255,255 }); // Magenta, opaque
 	testShape2->SetBorderThickness(2);
 	testShape2->SetCornerRadii({ 0.0f,0.0f,0.0f,50.0f });
 
 	// shape 3 right edge
 	testShape3->SetSize({ 0.0f, 0.0f, 0.5f, 1.0f });
 	testShape3->SetPosition({ 0.0f,0.0f,0.5f,0.0f });
-	testShape3->SetBaseColour({ 0,0,255,150 });
-	testShape3->SetBorderColour({ 255,0,0,255 });
+	testShape3->SetBaseColour({ 0,0,255,150 }); // Blue, partial transparency
+	testShape3->SetBorderColour({ 255,0,0,255 }); // Red, opaque
 	testShape3->SetBorderThickness(15);
 	testShape3->SetCornerRadii({ 0.0f,150.0f,150.0f,0.0f });
 
+	// shape 4 centre underneath others
+	testShape4->SetSize({ 0.0f,0.0f,0.5f,0.5f });
+	testShape4->SetPosition({ 0.0f,0.0f,0.25f,0.25f });
+	testShape4->SetBaseColour({ 255,0,0,150 }); // Red, partial transparency
+	testShape4->SetBorderColour({ 0,0,0,255 }); // Black, opaque
+	testShape4->SetBorderThickness(10);
+	testShape4->SetCornerRadii({ 25.f,25.f,25.f,25.f });
+
+	// Shape 5
+	testShape5->SetSize({ 0.0f,0.0f,1.f,1.f });
+	testShape5->SetPosition({ 0.0f,0.0f,0.5f,-0.5f });
+	testShape5->SetBaseColour({ 255,255,0,255 }); // Yellow, opaque
+	testShape5->SetBorderColour({ 0,0,0,0 }); // Invisible
+	testShape5->SetCornerRadii({ 0.f,0.f,0.f,0.f });
+	testShape3->AddChild(std::move(testShape5)); // To test clipping
+
 	// You cannot run commands on these elements after moving them
+	testRoot->AddChild(std::move(testShape4));
 	testRoot->AddChild(std::move(testShape1));
 	testRoot->AddChild(std::move(testShape2));
 	testRoot->AddChild(std::move(testShape3));
+	
 
 	treeRoot = std::move(testRoot);
 }
@@ -64,8 +85,9 @@ GuiLayout::~GuiLayout() {
 }
 
 void GuiLayout::InitialiseRenderResources() {
-	renderResources.CreateResources();
-	renderer.CreateResources(8192);
+	// renderResources.CreateResources(); <- handled from VulkanHandler now
+	renderer.CreateResources(8192); // handle 8192 gui elements
+	clipSsbo.CreateResources(1024); // Handle 1024 clips
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +162,7 @@ void GuiLayout::CreateLayerTexture() {
 	// Create Framebuffer
 	VkFramebufferCreateInfo fbInfo{};
 	fbInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	fbInfo.renderPass = renderResources.GetRenderPass();
+	fbInfo.renderPass = vulkanHandler.GetGuiRenderResources().GetRenderPass();
 	fbInfo.attachmentCount = 1;
 	fbInfo.pAttachments = &layerTexture.view;
 	fbInfo.width = currentWindowWidth;
@@ -213,55 +235,6 @@ void GuiLayout::Refresh(uint32_t width, uint32_t height) {
 	CreateLayerTexture();
 }
 
-//bool GuiLayout::ProcessGui(const InputEvent& event) {
-//	constexpr std::string_view functionName{ "ProcessGui" };
-//
-//	if (layerTexture.view == VK_NULL_HANDLE) {
-//		LogService::Log(LogType::ERROR, className, functionName, "Cannot process GUI without initialised texture");
-//		return false; // do not attempt to draw
-//	}
-//
-//	batches.Clear(); // Clear batches from previous frame
-//
-//	// Setup params for tree traversal
-//	UiPassParams params;
-//	params.event = event;
-//	params.activeTarget = nullptr; // TODO: must persist from last frame
-//	params.parentContentRect = { 0.0f,0.0f,static_cast<float>(currentWindowWidth),static_cast<float>(currentWindowHeight) };
-//	params.guiScaleFactor = 1.0f; // TODO: load from settings
-//	params.batches = &batches;
-//	params.layoutChanged = false;
-//
-//	//LogService::Log(LogType::WIP, className, functionName, "Some UiPassParams values still need TODO work, see comments");
-//
-//	if (treeRoot) {
-//		treeRoot->ProcessElement(params);
-//	}
-//
-//	//LogService::Log(LogType::WIP, className, functionName, "InputEventResult might need to be deprecated");
-//	// ^ We no longer store Viewports externally, so its original function is null unless we need it for something else
-//
-//	return params.layoutChanged;
-//}
-
-//void GuiLayout::RenderFinal(VkCommandBuffer cmd) {
-//	constexpr std::string_view functionName{ "Render" };
-//
-//	if (layerTexture.view == VK_NULL_HANDLE) {
-//		LogService::Log(LogType::ERROR, className, functionName, "Cannot render without initialised texture");
-//		return;
-//	}
-//
-//	// Build render target from layer texture
-//	RenderTarget target;
-//	target.imageView = layerTexture.view;
-//	target.framebuffer = layerTexture.framebuffer;
-//	target.width = currentWindowWidth;
-//	target.height = currentWindowHeight;
-//
-//	renderer.Render(cmd, batches, target);
-//}
-
 bool GuiLayout::UpdateAndRender(InputEvent& event, VkCommandBuffer cmd)
 {
 	constexpr std::string_view functionName{ "UpdateAndRender" };
@@ -289,6 +262,9 @@ bool GuiLayout::UpdateAndRender(InputEvent& event, VkCommandBuffer cmd)
 		treeRoot->ProcessElement(params);
 	}
 
+	// Upload accumulated clipChain to SSBO
+	clipSsbo.Upload(batches.finalClipChain);
+
 	// Build render target from layer texture
 	RenderTarget target;
 	target.imageView = layerTexture.view;
@@ -296,7 +272,7 @@ bool GuiLayout::UpdateAndRender(InputEvent& event, VkCommandBuffer cmd)
 	target.width = currentWindowWidth;
 	target.height = currentWindowHeight;
 
-	renderer.Render(cmd, batches, target);
+	renderer.Render(cmd, batches, target,clipSsbo.GetDescriptorSet());
 
 	return params.layoutChanged;
 }
