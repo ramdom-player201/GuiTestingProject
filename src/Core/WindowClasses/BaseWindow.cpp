@@ -325,6 +325,7 @@ void BaseWindow::Swapchain_Create(VkSwapchainKHR oldSwapchain) {
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.clipped = VK_TRUE;
 	createInfo.oldSwapchain = oldSwapchain;
+	createInfo.presentMode = presentMode;
 
 	if (vkCreateSwapchainKHR(vulkanHandler.GetLogicalDevice(), &createInfo, nullptr, &swapchainData.swapchain) != VK_SUCCESS) {
 		LogService::Log(LogType::CRITICAL, className, functionName, "Failed to create swapchain");
