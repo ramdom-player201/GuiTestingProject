@@ -6,13 +6,6 @@
 
 # Investigate ansi colours rendering incorrectly when running binary exe directly, but rendering correctly when ran via VisualStudio.	[ ]
 
-# Sort of Object tree with child/parent architecture. Allow windows to contain objects via ObjectManager.								[ ]
-# Evaluate whether to make all services into Objects.																					[X]
-Services will be static, not objects
-
-# Test that Services are not directly instanciatable and that Services system functions correctly.										[X]
-Can remove custom singleton logic and just use static
-
 # Evaluate and implement a new input system.																							[ ]
 
 # Allow windows to report when in focus and allow WindowManager to select a single active window to route inputs into.					[ ]

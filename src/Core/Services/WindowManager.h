@@ -6,7 +6,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include "../Window.h"
 #include "../WindowClasses/BaseWindow.h"
 
 // Valid Window Types

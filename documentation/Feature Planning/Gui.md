@@ -89,20 +89,24 @@ FILE [PagePanel]
 # defines actual widget subtree for a given panel
 # users can create custom panels by editing this without touching the raw C++ code
 
-# WIDGET SUBCLASSES
+# UI ELEMENTS
 
-CLASS [UiWidget -> WindowTile]
-# spacial container inside a DockingArea
+CLASS [UiFrame -> UiDockingLayout]
+# holds a set of UiDockingTiles
+# accepts docking inputs
+
+CLASS [UiFrame -> UiDockingTile]
+# spacial container inside a UiDockingLayout
 # holds 0 or more tabs
 # hidden when 0 tabs
 # tab switcher included when 2 or more tabs
 
-CLASS [UiWidget -> ViewportWidget]
-# represents the space where an actual viewport would be in the gui
-# does not actually do any 3D handling
-# special input handling, returns a viewport id for GuiLayout to forward to the real Viewport
+CLASS [UiFrame -> UiViewport]
+# holds a reference to a 3D scene
+# holds 3 textures
+# a seperate rendering service renders the 3D scene into UiViewport's textures, alternate between them such that there is always one idle to read from at all times
 
-CLASS [UiWidget -> ShapeWidget]
+CLASS [UiFrame -> UiShape]
 # parametric shape definition
 # can tune individual corner radii
 

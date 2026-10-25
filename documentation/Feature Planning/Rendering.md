@@ -36,20 +36,19 @@ CLASS [VulkanHandler]
 # holds vulkan rendering content shared across program
 # lifetime managed by Program
 
-CLASS [LayoutCompositor]
+CLASS [WindowPresenter]
 - VulkanHandler reference
 - GuiLayout
-- map<uint32_t, shared_ptr<Viewport>>
-# requests the gui and viewport output textures; composites them together and renders them to swapchain
+# tells Guilayout to render and then applies the output texture to BaseWindow's swapchain
 
 CLASS [GuiLayout]
 - etc
 # holds a gui tree
 # processes tree when modified and renders result to texture for compositing
 # see [[Gui.md]] for more details on gui rendering
-# lifetime managed by LayoutCompositor
+# lifetime managed by WindowPresenter
 
-CLASS [Viewport]
+DEPRECATED CLASS [Viewport]
 - etc
 # unlike GuiLayout, this class may not be exclusively used by the gui system
 # rendering is processed by a separate JobHandler system, allowing multi-threading and decoupling from UI render thread
@@ -66,3 +65,12 @@ CLASS [Viewport]
 # Windows are rendered one at a time via their Compositors
 # Each Viewport and GuiLayout gives the Compositor their latest finished VkImage
 # Viewports may do their actual rendering in separate corountines, but only wheir their target scenes differ
+
+CLASS [GuiRenderResources]
+- etc
+
+CLASS [GuiBatchRootRenderer]
+- etc
+
+CLASS [GuiClipSsbo]
+- etc

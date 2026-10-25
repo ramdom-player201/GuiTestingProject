@@ -127,30 +127,29 @@ endif()
 add_executable(
     main src/main.cpp
     "src/Core/Program.cpp"
-    "src/Core/Services/WindowManager.cpp"
-    "src/Core/Services/CommandConsole.cpp"
-    "src/Core/Services/ObjectManager.cpp"
-    "src/Core/Objects/IBaseObject.cpp"
-    "src/Core/Pages/WinTile.cpp"
-    "src/Core/Pages/UiPanel.cpp"
-    "src/Core/Services/LogService.cpp"
-    "src/Core/Services/FileManager.cpp"
-    "src/Core/Services/VulkanHandler.cpp"
-    "src/Core/WindowClasses/BaseWindow.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
-    "src/Core/Services.h" # <- no .cpp file
-    "src/Core/Services/IService.h" # <- no .cpp file
-    "src/Core/Services/LocalisedTextService.h"
+    "src/Core/Services/LogService.cpp"
+    "src/Core/Services/FileManager.cpp"
 
+    "src/Core/Services/WindowManager.cpp"
+    "src/Core/Services/VulkanHandler.cpp"
+
+    "src/Core/WindowClasses/BaseWindow.cpp"
     "src/Core/Rendering/WindowPresenter.cpp"
     "src/Core/Rendering/GuiLayout.cpp"
+
     "src/Core/Rendering/LayoutTypes.h" # <- no .cpp file
     "src/Core/Rendering/GuiRenderResources.cpp"
     "src/Core/Rendering/GuiBatchRootRenderer.cpp"
+    "src/Core/Rendering/GuiClipSsbo.cpp"
+
     "src/Core/Rendering/GuiElements/UiFrame.cpp"
     "src/Core/Rendering/GuiElements/UiShape.cpp"
-    "src/Core/Rendering/GuiClipSsbo.cpp"
+
+    "src/Core/Pages/UiPanel.cpp"  
+
+    "src/Core/Services/LocalisedTextService.h"
 )
 
 add_library(

@@ -1,4 +1,4 @@
-# Step 1:		[ ]
+# Step 1:		[X]
 		setup vulkan and be able to render a triangle
 		ensure windowing system is functional, and windows can be resized
 # Step 2:		[ ]
