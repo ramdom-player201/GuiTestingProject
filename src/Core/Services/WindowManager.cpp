@@ -4,7 +4,7 @@
 #include "LogService.h"
 #include <vector>
 
-size_t WindowManager::CreateWindow(const std::string& title) {
+uint32_t WindowManager::CreateWindow(const std::string& title) {
 	constexpr std::string_view functionName{ "CreateWindow" };
 
 	// creates a new Window and adds it to map
@@ -41,7 +41,7 @@ size_t WindowManager::CreateWindow(const std::string& title) {
 
 // int temp{ 0 };
 
-size_t WindowManager::CountWindows() const
+uint32_t WindowManager::CountWindows() const
 {
 	constexpr std::string_view functionName{ "CountWindows" };
 
@@ -58,7 +58,7 @@ size_t WindowManager::CountWindows() const
 	return windows.size();
 }
 
-BaseWindow* WindowManager::GetWindowById(size_t id) const
+BaseWindow* WindowManager::GetWindowById(uint32_t id) const
 {
 	constexpr std::string_view functionName{ "GetWindowById" };
 
@@ -79,7 +79,7 @@ BaseWindow* WindowManager::GetWindowById(size_t id) const
 	return nullptr;
 }
 
-void WindowManager::CloseWindow(size_t id)
+void WindowManager::CloseWindow(uint32_t id)
 {
 	constexpr std::string_view functionName{ "CloseWindow" };
 

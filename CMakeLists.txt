@@ -148,6 +148,10 @@ add_executable(
     "src/Core/Rendering/GuiElements/UiFrame.cpp"
     "src/Core/Rendering/GuiElements/UiShape.cpp"
 
+    "src/Core/ProgramContexts/Base_AbstractContext.cpp"
+    "src/Core/ProgramContexts/Core_ProjectPicker.cpp"
+    "src/Core/ProgramContexts/Dev_GuiTestingPane.cpp"
+
     "src/Core/Pages/UiPanel.cpp"  
 
     "src/Core/Services/LocalisedTextService.h"

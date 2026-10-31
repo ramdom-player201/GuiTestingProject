@@ -3,6 +3,8 @@
 #include "LogService.h"
 #include "WindowManager.h"
 
+#include "../ProgramContexts/Base_AbstractContext.h"
+
 enum class ProgramContext : uint8_t {
 	// Debug
 	Debug_Error = 0,
@@ -19,6 +21,7 @@ enum class ProgramContext : uint8_t {
 class ProgramContextManager {
 private:
 	WindowManager& windowManager;
+	std::vector<std::unique_ptr<Base_AbstractContext>> contexts;
 
 public:
 

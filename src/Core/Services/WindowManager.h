@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "IService.h"
 #include <string>
 #include <memory>
 #include <vector>
@@ -8,33 +7,22 @@
 
 #include "../WindowClasses/BaseWindow.h"
 
-// Valid Window Types
-//enum class WindowTypes : uint8_t {
-//	TooltipWindow,
-//	ContextWindow,
-//	TiledWindow,
-//	DedicatedWindow,
-//	TestWindow,
-//};
-
 class WindowManager {
 private:
 	//static inline std::vector<std::unique_ptr<Window>> windows;
-	std::unordered_map<size_t, std::unique_ptr<BaseWindow>> windows;	// list of windows with unique numeric id that does not shift
-	size_t currentId{ 0 };												// initial id
+	std::unordered_map<uint32_t, std::unique_ptr<BaseWindow>> windows;	// list of windows with unique numeric id that does not shift
+	uint32_t currentId{ 0 };											// initial id
 	VulkanHandler& vulkanHandler;
 public:
-	//void initialise() override;
-	//void shutdown() override;
 
 	// debug
 	bool debugMode{ false };
 
 	// service-specific functionality
-	size_t CreateWindow(const std::string& title);						// creates a new window and adds it to list
-	size_t CountWindows() const;										// returns number of windows in list
-	BaseWindow* GetWindowById(size_t id) const;							// returns a copy of a pointer to the window, based on its position in the vector
-	void CloseWindow(size_t id);										// closes the referenced window
+	uint32_t CreateWindow(const std::string& title);					// creates a new window and adds it to list
+	uint32_t CountWindows() const;										// returns number of windows in list
+	BaseWindow* GetWindowById(uint32_t id) const;						// returns a copy of a pointer to the window, based on its position in the vector
+	void CloseWindow(uint32_t id);										// closes the referenced window
 
 	bool UpdateWindows();												// loop through windows, calling update on each one. Return true if command line break;
 
