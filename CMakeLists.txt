@@ -98,8 +98,8 @@ find_program(GLSLC_EXECUTABLE glslc)
 if(NOT GLSLC_EXECUTABLE)
     message(WARNING "glslc not found. This should usually be included as part of the Vulkan SDK. Shaders will not compile automatically")
 else()
-    set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/data/shaders")
-    set(SHADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/data/shaders")
+    set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/data/Shaders")               # Read from here (ensure case is correct)
+    set(SHADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/program_data/shaders")   # Create folder in
 
     file(GLOB_RECURSE SHADER_SOURCES
         "${SHADER_SOURCE_DIR}/*.vert"
@@ -127,6 +127,7 @@ endif()
 add_executable(
     main src/main.cpp
     "src/Core/Program.cpp"
+    "src/Core/Services/ProgramContextManager.cpp"
 
     "src/Core/ConsoleColours.h"  # <- no .cpp file
     "src/Core/Services/LogService.cpp"

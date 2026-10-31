@@ -15,8 +15,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace { // Guard against multiple-definition errors
-	constexpr std::string_view SHAPE_VERT_PATH{ "data/shaders/gui_shape.vert.spv" };
-	constexpr std::string_view SHAPE_FRAG_PATH{ "data/shaders/gui_shape.frag.spv" };
+	constexpr std::string_view SHAPE_VERT_PATH{ "program_data/shaders/gui_shape.vert.spv" };
+	constexpr std::string_view SHAPE_FRAG_PATH{ "program_data/shaders/gui_shape.frag.spv" };
 
 	// Push constant layout, only used by vertex stage
 	constexpr uint32_t VERTEX_PUSH_OFFSET{ 0 };

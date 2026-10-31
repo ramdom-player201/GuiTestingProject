@@ -38,6 +38,9 @@ public:
 	float GetBorderThickness() const { return borderThickness; }
 	ColourRGBA_8 GetBaseColour() const { return baseColour; }
 	ColourRGBA_8 GetBorderColour() const { return borderColour; }
+
+	// ClassName
+	static constexpr std::string_view className{ "UiShape" };
 };
 
 

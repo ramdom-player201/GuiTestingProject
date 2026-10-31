@@ -41,7 +41,6 @@ private:
 	GuiRenderResources guiRenderResources;
 public:
 	// Safety locks to prevent copy/move/reassignment
-	VulkanHandler() = default;
 	VulkanHandler(const VulkanHandler&) = delete;
 	VulkanHandler& operator=(const VulkanHandler&) = delete;
 	VulkanHandler(VulkanHandler&&) = delete;
@@ -50,6 +49,8 @@ public:
 	// Lifecycle
 	void CreateVulkanInstance(const std::vector<const char*>& requiredExtensions);
 	void InitialiseDevices(const VkSurfaceKHR& surface);
+
+	VulkanHandler() { LogService::Log(LogType::TRACE, className, "Constructor", "Created VulkanHandler"); }
 	~VulkanHandler();
 
 	// Getters

@@ -1,13 +1,16 @@
 #pragma once
 
-#include <string>
 #include "Services/VulkanHandler.h"
 #include "Services/WindowManager.h"
+#include "Services/ProgramContextManager.h"
+
+#include <string>
 
 class Program {
 private:
 	VulkanHandler vulkanHandler; // must outlive windowManager, create first and destroy last
-	WindowManager windowManager;
+	WindowManager windowManager; // Depends on VulkanHandler
+	ProgramContextManager contextManager; // Depends on WindowManager
 public:
 	void Run();
 

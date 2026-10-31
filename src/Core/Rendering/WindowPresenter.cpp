@@ -366,8 +366,8 @@ void WindowPresenter::Persistent_CreatePipeline() {
 	VkDevice device = vulkanHandler.GetLogicalDevice();
 
 
-	VkShaderModule vertModule = CreateShaderModule("data/shaders/fullscreen_texture.vert.spv");
-	VkShaderModule fragModule = CreateShaderModule("data/shaders/fullscreen_texture.frag.spv");
+	VkShaderModule vertModule = CreateShaderModule("program_data/shaders/fullscreen_texture.vert.spv");
+	VkShaderModule fragModule = CreateShaderModule("program_data/shaders/fullscreen_texture.frag.spv");
 
 	VkPipelineShaderStageCreateInfo stages[2]{};
 	stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

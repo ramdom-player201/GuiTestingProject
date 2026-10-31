@@ -39,7 +39,7 @@ public:
 	bool UpdateWindows();												// loop through windows, calling update on each one. Return true if command line break;
 
 	// safety locks, plus destructor
-	WindowManager(VulkanHandler& vk) :vulkanHandler(vk) {};
+	WindowManager(VulkanHandler& vk) : vulkanHandler(vk) { LogService::Log(LogType::TRACE, className, "Constructor", "Created Window Manager"); };
 	WindowManager() = delete;
 	WindowManager(const WindowManager&) = delete;
 	WindowManager& operator=(const WindowManager&) = delete;

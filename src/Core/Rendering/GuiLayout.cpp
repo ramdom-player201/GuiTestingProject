@@ -75,7 +75,6 @@ GuiLayout::GuiLayout(VulkanHandler& vulkanHandler)
 	testRoot->AddChild(std::move(testShape2));
 	testRoot->AddChild(std::move(testShape3));
 	
-
 	treeRoot = std::move(testRoot);
 }
 

@@ -7,11 +7,8 @@ void Program::Run()
 {
 	LogService::Log(LogType::TRACE, className, "Run", "Program Start");
 
-	//Services::initialise();
-	//auto windowManager = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
-	//auto windowManager2 = dynamic_cast<WindowManager*>(Services::getService(ServiceType::WindowManager));
-	//auto commandConsole = dynamic_cast<CommandConsole*>(Services::getService(ServiceType::CommandConsole));
-	//auto objectManager = dynamic_cast<ObjectManager*>(Services::getService(ServiceType::ObjectManager));
+	contextManager.LaunchContext(ProgramContext::Core_ProjectPicker);
+	contextManager.LaunchContext(ProgramContext::Dev_GuiTestingPane);
 
 	windowManager.debugMode = true;
 
@@ -35,7 +32,8 @@ void Program::Run()
 
 Program::Program()
 	: vulkanHandler(),
-	windowManager(vulkanHandler)
+	windowManager(vulkanHandler),
+	contextManager(windowManager)
 {
 	constexpr std::string_view functionName{ "Constructor" };
 
