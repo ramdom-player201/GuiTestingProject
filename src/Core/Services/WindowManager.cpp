@@ -104,7 +104,7 @@ bool WindowManager::UpdateWindows()
 
 		bool canClose{ true };
 		if (it->second.owningContext) { // query owning context on whether window is allowed to close
-			canClose = it->second.owningContext->OnCloseRequested(id);
+			canClose = it->second.owningContext->HandleClosureRequest(id);
 			// Note: it is safe to mutate WindowManager state in the post-update closure processing
 			// ^ As an example, OnCloseRequested might spawn a confirmation popup window
 		}

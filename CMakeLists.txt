@@ -152,6 +152,8 @@ add_executable(
     "src/Core/ProgramContexts/Core_ProjectPicker.cpp"
     "src/Core/ProgramContexts/Dev_GuiTestingPane.cpp"
 
+    "src/Core/GuiLoading/Lexer.cpp"
+
     "src/Core/Pages/UiPanel.cpp"  
 
     "src/Core/Services/LocalisedTextService.h"

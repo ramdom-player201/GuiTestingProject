@@ -10,16 +10,6 @@ void Program::Run()
 	contextManager.LaunchContext(ProgramContext::Core_ProjectPicker);
 	contextManager.LaunchContext(ProgramContext::Dev_GuiTestingPane);
 
-	windowManager.debugMode = true;
-
-	windowManager.CountWindows();
-	windowManager.CreateWindow("Window 1");
-	windowManager.CreateWindow("Window 2");
-	windowManager.CountWindows();
-
-	windowManager.CreateWindow("Window 33");
-
-	windowManager.debugMode = false;
 	while (windowManager.CountWindows() > 0 || contextManager.CountContexts() > 0) {
 		// program should get call console to get commands
 		bool commandLinePause = windowManager.UpdateWindows();

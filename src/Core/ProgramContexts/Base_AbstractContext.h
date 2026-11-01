@@ -22,7 +22,7 @@ public:
 
 	virtual ContextUpdateResult Update() { return { contextShouldClose }; }
 
-	virtual bool OnCloseRequested(uint32_t windowId) { // Consider renaming to HandleClosureRequest
+	virtual bool HandleClosureRequest(uint32_t windowId) {
 		contextShouldClose = true;
 		return true;
 	}
