@@ -1,5 +1,6 @@
 #include "Core_ProjectPicker.h"
 
 Core_ProjectPicker::Core_ProjectPicker(WindowManager& wm) : Base_AbstractContext(wm) {
-	GetWindowManager().CreateWindow("Core_ProjectPicker");
+	LogService::Log(LogType::TRACE, className, "Constructor", "Creating Core_ProjectPicker");
+	windowId = GetWindowManager().CreateWindow("Core_ProjectPicker", this);
 }

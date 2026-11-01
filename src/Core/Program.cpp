@@ -20,9 +20,10 @@ void Program::Run()
 	windowManager.CreateWindow("Window 33");
 
 	windowManager.debugMode = false;
-	while (windowManager.CountWindows() > 0) {
+	while (windowManager.CountWindows() > 0 || contextManager.CountContexts() > 0) {
 		// program should get call console to get commands
 		bool commandLinePause = windowManager.UpdateWindows();
+		contextManager.UpdateContexts();
 		//if (commandLinePause) {
 		//	commandConsole->parseCommand();
 		//}
@@ -41,12 +42,12 @@ Program::Program()
 
 	// Initialise GLFW and VulkanHandler
 	if (!glfwInit()) {
-		LogService::Log(LogType::CRITICAL,className,functionName,"GLFW failed to initialise");
+		LogService::Log(LogType::CRITICAL, className, functionName, "GLFW failed to initialise");
 		std::cerr << "Failed to initialize GLFW" << std::endl;
 		return; // Don't proceed if GLFW fails
 	}
 	else {
-		LogService::Log(LogType::SUCCESS,className,functionName,"GLFW initialised successfully");
+		LogService::Log(LogType::SUCCESS, className, functionName, "GLFW initialised successfully");
 	}
 	// Get GLFW required extensions
 	uint32_t glfwExtensionCount{ 0 };

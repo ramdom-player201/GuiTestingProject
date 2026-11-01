@@ -19,7 +19,8 @@ WindowReturnData BaseWindow::Update() {
 
 	// Check for window close requests
 	if (glfwWindowShouldClose(window)) {
-		WRD.WindowClosed = true;
+		WRD.WindowCloseRequested = true;
+		glfwSetWindowShouldClose(window, GLFW_FALSE); // Reset state
 		return WRD;
 	}
 

@@ -25,10 +25,12 @@ private:
 
 public:
 
-	ProgramContextManager(WindowManager& wm) : windowManager(wm) { LogService::Log(LogType::TRACE, className, "Constructor", "Created ProgramContextManager"); }
-	~ProgramContextManager() {};
+	ProgramContextManager(WindowManager& wm) : windowManager(wm) { 
+		LogService::Log(LogType::TRACE, className, "Constructor", "Created ProgramContextManager"); 
+	}
+	~ProgramContextManager() = default;
 
-	// Safety locks to prevent copy/move/reassignment
+	// Safety locks
 	ProgramContextManager() = delete;
 	ProgramContextManager(const ProgramContextManager&) = delete;
 	ProgramContextManager& operator=(const ProgramContextManager&) = delete;
@@ -36,6 +38,8 @@ public:
 	ProgramContextManager& operator=(ProgramContextManager&&) = delete;
 
 	bool LaunchContext(ProgramContext context);
+	void UpdateContexts();
+	size_t CountContexts() const { return contexts.size(); }
 
 	// ClassName
 	static constexpr std::string_view className{ "ProgramContextManager" };

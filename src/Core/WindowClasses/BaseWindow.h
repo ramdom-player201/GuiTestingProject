@@ -22,7 +22,7 @@
 //};
 
 struct WindowReturnData {
-	bool WindowClosed{ false };
+	bool WindowCloseRequested{ false };
 	bool FocusChanged{ false };
 	bool UserCommandBreak{ false };
 	bool WindowInFocus{ false };

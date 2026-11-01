@@ -54,3 +54,17 @@ bool ProgramContextManager::LaunchContext(ProgramContext contextType)
 	contexts.push_back(std::move(context));
 	return true;
 }
+
+void ProgramContextManager::UpdateContexts()
+{
+	// Loop through all spawned contexts and update them
+	for (auto it = contexts.begin(); it != contexts.end();) {
+		ContextUpdateResult result{ (*it)->Update() }; // Update context and get result
+		if (result.contextShouldClose) {
+			it = contexts.erase(it); // If context requests close, erase from vector without incrementing iterator
+		}
+		else {
+			++it; // Iterate to next context
+		}
+	}
+}
